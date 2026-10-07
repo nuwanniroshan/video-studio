@@ -104,7 +104,12 @@ export const screenFlow: SceneModule<P> = {
         }
       }
     });
-    if (curShown) tl.to(cur, Math.min(ctx.end - 0.4, steps.at(-1)!.end - 0.4), 0.3, { o: 0 });
+    if (curShown) {
+      // leave at the first later step without a click (nothing to point at), else just before the end
+      const idle = p.steps.findIndex((s, i) => i > 0 && !s.click && p.steps.slice(0, i).some((x) => x.click));
+      const tHide = idle > 0 ? Math.max(steps[idle].start, t + 0.2) + 0.1 : Math.min(ctx.end - 0.4, steps.at(-1)!.end - 0.4);
+      tl.to(cur, tHide, 0.3, { o: 0 });
+    }
     const x = exitTime(ctx);
     if (x !== null) {
       if (copy) copyOut(tl, copy, x, u);

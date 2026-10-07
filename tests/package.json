@@ -1,0 +1,13 @@
+{
+  "name": "@vs/tests",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@vs/render": "workspace:*",
+    "@vs/spec": "workspace:*",
+    "@vs/storage": "workspace:*",
+    "@vs/runtime": "workspace:*",
+    "playwright": "^1.63.0",
+    "@vs/timing": "workspace:*"
+  }
+}

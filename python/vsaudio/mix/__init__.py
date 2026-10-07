@@ -16,9 +16,8 @@ from ..score.arranger import arrange, load_preset
 from ..score.dsp import SR, active_mask, add, bp, buf, hp, lp, reverb, rms_db
 from ..score.sfx import render_sfx
 
-# Sample-peak ceiling. Inter-sample peaks run ~0.1–0.3 dB above sample peaks, so −1.3 dBFS keeps
-# true peak ≤ −1 dBTP (the distribution target) without an oversampled limiter.
-CEILING_DB = -1.3
+# True-peak ceiling (the limiter detects on the 4x-oversampled signal).
+CEILING_DB = -1.0
 
 
 # ------------------------------------------------------------------ voice
@@ -79,7 +78,10 @@ def limiter(x, ceiling_db=CEILING_DB, attack=0.005, release=0.08, block=64):
     released with a one-pole (`release` s), then a min-filter + moving average of `attack` s
     (look-ahead) smooths the onset; the result never exceeds the required gain."""
     c = 10 ** (ceiling_db / 20)
-    peak = np.abs(x).max(axis=1)
+    # true-peak detection: per-sample max over the 4x-oversampled signal (inter-sample peaks ran
+    # 0.7 dB over the sample peak on the feature-launch mix)
+    up = np.abs(signal.resample_poly(x, 4, 1, axis=0))
+    peak = np.maximum(np.abs(x).max(axis=1), up[: len(x) * 4].reshape(len(x), 4, -1).max(axis=(1, 2)))
     req = np.minimum(1.0, c / np.maximum(peak, 1e-12))
     if req.min() >= 1.0:
         return x.copy()

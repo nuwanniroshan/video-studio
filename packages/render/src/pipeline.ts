@@ -16,6 +16,19 @@ import { planSegments, type Segment } from "./segments.ts";
 import { renderSegments } from "./segrender.ts";
 import { serve, type Served } from "./server.ts";
 import { vsaudio } from "./vsaudio.ts";
+import { hashJson, sha256 } from "@vs/storage";
+import { env } from "./env.ts";
+
+let vsHash: string | null = null;
+/** Hash of the vsaudio sources and presets (part of the mix cache key). */
+function vsaudioHash() {
+  if (vsHash) return vsHash;
+  const files: string[] = [];
+  const walk = (d: string) => { for (const e of fs.readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name);
+    if (e.isDirectory() && e.name !== "__pycache__") walk(p); else if (/\.(py|yaml)$/.test(e.name)) files.push(p); } };
+  walk(path.join(env.pythonPath(), "vsaudio"));
+  return (vsHash = sha256(Buffer.concat(files.sort().map((f) => fs.readFileSync(f)))));
+}
 
 export interface Prepared { project: Project; vo: Map<string, VoInfo>; variants: { id: string; resolved: ResolvedTimeline; doc: RuntimeDoc }[] }
 
@@ -87,7 +100,8 @@ export async function render(o: RenderOptions): Promise<{ results: VariantResult
       const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "vs-seg-"));
       const r = misses.length
         ? await renderSegments({ origin: srv.origin, doc: v.doc, q, segments: misses, store: project.store, workers: o.workers ?? Math.max(1, os.availableParallelism() - 1), tmpDir: tmp,
-            onFrame: () => { done++; if (done % 30 === 0 || done === total) o.onProgress?.({ variant: v.id, done, total }); } })
+            onFrame: () => { done++; if (done % 30 === 0 || done === total) o.onProgress?.({ variant: v.id, done, total }); },
+            onSegment: (s, secs) => { if (process.env.VS_PROFILE) log(`    seg ${String(s.index).padStart(2)} ${s.kind.padEnd(10)} ${s.scenes.join("→").padEnd(22)} ${String(s.f1 - s.f0).padStart(4)} frames ${secs.toFixed(1).padStart(5)} s  ${((s.f1 - s.f0) / secs).toFixed(1)} fps`); } })
         : { captures: 0, deduped: 0 };
       fs.rmSync(tmp, { recursive: true, force: true });
       sec.segments = (Date.now() - ts) / 1000;
@@ -133,12 +147,25 @@ async function mixAudio(prep: Prepared, variant: string, r: ResolvedTimeline, an
   }));
   const stems = { music: path.join(outDir, "stem_music.wav"), sfx: path.join(outDir, "stem_sfx.wav"), vo: path.join(outDir, "stem_vo.wav") };
   const mix = path.join(outDir, "mix.wav");
-  const report = await vsaudio<Record<string, unknown>>("mix", {
+  const job = {
     duration: r.duration, seed: 1, loudness: v.loudness ?? -16,
     music: spec.music.mode === "preset" ? { mode: "preset", preset: spec.music.preset, ...(spec.music.bpm ? { bpm: spec.music.bpm } : { bpm: r.bpm }) } : { mode: "none" },
     scenes: r.scenes.map((s) => ({ id: s.id, start: s.start, end: s.end, musicCue: s.musicCue, transitionIn: s.transitionIn ? { type: s.transitionIn.type, start: s.transitionIn.start, end: s.transitionIn.end } : null })),
-    markers, vo, out: { mix, stems },
-  });
+    markers, vo,
+  };
+  // mix cache: same job (timeline, markers, VO wavs) + same vsaudio code → reuse the mix and stems
+  const key = hashJson({ job, vo: vo.map((x) => path.basename(x.wav)), code: vsaudioHash() });
+  const store = prep.project.store;
+  const cached = ["mix", "music", "sfx", "vo", "report"].every((n) => store.has("mix", `${key}.${n}${n === "report" ? ".json" : ".wav"}`));
+  let report: Record<string, unknown>;
+  if (cached) {
+    for (const [n, f] of [["mix", mix], ...Object.entries(stems)] as [string, string][]) fs.copyFileSync(store.path("mix", `${key}.${n}.wav`), f);
+    report = { ...JSON.parse(fs.readFileSync(store.path("mix", `${key}.report.json`), "utf8")), cached: true };
+  } else {
+    report = await vsaudio<Record<string, unknown>>("mix", { ...job, out: { mix, stems } });
+    for (const [n, f] of [["mix", mix], ...Object.entries(stems)] as [string, string][]) fs.copyFileSync(f, store.path("mix", `${key}.${n}.wav`));
+    fs.writeFileSync(store.path("mix", `${key}.report.json`), JSON.stringify(report));
+  }
   fs.writeFileSync(path.join(outDir, "audio-report.json"), JSON.stringify(report, null, 1));
   return { mix, stems, report };
 }

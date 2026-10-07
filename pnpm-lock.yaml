@@ -118,6 +118,27 @@ importers:
         specifier: workspace:*
         version: link:../spec
 
+  tests:
+    dependencies:
+      '@vs/render':
+        specifier: workspace:*
+        version: link:../packages/render
+      '@vs/runtime':
+        specifier: workspace:*
+        version: link:../packages/runtime
+      '@vs/spec':
+        specifier: workspace:*
+        version: link:../packages/spec
+      '@vs/storage':
+        specifier: workspace:*
+        version: link:../packages/storage
+      '@vs/timing':
+        specifier: workspace:*
+        version: link:../packages/timing
+      playwright:
+        specifier: ^1.63.0
+        version: 1.63.0
+
 packages:
 
   '@esbuild/aix-ppc64@0.25.12':

@@ -12,9 +12,9 @@ import { SHUTTER, subTime, type QualityTier } from "./quality.ts";
 import { segmentEncoder } from "./ffmpeg.ts";
 import type { Segment } from "./segments.ts";
 
-interface Worker { browser: Browser; page: Page; cdp: CDPSession }
+export interface Worker { browser: Browser; page: Page; cdp: CDPSession }
 
-async function openWorker(origin: string, doc: RuntimeDoc, scale: number): Promise<Worker> {
+export async function openWorker(origin: string, doc: RuntimeDoc, scale: number): Promise<Worker> {
   const browser = await chromium.launch({ args: CHROMIUM_ARGS });
   const page = await browser.newPage({ viewport: { width: doc.width, height: doc.height }, deviceScaleFactor: scale });
   await page.route("**/*", (route) => {
@@ -26,7 +26,7 @@ async function openWorker(origin: string, doc: RuntimeDoc, scale: number): Promi
 }
 
 /** Fresh page state for a segment: navigate, then mount only the scenes it shows. */
-async function freshLoad(w: Worker, origin: string, doc: RuntimeDoc, only: string[]): Promise<LoadResult> {
+export async function freshLoad(w: Worker, origin: string, doc: RuntimeDoc, only: string[]): Promise<LoadResult> {
   const errors: string[] = [];
   const onErr = (e: Error) => errors.push(e.message);
   w.page.on("pageerror", onErr);
@@ -38,8 +38,13 @@ async function freshLoad(w: Worker, origin: string, doc: RuntimeDoc, only: strin
   return r;
 }
 
-/** Post-pass per segment (PLAN §7.4): grain + vignette in ffmpeg, so DOM frames stay dedupe-able. */
-export const POST_FILTER = "vignette=angle=0.42,noise=alls=5:allf=t:all_seed=7";
+/**
+ * Post-pass (PLAN §7.4) is applied in ffmpeg, not the DOM, so frames stay dedupe-able. It runs in the
+ * deliverable encodes (which re-encode anyway), not per segment: at the segments' CRF 8, grain made x264
+ * the bottleneck (feature-launch segment time 168 s → 68 s without it) and the vignette alone cost ~30%.
+ */
+export const POST_FILTER = process.env.VS_POST ?? "";
+export const FINISH_FILTER = process.env.VS_FINISH ?? "vignette=angle=0.42,noise=alls=5:allf=t:all_seed=7";
 
 export async function renderSegments(o: {
   origin: string; doc: RuntimeDoc; q: QualityTier; segments: Segment[]; store: LocalStore; workers: number; tmpDir: string;
@@ -58,7 +63,7 @@ export async function renderSegments(o: {
         const isStatic: boolean[] = await w.page.evaluate(
           ([a, k, fps, sub, sh]) => (window as any).__vs.staticFrames(a, k, fps, sub, sh), [seg.f0 / o.q.fps, count, o.q.fps, o.q.sub, SHUTTER] as const);
         const tmp = path.join(o.tmpDir, `${seg.key}.mp4`);
-        const enc = segmentEncoder(tmp, { fps: o.q.fps, sub: o.q.sub, codec: o.q.capture === "png" ? "png" : "mjpeg", crf: o.q.crf, post: POST_FILTER });
+        const enc = segmentEncoder(tmp, { fps: o.q.fps, sub: o.q.sub, codec: o.q.capture === "png" ? "png" : "mjpeg", crf: o.q.crf, post: POST_FILTER || undefined });
         let last: Buffer | null = null;
         for (let i = seg.f0; i < seg.f1; i++) {
           if (o.signal?.aborted) throw new Error("cancelled");

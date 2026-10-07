@@ -1,5 +1,5 @@
 /*
- * Segment planning (PLAN §10.4). Units: a scene body, a transition window, or a ≤ 6 s slice.
+ * Segment planning (PLAN §10.4). Units: a scene body, a transition window, or a slice of at most MAX_SLICE s.
  * Boundaries are frame-aligned at the tier fps. A segment's cache key covers everything that can
  * change its pixels: runtime build, brand, quality, aspect, the scenes it shows (type@version,
  * resolved props with asset hashes, tone, scene-local cues/VO/steps/transition windows) and its
@@ -19,7 +19,9 @@ export interface Segment {
   key: string;
 }
 
-const MAX_SLICE = 6;
+/** Slice length (s). Small enough that an edited scene's segments spread over all workers; each slice
+ *  costs one page load (~1 s), so going much lower stops paying off. */
+export const MAX_SLICE = 2;
 
 /** Everything about a scene that its pixels depend on, in scene-local time. */
 function sceneFingerprint(doc: RuntimeDoc, i: number) {

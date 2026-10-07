@@ -19,9 +19,12 @@
 .grid-light { background-image: linear-gradient(rgba(14,17,22,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(14,17,22,.035) 1px, transparent 1px);
   background-size: 5.926cqmin 5.926cqmin; background-position: -1px -1px;
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 40%, transparent 100%); }
-.orb { position: absolute; border-radius: 50%; filter: blur(7.4cqmin); }
-.orb-a { width: 60cqmin; height: 60cqmin; left: 62%; top: -12%; background: color-mix(in srgb, var(--vs-primary) 16%, transparent); }
-.orb-b { width: 55cqmin; height: 55cqmin; left: -8%; top: 55%; background: color-mix(in srgb, var(--vs-accent) 8%, transparent); }
+/* Soft orbs as radial gradients: a moving filter:blur(80px) is re-rasterized every frame on CPU (feature-launch render −18%). */
+.orb { position: absolute; border-radius: 50%; }
+.orb-a { width: 75cqmin; height: 75cqmin; left: calc(62% - 7.5cqmin); top: calc(-12% - 7.5cqmin);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-primary) 16%, transparent) 55%, transparent); }
+.orb-b { width: 70cqmin; height: 70cqmin; left: calc(-8% - 7.5cqmin); top: calc(55% - 7.5cqmin);
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-accent) 8%, transparent) 55%, transparent); }
 .vignette-light { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(14,17,22,.07) 100%); }
 
 /* Safe area (set per variant by the runtime). Layout containers use .safe-box insets. */
@@ -159,15 +162,16 @@
 .sf-cam { position: relative; transform-origin: 50% 50%; }
 .sf-shot { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top left; }
 .sf-typed { position: absolute; transform: translate(-2%, -50%); font-family: var(--vs-font-body); font-size: 1.6cqmin; color: var(--vs-ink); background: #fff; padding: .4cqmin .8cqmin; border-radius: .5cqmin; box-shadow: 0 0 0 2px var(--vs-primary); white-space: nowrap; }
-.sf-caps { position: relative; flex: none; height: 6cqmin; width: 100%; }
-.sf-cap { position: absolute; left: 50%; top: 0; transform: translateX(-50%); white-space: nowrap; font-family: var(--vs-font-display); font-weight: 600; font-size: 2.4cqmin; color: var(--vs-ink);
+.sf-caps { position: relative; flex: none; min-height: 6cqmin; width: 100%; display: grid; }
+/* Never center an engine-animated element with a CSS transform: the engine writes the inline transform. */
+.sf-cap { position: absolute; left: 0; right: 0; top: 0; margin: 0 auto; width: fit-content; max-width: 92%; text-align: center; text-wrap: balance; font-family: var(--vs-font-display); font-weight: 600; font-size: 2.4cqmin; color: var(--vs-ink);
   background: #fff; border: 1px solid var(--vs-grey200); box-shadow: var(--vs-shadow-md); border-radius: 99px; padding: 1.2cqmin 2.6cqmin; }
 .sf-cap.empty { display: none; }
 .tone-dark .sf-cap { background: rgba(255,255,255,.08); color: #fff; border-color: rgba(255,255,255,.12); box-shadow: none; }
 .sf-portrait { padding: 3cqh 0 2cqh; }
 .sf-portrait .sf-cambox { flex: 1; border-radius: 0; }
 .sf-portrait .sf-cap { font-size: 3.4cqmin; padding: 1.6cqmin 3.2cqmin; }
-.sf-portrait .sf-caps { height: 9cqmin; }
+.sf-portrait .sf-caps { min-height: 9cqmin; }
 .sf-portrait .vs-h2 { font-size: 6cqmin; }
 .sf-portrait .cursor { width: 3.4cqmin; height: 3.4cqmin; }
 
@@ -199,7 +203,7 @@
 .mb-copy { position: absolute; left: max(6cqw, var(--sa-l)); right: max(6cqw, var(--sa-r)); max-width: 70cqw; }
 .mb-bottom-left .mb-copy { bottom: max(9cqh, calc(var(--sa-b) + 3cqh)); }
 .mb-top-left .mb-copy { top: max(9cqh, calc(var(--sa-t) + 3cqh)); }
-.mb-center .mb-copy { top: 50%; transform: translateY(-50%); left: 10cqw; right: 10cqw; max-width: none; align-items: center; text-align: center; }
+.mb-center .mb-copy { top: 0; bottom: 0; justify-content: center; left: 10cqw; right: 10cqw; max-width: none; align-items: center; text-align: center; }
 .mb .vs-h1 { color: #fff; } .mb .vs-h1 .accent { color: var(--vs-primary200); } .mb .vs-sub { color: rgba(255,255,255,.8); }
 [data-orient="portrait"] .mb-copy { max-width: none; }
 
@@ -207,7 +211,7 @@
 /* ---------- ctaEndCard ---------- */
 .cta { position: absolute; inset: var(--sa-t) var(--sa-r) var(--sa-b) var(--sa-l); display: flex; align-items: center; justify-content: center; }
 .cta-glow { position: absolute; left: 50%; top: 42%; width: 111cqmin; height: 56cqmin; margin: -28cqmin 0 0 -55.5cqmin; opacity: 0;
-  background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-primary) 35%, transparent), transparent); filter: blur(1.85cqmin); }
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--vs-primary) 35%, transparent), transparent); }
 .cta-col { position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4cqmin; max-width: 92%; }
 .cta-logo { position: relative; width: min(31cqw, 55cqmin); }
 [data-orient="portrait"] .cta-logo { width: min(58cqw, 80%); }

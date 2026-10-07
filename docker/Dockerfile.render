@@ -1,9 +1,9 @@
 # studio-render: Node 20 + Playwright Chromium + ffmpeg. Slim, for fast Fargate cold starts (ARM64).
-# Build from the repo root:  docker build -f docker/Dockerfile.render -t studio-render .
+# No Python: audio runs in the vsaudio sidecar. Build from the repo root:
+#   docker build -f docker/Dockerfile.render -t studio-render .
 FROM node:20.17-bookworm-slim
 
-ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH \
-    PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
     NODE_ENV=production
 
 RUN apt-get update \
@@ -19,17 +19,27 @@ COPY packages/scenes/package.json packages/scenes/
 COPY packages/runtime/package.json packages/runtime/
 COPY packages/brand/package.json packages/brand/
 COPY packages/render/package.json packages/render/
+COPY packages/spec/package.json packages/spec/
+COPY packages/timing/package.json packages/timing/
+COPY packages/storage/package.json packages/storage/
+COPY apps/cli/package.json apps/cli/
+COPY tests/package.json tests/
 RUN pnpm install --frozen-lockfile --prod=false \
  && pnpm --filter @vs/render exec playwright install --with-deps --only-shell chromium \
  && rm -rf /var/lib/apt/lists/*
 
 COPY packages packages
+COPY apps/cli apps/cli
 COPY brands brands
+COPY templates templates
+COPY tests tests
 COPY scripts scripts
+COPY docs/schema.json docs/schema.json
 RUN cd packages/runtime && node build.mjs
 
-# Unprivileged user; Chromium runs with its sandbox.
+# Unprivileged user; caches go to /tmp.
 RUN useradd -m -u 10001 render && chown -R render /app
 USER render
+ENV VS_CACHE=/tmp/vs-cache
 ENTRYPOINT ["npx", "tsx"]
 CMD ["packages/render/scripts/spike.ts"]

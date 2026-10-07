@@ -6,6 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ResolvedTimeline } from "@vs/timing";
 import { run } from "./ffmpeg.ts";
+import { FINISH_FILTER } from "./segrender.ts";
 
 export type DeliverableSet = "all" | "master" | "web" | "hero" | "landing" | "captions" | "stills" | "stems";
 export interface DeliverableInput { video: string; mix: string; stems: Record<string, string>; resolved: ResolvedTimeline; outDir: string; base: string; fps: number }
@@ -36,14 +37,15 @@ export async function deliverables(d: DeliverableInput, sets: DeliverableSet[] =
     files.push(f);
     log(`  ${name}: ${path.basename(f)} (${((Date.now() - t) / 1000).toFixed(1)} s)`);
   };
-  const av = ["-i", d.video, "-i", d.mix, "-map", "0:v", "-map", "1:a", "-t", dur];
+  const vf = FINISH_FILTER ? ["-vf", FINISH_FILTER] : [];
+  const av = ["-i", d.video, "-i", d.mix, "-map", "0:v", "-map", "1:a", "-t", dur, ...vf];
   if (want("master")) await step("master", O("master.mp4"), [...av, "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-profile:v", "high", "-pix_fmt", "yuv420p",
     "-c:a", "aac", "-b:a", "320k", "-movflags", "+faststart", O("master.mp4")]);
   if (want("web")) await step("web", O("web.mp4"), [...av, "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-maxrate", "9M", "-bufsize", "18M", "-profile:v", "high",
     "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", O("web.mp4")]);
   if (want("hero")) {
-    await step("hero mp4", O("hero_muted.mp4"), ["-i", d.video, "-t", dur, "-an", "-r", "30", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p", "-movflags", "+faststart", O("hero_muted.mp4")]);
-    await step("hero webm", O("hero_muted.webm"), ["-i", d.video, "-t", dur, "-an", "-r", "30", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "36", "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", O("hero_muted.webm")]);
+    await step("hero mp4", O("hero_muted.mp4"), ["-i", d.video, "-t", dur, ...vf, "-an", "-r", "30", "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-pix_fmt", "yuv420p", "-movflags", "+faststart", O("hero_muted.mp4")]);
+    await step("hero webm", O("hero_muted.webm"), ["-i", d.video, "-t", dur, ...vf, "-an", "-r", "30", "-c:v", "libvpx-vp9", "-b:v", "0", "-crf", "36", "-row-mt", "1", "-deadline", "good", "-cpu-used", "2", O("hero_muted.webm")]);
   }
   if (want("landing")) {
     await step("landing mp4", O("landing.mp4"), [...av, "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-maxrate", "5M", "-bufsize", "10M", "-pix_fmt", "yuv420p",
