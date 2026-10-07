@@ -9,7 +9,7 @@ describe("engine", () => {
     const a = el();
     tl.tw(a, 1, 1, { x: 0, o: 0, blur: 8 }, { x: 100, o: 1, blur: 0 }, "linear");
     tl.seek(1.5);
-    expect(a.style.transform).toContain("translate3d(50.00px");
+    expect(a.style.transform).toContain("translate(50.00px");
     expect(a.style.opacity).toBe("0.5000");
     expect(a.style.filter).toBe("blur(4.00px)");
     tl.seek(5);
@@ -53,9 +53,9 @@ describe("engine", () => {
     const sc = tl.scope(10, { id: "s1", start: 10, end: 12 });
     sc.tw(a, 0, 1, { x: 0 }, { x: 10 }, "linear");
     tl.seek(10.5);
-    expect(a.style.transform).toContain("translate3d(5.00px");
+    expect(a.style.transform).toContain("translate(5.00px");
     tl.seek(20); // inactive: untouched
-    expect(a.style.transform).toContain("translate3d(5.00px");
+    expect(a.style.transform).toContain("translate(5.00px");
     expect(tl.valueAt(a, "x", 20)).toBe(10);
   });
 

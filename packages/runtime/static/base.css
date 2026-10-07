@@ -5,7 +5,7 @@ body { font-family: var(--vs-font-body); color: var(--vs-ink); -webkit-font-smoo
 #stage { position: relative; width: var(--stage-w, 1920px); height: var(--stage-h, 1080px); overflow: hidden; background: var(--vs-dark); container-type: size; }
 .layer, .scene { position: absolute; inset: 0; }
 .w { display: inline-block; overflow: visible; }
-.wi { display: inline-block; will-change: transform; }
+.wi { display: inline-block; }
 .caret { display: inline-block; width: .06em; height: 1.05em; background: var(--vs-primary); vertical-align: -0.15em; margin-left: .04em; }
 
 /* backgrounds (REFERENCE §3) */

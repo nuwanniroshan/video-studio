@@ -3,7 +3,10 @@ import type { LoadResult, RuntimeDoc } from "@vs/runtime";
 
 export interface OpenedPage { browser: Browser; page: Page; cdp: CDPSession; load: LoadResult; errors: string[] }
 
-export const CHROMIUM_ARGS = ["--disable-gpu-vsync", "--disable-frame-rate-limit", "--font-render-hinting=none", "--hide-scrollbars"];
+export const CHROMIUM_ARGS = [
+  "--disable-gpu-vsync", "--disable-frame-rate-limit", "--font-render-hinting=none", "--hide-scrollbars",
+  ...(process.env.VS_CHROME_ARGS?.split(" ").filter(Boolean) ?? []),
+];
 
 /** One Chromium per worker: pages sharing a browser serialise on its compositor (1.0 vs 6.6 fps). */
 export async function openPage(origin: string, doc: RuntimeDoc, scale = 1): Promise<OpenedPage> {

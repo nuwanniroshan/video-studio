@@ -107,13 +107,12 @@ class Engine {
 
   seek(t: number) {
     this.time = t;
+    // Windows toggle visibility only: display:none zeroed rects (pitfall 6) and discards layout
+    // state on every scene change. Byte-exact determinism comes from the renderer reloading the
+    // page at each segment start, not from here (SPIKE.md §Determinism).
     for (const w of this.windows) {
-      const on = t >= w.a && t < w.b;
-      const disp = on ? "" : "none";
-      if (w.el.style.display !== disp) {
-        w.el.style.display = disp;
-        w.el.style.visibility = on ? "visible" : "hidden";
-      }
+      const vis = t >= w.a && t < w.b ? "visible" : "hidden";
+      if (w.el.style.visibility !== vis) w.el.style.visibility = vis;
     }
     const scopes = this.active(t);
     const touched = new Set<Element>();
@@ -149,13 +148,21 @@ class Engine {
     if (hasT) {
       const g = (p: Prop) => (v[p] ?? DEFAULTS[p]) as number;
       const s = g("s");
-      put("transform",
-        `translate3d(${g("x").toFixed(2)}px,${g("y").toFixed(2)}px,${g("z").toFixed(2)}px)` +
-        ` rotateX(${g("rx").toFixed(3)}deg) rotateY(${g("ry").toFixed(3)}deg) rotate(${g("r").toFixed(3)}deg)` +
-        ` scale(${(s * g("sx")).toFixed(4)},${(s * g("sy")).toFixed(4)})`);
+      // 2D transforms unless 3D is in use: translate3d promotes every animated word to its own
+      // composited layer, which measured ~6% slower on SwiftShader (SPIKE.md).
+      const is3d = Math.abs(g("z")) > 1e-4 || Math.abs(g("rx")) > 1e-4 || Math.abs(g("ry")) > 1e-4;
+      put("transform", is3d
+        ? `translate3d(${g("x").toFixed(2)}px,${g("y").toFixed(2)}px,${g("z").toFixed(2)}px)` +
+          ` rotateX(${g("rx").toFixed(3)}deg) rotateY(${g("ry").toFixed(3)}deg) rotate(${g("r").toFixed(3)}deg)` +
+          ` scale(${(s * g("sx")).toFixed(4)},${(s * g("sy")).toFixed(4)})`
+        : `translate(${g("x").toFixed(2)}px,${g("y").toFixed(2)}px) rotate(${g("r").toFixed(3)}deg)` +
+          ` scale(${(s * g("sx")).toFixed(4)},${(s * g("sy")).toFixed(4)})`);
     }
     if (v.o !== undefined) put("opacity", clamp(v.o).toFixed(4));
     if (hasF) {
+      // Keep the same filter-function list for the channel's whole life (blur(0px) rather than
+      // "none"): toggling a filter on and off changes render-surface promotion, and the resulting
+      // raster then depends on seek history (SPIKE.md, determinism).
       const parts: string[] = [];
       if (v.blur !== undefined && v.blur > 0.01) parts.push(`blur(${v.blur.toFixed(2)}px)`);
       if (v.bright !== undefined && Math.abs(v.bright - 1) > 0.001) parts.push(`brightness(${v.bright.toFixed(3)})`);
