@@ -650,7 +650,10 @@ Mirror Acentra's `infrastructure/lib/constructs/ecs-construct.ts` style: ECR, cl
   - Rendered inside the pinned render image for each scene × aspect × fixture at cue times.
   - Compared by SSIM ≥ 0.985; `--update` refreshes the baselines.
   - Each scene has a long-text stress fixture that must give zero lint errors.
-- **Determinism:** the same frames rendered in shuffled order across two workers must produce byte-identical PNG hashes.
+- **Determinism** (amended after M0, see `SPIKE.md`):
+  - the renderer reloads the page at the start of every segment;
+  - the same **segment** rendered by two workers with different prior history must produce byte-identical frame hashes;
+  - frames rendered in shuffled order across scenes may differ by at most 1/255 per pixel.
 - **Audio:**
   - a stable hash for a short render per preset;
   - LUFS within ±1 LU of target;
