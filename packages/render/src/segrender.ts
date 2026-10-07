@@ -44,7 +44,12 @@ export async function freshLoad(w: Worker, origin: string, doc: RuntimeDoc, only
  * the bottleneck (feature-launch segment time 168 s → 68 s without it) and the vignette alone cost ~30%.
  */
 export const POST_FILTER = process.env.VS_POST ?? "";
-export const FINISH_FILTER = process.env.VS_FINISH ?? "vignette=angle=0.42,noise=alls=5:allf=t:all_seed=7";
+/**
+ * Finishing filter for deliverables. Grain is opt-in (VS_FINISH or `vs render --grain`): per-frame temporal
+ * noise is nearly incompressible at master quality (45 s master: 768 MB with grain vs ~20 MB without).
+ */
+export const GRAIN = "noise=alls=3:allf=t:all_seed=7";
+export const finishFilter = () => process.env.VS_FINISH ?? "vignette=angle=0.42";
 
 export async function renderSegments(o: {
   origin: string; doc: RuntimeDoc; q: QualityTier; segments: Segment[]; store: LocalStore; workers: number; tmpDir: string;

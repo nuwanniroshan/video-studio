@@ -3,7 +3,7 @@ import path from "node:path";
 import { Command } from "commander";
 import { BrandKit, SCENE_DEFS, jsonSchema, migrate, validateSpec } from "@vs/spec";
 import {
-  QUALITY, REPO, SpecError, analyze, contactSheet, deliverables, env, prepare, render, serveProject, slug, stills, voFor, vsaudio,
+  GRAIN, QUALITY, REPO, SpecError, analyze, contactSheet, deliverables, env, prepare, render, serveProject, slug, stills, voFor, vsaudio,
   type DeliverableSet, type Quality,
 } from "@vs/render";
 import { effectiveScenes } from "@vs/spec";
@@ -111,9 +111,11 @@ program.command("render")
   .option("-w, --workers <n>", "parallel Chromium workers")
   .option("-o, --out <dir>", "output directory (default: <spec dir>/out)")
   .option("-d, --deliverables <sets>", "none | all | master,web,hero,landing,captions,stills,stems", "captions")
+  .option("--grain", "add temporal film grain to deliverables (large files at master quality)")
   .option("--json", "print a JSON summary on stdout")
-  .action(async (sp: string, o: { variant?: string; quality?: Quality; workers?: string; out?: string; deliverables: string; json?: boolean }) => {
+  .action(async (sp: string, o: { variant?: string; quality?: Quality; workers?: string; out?: string; deliverables: string; grain?: boolean; json?: boolean }) => {
     try {
+      if (o.grain && !process.env.VS_FINISH) process.env.VS_FINISH = "vignette=angle=0.42," + GRAIN;
       let last = 0;
       const { results, prepared } = await render({
         specPath: sp, variants: o.variant ? list(o.variant) : undefined, quality: o.quality, workers: o.workers ? +o.workers : undefined, outDir: o.out,

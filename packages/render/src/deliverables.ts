@@ -6,7 +6,7 @@ import fs from "node:fs";
 import path from "node:path";
 import type { ResolvedTimeline } from "@vs/timing";
 import { run } from "./ffmpeg.ts";
-import { FINISH_FILTER } from "./segrender.ts";
+import { finishFilter } from "./segrender.ts";
 
 export type DeliverableSet = "all" | "master" | "web" | "hero" | "landing" | "captions" | "stills" | "stems";
 export interface DeliverableInput { video: string; mix: string; stems: Record<string, string>; resolved: ResolvedTimeline; outDir: string; base: string; fps: number }
@@ -37,7 +37,8 @@ export async function deliverables(d: DeliverableInput, sets: DeliverableSet[] =
     files.push(f);
     log(`  ${name}: ${path.basename(f)} (${((Date.now() - t) / 1000).toFixed(1)} s)`);
   };
-  const vf = FINISH_FILTER ? ["-vf", FINISH_FILTER] : [];
+  const f = finishFilter();
+  const vf = f ? ["-vf", f] : [];
   const av = ["-i", d.video, "-i", d.mix, "-map", "0:v", "-map", "1:a", "-t", dur, ...vf];
   if (want("master")) await step("master", O("master.mp4"), [...av, "-c:v", "libx264", "-preset", "slow", "-crf", "14", "-profile:v", "high", "-pix_fmt", "yuv420p",
     "-c:a", "aac", "-b:a", "320k", "-movflags", "+faststart", O("master.mp4")]);
