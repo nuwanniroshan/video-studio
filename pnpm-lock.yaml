@@ -71,6 +71,12 @@ importers:
         specifier: ^4.6.5
         version: 4.6.5
 
+  packages/timing:
+    dependencies:
+      '@vs/spec':
+        specifier: workspace:*
+        version: link:../spec
+
 packages:
 
   '@esbuild/aix-ppc64@0.25.12':
