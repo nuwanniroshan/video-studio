@@ -1,0 +1,9 @@
+{
+  "name": "@vs/scenes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@vs/engine": "workspace:*" },
+  "scripts": { "typecheck": "tsc -p .", "test": "vitest run --passWithNoTests" }
+}

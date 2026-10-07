@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.turbo/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# large/generated
+models/
+.vs-cache/
+build/
+out/
+*.mp4
+*.webm
+*.wav
+!tests/golden/**/*.png
+.DS_Store

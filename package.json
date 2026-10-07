@@ -1,0 +1,22 @@
+{
+  "name": "video-studio",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": { "node": ">=20.17" },
+  "scripts": {
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "vs": "tsx apps/cli/src/main.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "esbuild": "^0.25.0",
+    "fast-check": "^4.0.0",
+    "tsx": "^4.19.0",
+    "turbo": "^2.5.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}
