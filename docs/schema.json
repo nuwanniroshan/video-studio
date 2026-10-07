@@ -1,0 +1,2564 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "type": "number",
+      "const": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "brand": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "fps": {
+      "default": 60,
+      "anyOf": [
+        {
+          "type": "number",
+          "const": 24
+        },
+        {
+          "type": "number",
+          "const": 25
+        },
+        {
+          "type": "number",
+          "const": 30
+        },
+        {
+          "type": "number",
+          "const": 50
+        },
+        {
+          "type": "number",
+          "const": 60
+        }
+      ]
+    },
+    "quality": {
+      "default": "standard",
+      "type": "string",
+      "enum": [
+        "draft",
+        "standard",
+        "cinema"
+      ]
+    },
+    "music": {
+      "default": {
+        "mode": "preset",
+        "preset": "uplifting-tech"
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "preset"
+            },
+            "preset": {
+              "default": "uplifting-tech",
+              "type": "string"
+            },
+            "bpm": {
+              "type": "number",
+              "minimum": 50,
+              "maximum": 180
+            },
+            "key": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "upload"
+            },
+            "asset": {
+              "type": "string",
+              "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+            },
+            "bpm": {
+              "type": "number",
+              "minimum": 50,
+              "maximum": 200
+            },
+            "downbeatOffset": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "mode",
+            "asset"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "mode": {
+              "type": "string",
+              "const": "none"
+            }
+          },
+          "required": [
+            "mode"
+          ]
+        }
+      ]
+    },
+    "voice": {
+      "default": {
+        "provider": "kokoro",
+        "voice": "af_heart",
+        "speed": 0.94
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "const": "kokoro"
+            },
+            "voice": {
+              "default": "af_heart",
+              "type": "string"
+            },
+            "speed": {
+              "default": 0.94,
+              "type": "number",
+              "minimum": 0.6,
+              "maximum": 1.4
+            }
+          },
+          "required": [
+            "provider"
+          ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "provider": {
+              "type": "string",
+              "const": "upload"
+            }
+          },
+          "required": [
+            "provider"
+          ]
+        }
+      ]
+    },
+    "timing": {
+      "default": {
+        "snap": "bar",
+        "leadIn": 0.45,
+        "lineGap": 0.35,
+        "tail": 0.6
+      },
+      "type": "object",
+      "properties": {
+        "snap": {
+          "default": "bar",
+          "type": "string",
+          "enum": [
+            "bar",
+            "beat",
+            "none"
+          ]
+        },
+        "leadIn": {
+          "default": 0.45,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "lineGap": {
+          "default": 0.35,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 3
+        },
+        "tail": {
+          "default": 0.6,
+          "type": "number",
+          "minimum": 0,
+          "maximum": 5
+        }
+      }
+    },
+    "variants": {
+      "default": [
+        {
+          "id": "main",
+          "aspect": "16:9",
+          "captions": "sidecar",
+          "safeArea": "title"
+        }
+      ],
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,39}$"
+          },
+          "aspect": {
+            "type": "string",
+            "enum": [
+              "16:9",
+              "9:16",
+              "1:1",
+              "4:5"
+            ]
+          },
+          "scenes": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+            }
+          },
+          "maxDuration": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "captions": {
+            "default": "sidecar",
+            "type": "string",
+            "enum": [
+              "none",
+              "burned",
+              "sidecar"
+            ]
+          },
+          "safeArea": {
+            "default": "title",
+            "type": "string",
+            "enum": [
+              "none",
+              "title",
+              "reels"
+            ]
+          },
+          "loudness": {
+            "help": "Integrated LUFS target; default −16 (web), use −14 for social.",
+            "type": "number",
+            "minimum": -30,
+            "maximum": -9
+          },
+          "overrides": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "vo": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "help": "Defaults to v1, v2… within the scene.",
+                        "type": "string",
+                        "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                      },
+                      "text": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 320,
+                        "ui": "text",
+                        "label": "Voice-over line"
+                      },
+                      "phonemes": {
+                        "type": "string"
+                      },
+                      "asset": {
+                        "type": "string",
+                        "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                      },
+                      "step": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      }
+                    },
+                    "required": [
+                      "text"
+                    ]
+                  }
+                },
+                "props": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                },
+                "duration": {
+                  "oneOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "type": "string",
+                          "const": "auto"
+                        },
+                        "min": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 60
+                        }
+                      },
+                      "required": [
+                        "mode"
+                      ]
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "mode": {
+                          "type": "string",
+                          "const": "fixed"
+                        },
+                        "seconds": {
+                          "type": "number",
+                          "exclusiveMinimum": 0,
+                          "maximum": 120
+                        }
+                      },
+                      "required": [
+                        "mode",
+                        "seconds"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "id",
+          "aspect"
+        ]
+      }
+    },
+    "scenes": {
+      "minItems": 1,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "kineticTitle"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "kicker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Kicker",
+                    "maxChars": 32,
+                    "help": "Small mono label above the headline."
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Headline",
+                    "maxChars": 70,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "sub": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Sub-line",
+                    "maxChars": 120
+                  },
+                  "style": {
+                    "default": "rise",
+                    "ui": "select",
+                    "label": "Motion",
+                    "type": "string",
+                    "enum": [
+                      "rise",
+                      "mask",
+                      "typewriter",
+                      "scale"
+                    ]
+                  },
+                  "align": {
+                    "default": "center",
+                    "ui": "select",
+                    "label": "Alignment",
+                    "type": "string",
+                    "enum": [
+                      "center",
+                      "left"
+                    ]
+                  },
+                  "exit": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Animate out at the end",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "headline"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "logoReveal"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "type": "string",
+                    "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$",
+                    "ui": "asset",
+                    "label": "Logo",
+                    "help": "Defaults to the brand kit logo."
+                  },
+                  "tagline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Tagline",
+                    "maxChars": 60
+                  },
+                  "sheen": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Sheen sweep",
+                    "type": "boolean"
+                  },
+                  "flare": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Flare line",
+                    "type": "boolean"
+                  },
+                  "glow": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Glow",
+                    "type": "boolean"
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "featureSpotlight"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "kicker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Kicker",
+                    "maxChars": 32
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Headline",
+                    "maxChars": 60,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Body",
+                    "maxChars": 160
+                  },
+                  "bullets": {
+                    "minItems": 0,
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "ui": "text",
+                      "label": "Bullet",
+                      "maxChars": 48
+                    },
+                    "ui": "list",
+                    "label": "Bullets"
+                  },
+                  "visual": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "image"
+                          },
+                          "asset": {
+                            "type": "string",
+                            "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$",
+                            "ui": "asset",
+                            "label": "Screenshot or image"
+                          },
+                          "frame": {
+                            "default": "browser",
+                            "ui": "select",
+                            "label": "Frame",
+                            "type": "string",
+                            "enum": [
+                              "browser",
+                              "none"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "asset"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "kind": {
+                            "type": "string",
+                            "const": "panel"
+                          },
+                          "title": {
+                            "type": "string",
+                            "minLength": 1,
+                            "ui": "text",
+                            "label": "Panel title",
+                            "maxChars": 32
+                          },
+                          "rows": {
+                            "minItems": 1,
+                            "maxItems": 6,
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "label": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "ui": "text",
+                                  "label": "Label",
+                                  "maxChars": 36
+                                },
+                                "value": {
+                                  "type": "string",
+                                  "minLength": 1,
+                                  "ui": "text",
+                                  "label": "Value",
+                                  "maxChars": 24
+                                },
+                                "status": {
+                                  "default": "none",
+                                  "ui": "select",
+                                  "label": "Status",
+                                  "type": "string",
+                                  "enum": [
+                                    "none",
+                                    "ok",
+                                    "warn",
+                                    "info",
+                                    "new"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "label"
+                              ]
+                            },
+                            "ui": "list",
+                            "label": "Rows"
+                          },
+                          "action": {
+                            "type": "string",
+                            "minLength": 1,
+                            "ui": "text",
+                            "label": "Button",
+                            "maxChars": 20
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "title",
+                          "rows"
+                        ]
+                      }
+                    ],
+                    "ui": "uiKit",
+                    "label": "Visual"
+                  },
+                  "layout": {
+                    "default": "auto",
+                    "ui": "select",
+                    "label": "Layout",
+                    "help": "auto = split-left in landscape, stacked in portrait.",
+                    "type": "string",
+                    "enum": [
+                      "auto",
+                      "split-left",
+                      "split-right",
+                      "stacked",
+                      "visual-only"
+                    ]
+                  }
+                },
+                "required": [
+                  "headline",
+                  "visual"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "featureGrid"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "kicker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Kicker",
+                    "maxChars": 32
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Headline",
+                    "maxChars": 60,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "items": {
+                    "minItems": 2,
+                    "maxItems": 6,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "icon": {
+                          "type": "string",
+                          "enum": [
+                            "home",
+                            "brief",
+                            "users",
+                            "cal",
+                            "clock",
+                            "target",
+                            "chart",
+                            "gear",
+                            "search",
+                            "bell",
+                            "check",
+                            "lock",
+                            "unlock",
+                            "spark",
+                            "file",
+                            "shield",
+                            "arrow",
+                            "key",
+                            "list",
+                            "wallet",
+                            "box",
+                            "flag",
+                            "cycle",
+                            "msg",
+                            "policy",
+                            "copy"
+                          ],
+                          "ui": "select",
+                          "label": "Icon"
+                        },
+                        "title": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Title",
+                          "maxChars": 28
+                        },
+                        "text": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Line",
+                          "maxChars": 80
+                        }
+                      },
+                      "required": [
+                        "icon",
+                        "title"
+                      ]
+                    },
+                    "ui": "list",
+                    "label": "Items"
+                  }
+                },
+                "required": [
+                  "items"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "screenFlow"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "kicker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Kicker",
+                    "maxChars": 32
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Title",
+                    "maxChars": 60
+                  },
+                  "steps": {
+                    "minItems": 1,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "screen": {
+                          "type": "string",
+                          "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$",
+                          "ui": "asset",
+                          "label": "Screenshot"
+                        },
+                        "click": {
+                          "ui": "hotspots",
+                          "label": "Click point",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y"
+                          ]
+                        },
+                        "type": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Typed text",
+                          "maxChars": 40
+                        },
+                        "caption": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Caption",
+                          "maxChars": 60
+                        },
+                        "focus": {
+                          "ui": "focusRect",
+                          "label": "Focus",
+                          "help": "Portrait variants zoom to this rect.",
+                          "type": "object",
+                          "properties": {
+                            "x": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "y": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "w": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 1
+                            },
+                            "h": {
+                              "type": "number",
+                              "exclusiveMinimum": 0,
+                              "maximum": 1
+                            }
+                          },
+                          "required": [
+                            "x",
+                            "y",
+                            "w",
+                            "h"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "screen"
+                      ]
+                    },
+                    "ui": "list",
+                    "label": "Steps"
+                  }
+                },
+                "required": [
+                  "steps"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "statsCounter"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "kicker": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Kicker",
+                    "maxChars": 32
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Headline",
+                    "maxChars": 60,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "stats": {
+                    "minItems": 1,
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "value": {
+                          "type": "number",
+                          "ui": "number",
+                          "label": "Value"
+                        },
+                        "decimals": {
+                          "default": 0,
+                          "ui": "number",
+                          "label": "Decimals",
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 2
+                        },
+                        "prefix": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Prefix",
+                          "maxChars": 3
+                        },
+                        "suffix": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Suffix",
+                          "maxChars": 4
+                        },
+                        "label": {
+                          "type": "string",
+                          "minLength": 1,
+                          "ui": "text",
+                          "label": "Label",
+                          "maxChars": 36
+                        }
+                      },
+                      "required": [
+                        "value",
+                        "label"
+                      ]
+                    },
+                    "ui": "list",
+                    "label": "Stats"
+                  }
+                },
+                "required": [
+                  "stats"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "mediaBroll"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "media": {
+                    "type": "string",
+                    "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$",
+                    "ui": "asset",
+                    "label": "Image"
+                  },
+                  "motion": {
+                    "default": "in",
+                    "ui": "select",
+                    "label": "Ken Burns",
+                    "type": "string",
+                    "enum": [
+                      "in",
+                      "out",
+                      "left",
+                      "right",
+                      "none"
+                    ]
+                  },
+                  "tint": {
+                    "default": "darken",
+                    "ui": "select",
+                    "label": "Tint",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "duotone",
+                      "darken"
+                    ]
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Overlay headline",
+                    "maxChars": 60,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "sub": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Overlay sub-line",
+                    "maxChars": 100
+                  },
+                  "position": {
+                    "default": "bottom-left",
+                    "ui": "select",
+                    "label": "Text position",
+                    "type": "string",
+                    "enum": [
+                      "bottom-left",
+                      "center",
+                      "top-left"
+                    ]
+                  },
+                  "focusX": {
+                    "default": 0.5,
+                    "ui": "number",
+                    "label": "Focus X",
+                    "help": "Horizontal focal point used when cropping.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "vignette": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Edge darkening",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "media"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "ctaEndCard"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "logo": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Show logo",
+                    "type": "boolean"
+                  },
+                  "headline": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "richText",
+                    "label": "Headline",
+                    "maxChars": 60,
+                    "help": "Wrap words in *asterisks* for the accent colour."
+                  },
+                  "button": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Button label",
+                    "maxChars": 24
+                  },
+                  "url": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "URL",
+                    "maxChars": 40,
+                    "help": "Defaults to the brand kit CTA URL."
+                  },
+                  "note": {
+                    "type": "string",
+                    "minLength": 1,
+                    "ui": "text",
+                    "label": "Note",
+                    "maxChars": 90
+                  },
+                  "click": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Cursor clicks the button",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "headline",
+                  "button"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "version",
+    "title",
+    "brand",
+    "scenes"
+  ]
+}
