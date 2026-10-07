@@ -1,0 +1,8 @@
+**/node_modules
+.venv
+models
+out
+build
+.turbo
+**/dist
+.git
