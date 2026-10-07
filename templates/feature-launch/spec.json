@@ -1,0 +1,89 @@
+{
+  "$schema": "../../docs/schema.json",
+  "version": 1,
+  "title": "Payroll launch",
+  "brand": "luraplus",
+  "fps": 60,
+  "quality": "standard",
+  "music": { "mode": "preset", "preset": "uplifting-tech", "bpm": 96 },
+  "voice": { "provider": "kokoro", "voice": "af_heart", "speed": 0.94 },
+  "timing": { "snap": "bar", "leadIn": 0.45, "lineGap": 0.35, "tail": 0.6 },
+  "variants": [
+    { "id": "main", "aspect": "16:9", "safeArea": "title" },
+    { "id": "social", "aspect": "9:16", "scenes": ["hook", "reveal", "spotlight", "flow", "cta"], "maxDuration": 35,
+      "safeArea": "reels", "loudness": -14,
+      "overrides": { "spotlight": { "vo": [{ "text": "Pay runs build themselves from approved timesheets." }] } } }
+  ],
+  "scenes": [
+    {
+      "id": "hook", "type": "kineticTitle", "tone": "dark", "musicCue": "tension",
+      "vo": [{ "text": "Payroll day shouldn't take all week." }],
+      "props": { "kicker": "Payroll", "headline": "Payroll day shouldn't take *all week.*", "style": "rise" }
+    },
+    {
+      "id": "reveal", "type": "logoReveal", "tone": "dark", "transitionIn": { "type": "flash" }, "musicCue": "reveal",
+      "vo": [{ "text": "Meet LuraPlus Payroll." }],
+      "props": { "tagline": "Payroll, *built in.*" }
+    },
+    {
+      "id": "spotlight", "type": "featureSpotlight", "tone": "light", "transitionIn": { "type": "iris" }, "musicCue": "groove",
+      "vo": [{ "text": "Pay runs build themselves, from approved timesheets, leave and allowances." }],
+      "props": {
+        "kicker": "Pay runs", "headline": "Pay runs that *build themselves.*",
+        "body": "Hours, leave and allowances flow straight in from the rest of LuraPlus.",
+        "bullets": ["Built from approved timesheets", "Leave already accounted for"],
+        "visual": { "kind": "panel", "title": "October pay run", "action": "Approve pay run", "rows": [
+          { "label": "Employees", "value": "128" },
+          { "label": "Timesheets approved", "value": "128 / 128", "status": "ok" },
+          { "label": "Leave adjustments", "value": "6", "status": "info" },
+          { "label": "Overtime to review", "value": "1", "status": "warn" },
+          { "label": "Total gross", "value": "$412,380" }
+        ] }
+      }
+    },
+    {
+      "id": "flow", "type": "screenFlow", "tone": "light", "transitionIn": { "type": "crossfade" }, "musicCue": "groove",
+      "vo": [
+        { "text": "Start a pay run.", "step": 0 },
+        { "text": "Review the totals.", "step": 1 },
+        { "text": "Approve, and everyone's paid.", "step": 2 }
+      ],
+      "props": {
+        "kicker": "How it works", "title": "Three clicks to pay day",
+        "steps": [
+          { "screen": "assets/flow-1.png", "click": { "x": 0.935, "y": 0.126 }, "caption": "Start a pay run", "focus": { "x": 0.5, "y": 0.0, "w": 0.5, "h": 0.42 } },
+          { "screen": "assets/flow-2.png", "click": { "x": 0.934, "y": 0.947 }, "caption": "Review the totals", "focus": { "x": 0.42, "y": 0.55, "w": 0.58, "h": 0.45 } },
+          { "screen": "assets/flow-3.png", "caption": "Paid. Payslips sent.", "focus": { "x": 0.2, "y": 0.2, "w": 0.6, "h": 0.6 } }
+        ]
+      }
+    },
+    {
+      "id": "grid", "type": "featureGrid", "tone": "light", "transitionIn": { "type": "push", "direction": "left" }, "musicCue": "groove",
+      "vo": [{ "text": "Tax tables update themselves, every pay type fits one run, and payslips go out on their own." }],
+      "props": {
+        "kicker": "Built in", "headline": "Everything payroll needs.",
+        "items": [
+          { "icon": "shield", "title": "Always compliant", "text": "Tax tables and super rates update automatically." },
+          { "icon": "wallet", "title": "Every pay type", "text": "Salaries, hourly, allowances and bonuses in one run." },
+          { "icon": "msg", "title": "Payslips, sent", "text": "Everyone gets their payslip the moment you pay." }
+        ]
+      }
+    },
+    {
+      "id": "stats", "type": "statsCounter", "tone": "light", "transitionIn": { "type": "crossfade" }, "musicCue": "build", "optional": true,
+      "vo": [{ "text": "Early teams cut pay-run time by eighty-two percent." }],
+      "props": {
+        "kicker": "Early access", "headline": "Faster pay runs, *fewer errors.*",
+        "stats": [
+          { "value": 82, "suffix": "%", "label": "less time per pay run" },
+          { "value": 4.9, "decimals": 1, "suffix": "/5", "label": "average admin rating" }
+        ]
+      }
+    },
+    {
+      "id": "cta", "type": "ctaEndCard", "tone": "dark", "transitionIn": { "type": "iris" }, "musicCue": "resolve",
+      "vo": [{ "text": "LuraPlus Payroll." }, { "text": "Book a demo, and see your first pay run." }],
+      "props": { "headline": "Payroll, *from one platform.*", "button": "Book a demo", "note": "Guided onboarding: we'll set up your first pay run with you." }
+    }
+  ]
+}

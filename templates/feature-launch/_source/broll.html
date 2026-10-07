@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+body{margin:0;width:1920px;height:1280px;overflow:hidden;background:#0b1424}
+.b{position:absolute;border-radius:50%;filter:blur(40px)}
+</style></head><body>
+<div class="b" style="left:-200px;top:300px;width:900px;height:900px;background:#1856C4;opacity:.7"></div>
+<div class="b" style="left:900px;top:-200px;width:1100px;height:900px;background:#7C5CFC;opacity:.45"></div>
+<div class="b" style="left:1200px;top:600px;width:700px;height:700px;background:#3782F7;opacity:.55"></div>
+<div class="b" style="left:500px;top:700px;width:500px;height:500px;background:#F2AE3D;opacity:.35"></div>
+<script>
+for (let i = 0; i < 70; i++) { const d = document.createElement('div'); const s = 20 + ((i * 37) % 90);
+  d.className = 'b'; d.style.cssText = `left:${(i*263)%1920}px;top:${(i*151)%1280}px;width:${s}px;height:${s}px;background:#fff;opacity:${0.05 + ((i*7)%10)/60};filter:blur(${4 + i%8}px)`;
+  document.body.append(d); }
+</script></body></html>

@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@10.34.5",
-  "engines": { "node": ">=20.17" },
+  "engines": {
+    "node": ">=20.17"
+  },
   "scripts": {
     "build": "turbo run build",
     "test": "turbo run test",
     "typecheck": "turbo run typecheck",
-    "vs": "tsx apps/cli/src/main.ts"
+    "vs": "node apps/cli/bin/vs.mjs"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",

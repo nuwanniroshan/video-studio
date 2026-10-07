@@ -100,3 +100,15 @@ describe("JSON Schema", () => {
     expect(s).toContain('"ui":"richText"');
   });
 });
+
+import { listAssets, mapAssets } from "../src/index.ts";
+describe("assets", () => {
+  it("finds asset fields through unions, arrays and optionals", () => {
+    const sf = SCENE_DEFS.find((d) => d.type === "screenFlow")!;
+    expect(listAssets("screenFlow", sf.schema.parse(sf.example)).map((a) => a.path)).toEqual(["steps.0.screen", "steps.1.screen", "steps.2.screen"]);
+    const fs = { headline: "x", visual: { kind: "image", asset: "a.png", frame: "browser" }, layout: "auto" };
+    expect(mapAssets("featureSpotlight", fs, (r) => `/assets/${r}`)).toMatchObject({ visual: { asset: "/assets/a.png" } });
+    expect(listAssets("featureSpotlight", { ...fs, visual: { kind: "panel", title: "t", rows: [] } })).toEqual([]);
+    expect(listAssets("logoReveal", {})).toEqual([]);
+  });
+});

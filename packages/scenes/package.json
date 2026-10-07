@@ -3,7 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@vs/engine": "workspace:*" },
-  "scripts": { "typecheck": "tsc -p .", "test": "vitest run --passWithNoTests" }
+  "exports": {
+    ".": "./src/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "dependencies": {
+    "@vs/engine": "workspace:*",
+    "@vs/spec": "workspace:*",
+    "zod": "^4.6.5"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run --passWithNoTests"
+  }
 }

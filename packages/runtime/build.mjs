@@ -7,8 +7,10 @@ await build({
   format: "iife",
   target: "chrome120",
   outfile: "dist/runtime.js",
-  sourcemap: "inline",
+  sourcemap: false,
+  legalComments: "none",
   logLevel: "warning",
 });
 for (const f of fs.readdirSync("static")) fs.copyFileSync(`static/${f}`, `dist/${f}`);
+fs.copyFileSync("../scenes/src/styles.css", "dist/scenes.css");
 console.log("runtime built");

@@ -9,7 +9,7 @@ import { serve } from "./server.ts";
 
 export interface RangeJob { i0: number; i1: number; out: string }
 export interface Progress { framesDone: number; framesTotal: number; fps: number; etaSec: number }
-export interface RenderOptions {
+export interface ClipRenderOptions {
   doc: RuntimeDoc;
   brandsDir: string;
   assetsDir?: string;
@@ -65,7 +65,7 @@ export async function renderJobs(origin: string, doc: RuntimeDoc, q: QualityTier
 }
 
 /** Full render of [from, to): frames split evenly over workers, then concatenated by stream copy. */
-export async function renderVideo(opt: RenderOptions): Promise<RenderStats> {
+export async function renderVideo(opt: ClipRenderOptions): Promise<RenderStats> {
   const q = typeof opt.quality === "string" ? QUALITY[opt.quality] : opt.quality;
   const t0 = opt.from ?? 0, t1 = opt.to ?? opt.doc.duration;
   const n = Math.round((t1 - t0) * q.fps);

@@ -25,6 +25,7 @@ export interface AnimCtx {
   stage: { w: number; h: number };
   /** URL resolver for brand-relative and asset paths. */
   url(path: string): string;
+  brand: { name: string; logoOnDark: string; logoOnLight: string; ctaUrl?: string };
 }
 
 export interface MountCtx extends AnimCtx {

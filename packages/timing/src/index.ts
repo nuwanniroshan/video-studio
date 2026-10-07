@@ -85,10 +85,12 @@ export function sceneBody(s: EffectiveScene, voDur: VoDuration, t: { leadIn: num
     let at = t.leadIn;
     for (const l of lines) { vo.push({ id: l.id, text: l.text, rel: at, dur: l.dur }); at += l.dur + t.lineGap; }
     if (stepMins) {
-      // steps spread across the available body in proportion to their minimums
-      const avail = len - t.leadIn - t.tail, tot = minSteps || 1;
+      // steps spread across the narration (or their minimums, if longer) in proportion to their minimums,
+      // so items land while the voice-over describes them; slack after that goes to the last step
+      const avail = Math.max(voSpan, minSteps), tot = minSteps || 1;
       let c = t.leadIn;
       steps = stepMins.map((m) => { const d = (avail * m) / tot; const st = { start: c, end: c + d }; c += d; return st; });
+      steps[steps.length - 1].end = len - t.tail;
     } else steps = [{ start: 0, end: len }];
   }
   if (s.duration.mode === "fixed") {

@@ -122,7 +122,7 @@ class Engine {
     const keyed = new Map<string, FnRec>();
     for (const s of scopes) {
       for (const f of s.fns) {
-        if (!f.key) { f.cb(f.e(clamp((t - f.t0) / f.d)), t); continue; }
+        if (!f.key) { f.cb(f.e(clamp((t - f.t0) / f.d)), t - f.scope.offset); continue; }
         const cur = keyed.get(f.key);
         if (!cur) { keyed.set(f.key, f); continue; }
         const fStarted = f.t0 <= t, curStarted = cur.t0 <= t;
@@ -130,7 +130,7 @@ class Engine {
         else if (!fStarted && !curStarted && f.t0 < cur.t0) keyed.set(f.key, f);
       }
     }
-    for (const f of keyed.values()) f.cb(f.e(clamp((t - f.t0) / f.d)), t);
+    for (const f of keyed.values()) f.cb(f.e(clamp((t - f.t0) / f.d)), t - f.scope.offset);
   }
 
   apply(el: Element, st: ElState, t: number) {
@@ -173,9 +173,10 @@ class Engine {
     if (v.h !== undefined) put("height", v.h.toFixed(2) + "px");
     if (v.pct !== undefined) put("width", v.pct.toFixed(3) + "%");
     if (v.dash !== undefined) put("stroke-dashoffset", (1 - v.dash).toFixed(4));
-    if (v.clipX !== undefined) put("clip-path", `inset(0 ${(100 - v.clipX).toFixed(3)}% 0 0)`);
-    if (v.clipY !== undefined) put("clip-path", `inset(${(100 - v.clipY).toFixed(3)}% 0 0 0)`);
-    if (v.clipR !== undefined) put("clip-path", `circle(${v.clipR.toFixed(3)}% at var(--cx,50%) var(--cy,50%))`);
+    // fully open clips write "none" so a finished wipe/iris costs nothing for the rest of the scene
+    if (v.clipX !== undefined) put("clip-path", v.clipX >= 100 ? "none" : `inset(0 ${(100 - v.clipX).toFixed(3)}% 0 0)`);
+    if (v.clipY !== undefined) put("clip-path", v.clipY >= 100 ? "none" : `inset(${(100 - v.clipY).toFixed(3)}% 0 0 0)`);
+    if (v.clipR !== undefined) put("clip-path", v.clipR >= 142 ? "none" : `circle(${v.clipR.toFixed(3)}% at var(--cx,50%) var(--cy,50%))`);
   }
 
   /** True if anything visible may change between t0 and t1 (inclusive), across all scopes. */
@@ -311,7 +312,7 @@ export class Scope {
     return this;
   }
 
-  /** Per-frame callback receiving eased progress (clamped 0..1) and absolute time. */
+  /** Per-frame callback receiving eased progress (clamped 0..1) and this scope's local time. */
   fn(t0: number, d: number, cb: (p: number, t: number) => void, opt: FnOptions | EaseLike = {}): this {
     const o: FnOptions = typeof opt === "object" ? opt : { ease: opt };
     this._s.fns.push({
@@ -371,12 +372,11 @@ export class Scope {
   type(target: Target, t0: number, d: number, text: string, caret = true): this {
     const el = this.els(target, "type")[0] as HTMLElement;
     el.textContent = "";
-    const T0 = this._s.offset + t0;
     let last = "";
     return this.fn(t0, d, (p, t) => {
       const n = Math.round(p * text.length);
-      const blink = caret && (p < 1 ? true : Math.floor((t - T0 - d) * 2.4) % 2 === 0 && t - T0 - d < 1.2);
-      const html = escapeHtml(text.slice(0, n)) + (blink && t >= T0 ? '<i class="caret"></i>' : "");
+      const blink = caret && (p < 1 ? true : Math.floor((t - t0 - d) * 2.4) % 2 === 0 && t - t0 - d < 1.2);
+      const html = escapeHtml(text.slice(0, n)) + (blink && t >= t0 ? '<i class="caret"></i>' : "");
       if (html !== last) { el.innerHTML = html; last = html; }
     }, { ease: ease.linear });
   }
@@ -404,6 +404,22 @@ export class Timeline extends Scope {
     for (const st of this._e.els.values()) for (const ch of st.channels.values()) this._e.resolve(ch);
     return [...this._e.warnings];
   }
+  /** Seconds each element spends with `prop` above `threshold` (sampled at 1/30 s). Used by layout lint. */
+  sustained(prop: Prop, threshold: number): { el: Element; seconds: number }[] {
+    const out: { el: Element; seconds: number }[] = [];
+    for (const [el, st] of this._e.els) {
+      const ch = st.channels.get(prop);
+      if (!ch || !ch.segs.length) continue;
+      this._e.resolve(ch);
+      const a = ch.segs[0].t0, b = Math.max(...ch.segs.map((s) => s.t0 + s.d));
+      let n = 0;
+      for (let t = a; t <= b; t += 1 / 30) if (this._e.valueAt(ch, t) > threshold) n++;
+      const tail = this._e.valueAt(ch, b) > threshold ? Infinity : 0;
+      if (n || tail) out.push({ el, seconds: tail || n / 30 });
+    }
+    return out;
+  }
+
   /** Value a prop will have at time t (for tests and measurement). */
   valueAt(el: Element, prop: Prop, t: number): number {
     return this._e.valueAt(this._e.channel(el, prop), t);

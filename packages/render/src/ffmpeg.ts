@@ -20,10 +20,11 @@ export function probe(file: string, args: string[]): Promise<string> {
 }
 
 /** Segment encoder fed with images on stdin; sub-frames are averaged by tmix (motion blur). */
-export function segmentEncoder(out: string, o: { fps: number; sub: number; codec: "png" | "mjpeg"; crf: number }): {
+export function segmentEncoder(out: string, o: { fps: number; sub: number; codec: "png" | "mjpeg"; crf: number; post?: string }): {
   proc: ChildProcessWithoutNullStreams; write(buf: Buffer): Promise<void>; end(): Promise<void>;
 } {
-  const vf = o.sub > 1 ? `tmix=frames=${o.sub},select='eq(mod(n\\,${o.sub})\\,${o.sub - 1})',setpts=N/(${o.fps}*TB)` : "null";
+  const blur = o.sub > 1 ? `tmix=frames=${o.sub},select='eq(mod(n\\,${o.sub})\\,${o.sub - 1})',setpts=N/(${o.fps}*TB)` : "null";
+  const vf = o.post ? `${blur},${o.post}` : blur;
   const proc = spawn("ffmpeg", [
     "-hide_banner", "-loglevel", "error", "-y",
     "-f", "image2pipe", "-framerate", String(o.fps * o.sub), "-c:v", o.codec, "-i", "-",

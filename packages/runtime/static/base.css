@@ -1,53 +1,9 @@
-/* Base stage + house-style primitives. Every colour/font comes from brand variables (--vs-*). */
+/* Stage only; scene and primitive styles live in @vs/scenes (scenes.css). */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html, body { width: var(--stage-w, 1920px); height: var(--stage-h, 1080px); overflow: hidden; background: #000; }
 body { font-family: var(--vs-font-body); color: var(--vs-ink); -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
 #stage { position: relative; width: var(--stage-w, 1920px); height: var(--stage-h, 1080px); overflow: hidden; background: var(--vs-dark); container-type: size; }
-.layer, .scene { position: absolute; inset: 0; }
+.scene { position: absolute; inset: 0; overflow: hidden; }
 .w { display: inline-block; overflow: visible; }
 .wi { display: inline-block; }
-.caret { display: inline-block; width: .06em; height: 1.05em; background: var(--vs-primary); vertical-align: -0.15em; margin-left: .04em; }
-
-/* backgrounds (REFERENCE §3) */
-.bg-dark { background:
-  radial-gradient(110cqmax 65cqmax at 70% 40%, color-mix(in srgb, var(--vs-primary) 10%, transparent), transparent 60%),
-  radial-gradient(85cqmax 55cqmax at 15% 90%, color-mix(in srgb, var(--vs-accent) 7%, transparent), transparent 60%),
-  var(--vs-dark); }
-.grid-dark { background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
-  background-size: 5.926cqmin 5.926cqmin; background-position: -1px -1px; }
-.bg-light { background: var(--vs-light); overflow: hidden; }
-.grid-light { background-image: linear-gradient(rgba(14,17,22,.035) 1px, transparent 1px), linear-gradient(90deg, rgba(14,17,22,.035) 1px, transparent 1px);
-  background-size: 5.926cqmin 5.926cqmin; background-position: -1px -1px;
-  -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 50%, #000 40%, transparent 100%); }
-.orb { position: absolute; border-radius: 50%; filter: blur(7.4cqmin); }
-.orb-a { width: 60cqmin; height: 60cqmin; left: 62%; top: -12%; background: color-mix(in srgb, var(--vs-primary) 16%, transparent); }
-.orb-b { width: 55cqmin; height: 55cqmin; left: -8%; top: 55%; background: color-mix(in srgb, var(--vs-accent) 8%, transparent); }
-.vignette-light { background: radial-gradient(ellipse 80% 75% at 50% 50%, transparent 60%, rgba(14,17,22,.07) 100%); }
-
-/* type (sizes in cqmin: 1080-tall reference → 1cqmin = 10.8px) */
-.vs-kicker { font-family: var(--vs-font-mono); font-size: 1.574cqmin; letter-spacing: .16em; text-transform: uppercase; color: var(--vs-primary); font-weight: 500; display: flex; align-items: center; gap: 1.3cqmin; }
-.vs-kicker .bar { width: 3.33cqmin; height: max(1.5px, .139cqmin); background: currentColor; display: inline-block; transform-origin: 0 50%; }
-.vs-h1 { font-family: var(--vs-font-display); font-weight: 600; font-size: 7.407cqmin; line-height: 1.02; letter-spacing: -0.035em; color: var(--vs-ink); }
-.vs-h1 .accent { color: var(--vs-primary); }
-.vs-sub { font-family: var(--vs-font-body); font-size: 2.315cqmin; line-height: 1.45; color: var(--vs-grey600); font-weight: 400; }
-.tone-dark .vs-h1, .tone-brand .vs-h1 { color: #fff; }
-.tone-dark .vs-h1 .accent { color: rgba(255,255,255,.38); }
-.tone-dark .vs-sub, .tone-brand .vs-sub { color: rgba(255,255,255,.62); }
-.tone-dark .vs-kicker { color: var(--vs-primary400); }
-
-/* kineticTitle */
-.kt { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; gap: 2.4cqmin; padding: 0 10cqw; }
-.kt-center { align-items: center; text-align: center; }
-.kt-center .vs-h1, .kt-center .vs-sub { max-width: 80cqw; }
-.kt-left { align-items: flex-start; text-align: left; padding-left: max(10.4cqmin, 6cqw); }
-.kt-left .vs-h1 { max-width: 62cqw; }
-.kt .vs-h1 { width: 100%; }
-.kt .vs-sub { max-width: min(80cqw, 120cqmin); }
-[data-orient="portrait"] .kt { padding: 0 7cqw; }
-[data-orient="portrait"] .kt .vs-h1 { max-width: 86cqw; }
-.vs-h1.masked .w { overflow: hidden; vertical-align: top; padding-bottom: .08em; margin-bottom: -.08em; }
-
-/* spike stress probe */
-.spike-grid { position: absolute; inset: 8cqmin; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3cqmin; }
-.spike-card { background: #fff; border-radius: 1.2cqmin; border: 1px solid var(--vs-grey200); box-shadow: var(--vs-shadow-md); padding: 2cqmin; display: flex; flex-direction: column; gap: 1cqmin; font-size: 1.6cqmin; color: var(--vs-grey600); }
-.spike-card b { font-family: var(--vs-font-display); font-size: 2.2cqmin; color: var(--vs-ink); }
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 100; pointer-events: none; }

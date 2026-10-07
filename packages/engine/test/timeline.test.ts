@@ -59,6 +59,24 @@ describe("engine", () => {
     expect(tl.valueAt(a, "x", 20)).toBe(10);
   });
 
+  it("fn callbacks receive scope-local time", () => {
+    const tl = createTimeline();
+    let seen = NaN;
+    tl.scope(10, { id: "s" }).fn(0, 1, (_p, t) => (seen = t));
+    tl.seek(10.25);
+    expect(seen).toBeCloseTo(0.25, 9);
+  });
+
+  it("sustained() measures time above a threshold", () => {
+    const tl = createTimeline();
+    const a = el(), b = el();
+    tl.tw(a, 0, 1, { blur: 20 }, { blur: 0 }, "linear"); // > 12 for 0.4 s
+    tl.set(b, 0, { blur: 30 }); // stays blurred
+    const r = tl.sustained("blur", 12);
+    expect(r.find((x) => x.el === a)!.seconds).toBeCloseTo(0.4, 1);
+    expect(r.find((x) => x.el === b)!.seconds).toBe(Infinity);
+  });
+
   it("emit records absolute marker times", () => {
     const tl = createTimeline();
     tl.scope(4, { id: "s" }).emit("whoosh", 0.5, { gain: 1 });

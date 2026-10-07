@@ -6,3 +6,4 @@ export * from "./migrate.ts";
 export * from "./brand.ts";
 export { jsonSchema } from "./json-schema.ts";
 export * from "./maxchars.ts";
+export * from "./assets.ts";
