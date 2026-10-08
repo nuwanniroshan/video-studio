@@ -16,3 +16,4 @@ out/
 !tests/golden/**/*.png
 .DS_Store
 /my-video/
+studio-data/

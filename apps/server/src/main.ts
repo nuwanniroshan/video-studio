@@ -1,0 +1,98 @@
+/*
+ * Local studio server (M2-minimum): JSON API + the web SPA + a same-origin proxy to the runtime
+ * server (so the preview iframe and the API share an origin). Binds 127.0.0.1 only; no auth yet.
+ *   pnpm studio   → http://127.0.0.1:5190
+ */
+import fs from "node:fs";
+import http from "node:http";
+import path from "node:path";
+import Fastify from "fastify";
+import fastifyStatic from "@fastify/static";
+import multipart from "@fastify/multipart";
+import { REPO, type Quality } from "@vs/render";
+import {
+  StudioError, catalog, contactSheets, createProject, deleteProject, getJob, getProject, listBrands, listJobs, listOutputs,
+  listProjects, listTemplates, preview, projectFile, publicJob, runtimeOrigin, saveAsset, saveSpec, startRender,
+} from "@vs/studio";
+
+const PORT = +(process.env.PORT ?? 5190);
+const WEB = path.join(REPO, "apps/web/dist");
+const app = Fastify({ logger: false, bodyLimit: 5 * 1024 * 1024 });
+await app.register(multipart, { limits: { fileSize: 25 * 1024 * 1024 } });
+
+app.setErrorHandler((e, _req, reply) => {
+  const err = e as Error & { status?: number; issues?: unknown };
+  const status = e instanceof StudioError ? e.status : (err as any).statusCode ?? 500;
+  if (status >= 500) console.error(err);
+  reply.status(status).send({ error: err.message, issues: (e as StudioError).issues ?? (err as any).issues });
+});
+
+type P = { Params: { id: string } };
+app.get("/api/catalog", async () => catalog());
+app.get("/api/templates", async () => listTemplates());
+app.get("/api/brands", async () => listBrands());
+app.get("/api/projects", async () => listProjects());
+app.post<{ Body: { title: string; template?: string; brand?: string } }>("/api/projects", async (req) => createProject(req.body));
+app.get<P>("/api/projects/:id", async (req) => { const p = getProject(req.params.id); return { id: p.id, spec: p.spec, assets: p.assets }; });
+app.delete<P>("/api/projects/:id", async (req) => { deleteProject(req.params.id); return { ok: true }; });
+app.put<P>("/api/projects/:id/spec", async (req, reply) => {
+  const r = saveSpec(req.params.id, req.body);
+  if (!r.ok) reply.status(422);
+  return r;
+});
+app.post<P>("/api/projects/:id/assets", async (req) => {
+  const f = await req.file();
+  if (!f) throw new StudioError(400, "no file");
+  return { path: saveAsset(req.params.id, f.filename, await f.toBuffer()) };
+});
+app.post<P & { Body: { variant?: string } }>("/api/projects/:id/preview", async (req) => preview(req.params.id, req.body?.variant));
+app.post<P & { Body: { variant?: string } }>("/api/projects/:id/stills", async (req) => {
+  const r = await contactSheets(req.params.id, req.body?.variant);
+  return r.map((v) => ({ variant: v.variant, sheet: v.sheet && `/files/${req.params.id}/${path.relative(getProject(req.params.id).dir, v.sheet)}`, lint: v.lint }));
+});
+app.get<P>("/api/projects/:id/outputs", async (req) => listOutputs(req.params.id));
+app.post<P & { Body: { variants?: string[]; quality?: Quality; deliverables?: "none" | "all" } }>("/api/projects/:id/renders", async (req) => {
+  const b = req.body ?? {};
+  return publicJob(startRender(req.params.id, { variants: b.variants, quality: b.quality, deliverables: b.deliverables === "none" ? "none" : ["all"] }));
+});
+app.get<P>("/api/projects/:id/renders", async (req) => listJobs(req.params.id).map(publicJob));
+app.get<{ Params: { job: string } }>("/api/renders/:job/events", (req, reply) => {
+  const job = getJob(req.params.job);
+  if (!job) return reply.status(404).send({ error: "no such render" });
+  reply.raw.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
+  const send = (j: unknown) => reply.raw.write(`data: ${JSON.stringify(j)}\n\n`);
+  send(publicJob(job));
+  const on = (j: unknown) => send(j);
+  job.events.on("update", on);
+  req.raw.on("close", () => job.events.off("update", on));
+});
+app.get<{ Params: { id: string; "*": string }; Querystring: { download?: string } }>("/files/:id/*", async (req, reply) => {
+  const f = projectFile(req.params.id, req.params["*"]);
+  if (req.query.download !== undefined) reply.header("content-disposition", `attachment; filename="${path.basename(f)}"`);
+  return reply.type(mime(f)).send(fs.createReadStream(f));
+});
+
+// same-origin proxy to the runtime server (runtime bundle, brand CSS/fonts, content-addressed assets)
+const rt = await runtimeOrigin();
+for (const prefix of ["/runtime/*", "/brand/*", "/assets/*"]) {
+  app.get(prefix, (req, reply) => {
+    const up = http.request(rt.origin + req.url, (r) => { reply.raw.writeHead(r.statusCode ?? 502, r.headers); r.pipe(reply.raw); });
+    up.on("error", () => reply.status(502).send());
+    up.end();
+  });
+}
+
+if (fs.existsSync(WEB)) {
+  await app.register(fastifyStatic, { root: WEB, prefix: "/" });
+  app.setNotFoundHandler((req, reply) => (req.url.startsWith("/api") ? reply.status(404).send({ error: "not found" }) : reply.sendFile("index.html")));
+} else {
+  app.get("/", async () => "Web UI not built: run `pnpm studio` (builds apps/web).");
+}
+
+function mime(f: string) {
+  return ({ ".mp4": "video/mp4", ".webm": "video/webm", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp",
+    ".srt": "text/plain; charset=utf-8", ".vtt": "text/vtt", ".wav": "audio/wav", ".json": "application/json" } as Record<string, string>)[path.extname(f).toLowerCase()] ?? "application/octet-stream";
+}
+
+await app.listen({ port: PORT, host: "127.0.0.1" });
+console.log(`video-studio: http://127.0.0.1:${PORT}`);

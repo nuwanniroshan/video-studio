@@ -1,0 +1,18 @@
+{
+  "name": "@vs/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@fastify/multipart": "^9.4.0",
+    "@fastify/static": "^8.3.0",
+    "@vs/render": "workspace:*",
+    "@vs/studio": "workspace:*",
+    "fastify": "^5.12.5",
+    "tsx": "^4.19.0"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "start": "tsx src/main.ts"
+  }
+}
