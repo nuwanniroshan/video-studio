@@ -14,11 +14,25 @@ A code-driven motion-graphics video generator. A declarative storyboard spec goe
 pnpm studio      # opens http://127.0.0.1:5190
 ```
 
-From the studio you can:
-- create a video from a template;
-- edit scenes in forms (with image upload and click-to-place cursor points);
-- preview live;
-- render, then download.
+- **Start a video:** pick a template (feature launch, product promo, announcement, how-to, social teaser), or **describe your idea** in a guided brief. The brief writes the storyboard, voice-over and music for you, with no AI needed.
+- **Brand kits:**
+  - upload logos;
+  - pick five colours (shades are derived automatically);
+  - choose fonts from the bundled library or upload your own;
+  - choose the narrator voice and speed;
+  - teach the pronunciation of brand names;
+  - set the website and the default music.
+  - A live preview shows the result.
+- **Editor:**
+  - scene list and timeline;
+  - live preview, with sound on demand;
+  - forms for every scene, including image upload and click-to-place cursor points;
+  - per-format scene choice;
+  - automatic saving with revisions.
+- **Render and watch:**
+  - three quality levels with progress;
+  - an in-app player;
+  - downloads for the master, web, hero and landing versions, captions, thumbnails and audio stems.
 
 ## Ask Claude to make it
 

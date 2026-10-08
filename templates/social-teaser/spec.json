@@ -1,0 +1,18 @@
+{
+  "version": 1, "title": "Social teaser", "brand": "luraplus", "fps": 60, "quality": "standard",
+  "music": { "mode": "preset", "preset": "uplifting-tech", "bpm": 96 },
+  "voice": { "provider": "kokoro", "voice": "af_bella", "speed": 1.0 },
+  "timing": { "snap": "beat", "leadIn": 0.3, "lineGap": 0.25, "tail": 0.4 },
+  "variants": [{ "id": "vertical", "aspect": "9:16", "safeArea": "reels", "loudness": -14 }, { "id": "square", "aspect": "1:1", "safeArea": "title", "loudness": -14 }],
+  "scenes": [
+    { "id": "hook", "type": "kineticTitle", "tone": "dark", "musicCue": "build",
+      "vo": [{ "text": "Still doing payroll by hand?" }],
+      "props": { "headline": "Still doing payroll *by hand?*", "style": "typewriter" } },
+    { "id": "stat", "type": "statsCounter", "tone": "brand", "transitionIn": { "type": "flash" }, "musicCue": "groove",
+      "vo": [{ "text": "Teams cut pay-run time by eighty-two percent." }],
+      "props": { "stats": [{ "value": 82, "suffix": "%", "label": "less time on every pay run" }] } },
+    { "id": "cta", "type": "ctaEndCard", "tone": "dark", "transitionIn": { "type": "push", "direction": "up" }, "musicCue": "resolve",
+      "vo": [{ "text": "Try LuraPlus free." }],
+      "props": { "headline": "Payroll, *done in minutes.*", "button": "Try it free" } }
+  ]
+}

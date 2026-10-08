@@ -11,10 +11,12 @@ import fastifyStatic from "@fastify/static";
 import multipart from "@fastify/multipart";
 import { REPO, type Quality } from "@vs/render";
 import {
-  StudioError, catalog, contactSheets, createProject, deleteProject, getJob, getProject, listBrands, listJobs, listOutputs,
+  StudioError, initStudio, listBrandKits, brandView, saveBrand, saveBrandFile, deleteBrand, testVoice, fontLibrary, fontFile, templateThumb,
+  saveUpload, createFromBrief, previewAudio, briefToSpec, type BrandFileKind, catalog, contactSheets, createProject, deleteProject, getJob, getProject, listBrands, listJobs, listOutputs,
   listProjects, listTemplates, preview, projectFile, publicJob, runtimeOrigin, saveAsset, saveSpec, startRender,
 } from "@vs/studio";
 
+initStudio();
 const PORT = +(process.env.PORT ?? 5190);
 const WEB = path.join(REPO, "apps/web/dist");
 const app = Fastify({ logger: false, bodyLimit: 5 * 1024 * 1024 });
@@ -31,8 +33,39 @@ type P = { Params: { id: string } };
 app.get("/api/catalog", async () => catalog());
 app.get("/api/templates", async () => listTemplates());
 app.get("/api/brands", async () => listBrands());
+app.get<{ Params: { id: string } }>("/api/templates/:id/thumb.jpg", async (req, reply) => reply.type("image/jpeg").send(fs.createReadStream(templateThumb(req.params.id))));
+app.get("/api/fonts", async () => fontLibrary());
+app.get<{ Params: { file: string } }>("/api/fonts/:file", async (req, reply) => reply.type("font/ttf").send(fs.createReadStream(fontFile(req.params.file))));
+app.get("/api/brandkits", async () => listBrandKits());
+app.get<P>("/api/brandkits/:id", async (req) => brandView(req.params.id));
+app.post<{ Body: any }>("/api/brandkits", async (req) => saveBrand(undefined, req.body as never));
+app.put<P & { Body: any }>("/api/brandkits/:id", async (req) => saveBrand(req.params.id, req.body as never));
+app.delete<P>("/api/brandkits/:id", async (req) => { deleteBrand(req.params.id); return { ok: true }; });
+app.post<P & { Querystring: { kind: BrandFileKind } }>("/api/brandkits/:id/files", async (req) => {
+  const f = await req.file();
+  if (!f) throw new StudioError(400, "no file");
+  return saveBrandFile(req.params.id, req.query.kind, f.filename, await f.toBuffer());
+});
+app.post<{ Body: { text: string; voice?: string; speed?: number; pronunciations?: Record<string, unknown>; brand?: string } }>("/api/voice-test", async (req, reply) => {
+  const r = await testVoice(req.body);
+  return reply.type("audio/wav").send(fs.createReadStream(r.wav));
+});
+app.post("/api/uploads", async (req) => {
+  const f = await req.file();
+  if (!f) throw new StudioError(400, "no file");
+  return { ref: saveUpload(f.filename, await f.toBuffer()) };
+});
+app.post("/api/brief-preview", async (req) => {
+  const b = req.body as any;
+  return briefToSpec({ ...b, screenshots: (b.screenshots ?? []).map((_: string, i: number) => `assets/screenshot-${i + 1}.png`) }, b.brand ?? "luraplus");
+});
+app.post<{ Body: any }>("/api/projects/from-brief", async (req) => createFromBrief(req.body as never));
+app.post<P & { Body: { variant?: string } }>("/api/projects/:id/preview-audio", async (req) => {
+  const r = await previewAudio(req.params.id, req.body?.variant);
+  return { url: `/files/${req.params.id}/${r.path}?v=${Date.now()}`, lufs: r.lufs };
+});
 app.get("/api/projects", async () => listProjects());
-app.post<{ Body: { title: string; template?: string; brand?: string } }>("/api/projects", async (req) => createProject(req.body));
+app.post<{ Body: { title: string; template?: string; brand?: string; formats?: string[] } }>("/api/projects", async (req) => createProject(req.body));
 app.get<P>("/api/projects/:id", async (req) => { const p = getProject(req.params.id); return { id: p.id, spec: p.spec, assets: p.assets }; });
 app.delete<P>("/api/projects/:id", async (req) => { deleteProject(req.params.id); return { ok: true }; });
 app.put<P>("/api/projects/:id/spec", async (req, reply) => {

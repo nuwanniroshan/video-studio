@@ -3,7 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
-  "dependencies": { "@vs/render": "workspace:*", "@vs/spec": "workspace:*", "@vs/storage": "workspace:*", "@vs/runtime": "workspace:*", "zod": "^4.0.0" },
-  "scripts": { "typecheck": "tsc -p .", "test": "vitest run --passWithNoTests" }
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@vs/render": "workspace:*",
+    "@vs/spec": "workspace:*",
+    "@vs/storage": "workspace:*",
+    "@vs/runtime": "workspace:*",
+    "zod": "^4.0.0",
+    "@vs/brand": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  }
 }

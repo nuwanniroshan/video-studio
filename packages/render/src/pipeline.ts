@@ -132,7 +132,7 @@ export async function render(o: RenderOptions): Promise<{ results: VariantResult
   return { results, prepared: prep };
 }
 
-async function mixAudio(prep: Prepared, variant: string, r: ResolvedTimeline, an: LoadResult, outDir: string) {
+export async function mixAudio(prep: Prepared, variant: string, r: ResolvedTimeline, an: LoadResult, outDir: string) {
   const { spec } = prep.project;
   const v = spec.variants.find((x) => x.id === variant)!;
   const eff = new Map(effectiveScenes(spec, variant).map((s) => [s.id, s]));

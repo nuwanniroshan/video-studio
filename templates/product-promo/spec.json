@@ -1,0 +1,30 @@
+{
+  "version": 1, "title": "Product promo", "brand": "luraplus", "fps": 60, "quality": "standard",
+  "music": { "mode": "preset", "preset": "uplifting-tech", "bpm": 96 },
+  "voice": { "provider": "kokoro", "voice": "af_heart", "speed": 0.94 },
+  "variants": [{ "id": "main", "aspect": "16:9", "safeArea": "title" }, { "id": "square", "aspect": "1:1", "safeArea": "title", "scenes": ["problem", "reveal", "product", "benefits", "cta"] }],
+  "scenes": [
+    { "id": "problem", "type": "kineticTitle", "tone": "dark", "musicCue": "tension",
+      "vo": [{ "text": "Your team juggles five tools to get one job done." }],
+      "props": { "kicker": "The problem", "headline": "Five tools. *Zero answers.*", "style": "mask" } },
+    { "id": "reveal", "type": "logoReveal", "tone": "dark", "transitionIn": { "type": "flash" }, "musicCue": "reveal",
+      "vo": [{ "text": "Meet LuraPlus." }], "props": { "tagline": "One workspace, *for every team.*" } },
+    { "id": "product", "type": "featureSpotlight", "tone": "light", "transitionIn": { "type": "iris" }, "musicCue": "groove",
+      "vo": [{ "text": "Everything your team needs lives in one place, with one record for every person." }],
+      "props": { "kicker": "One home", "headline": "Your whole business, *in one place.*", "body": "People, pay, leave and performance share one record.",
+        "visual": { "kind": "image", "asset": "assets/flow-1.png", "frame": "browser" } } },
+    { "id": "benefits", "type": "featureGrid", "tone": "light", "transitionIn": { "type": "push", "direction": "left" }, "musicCue": "groove",
+      "vo": [{ "text": "It's faster, it's secure, and your team will actually enjoy using it." }],
+      "props": { "kicker": "Why teams switch", "headline": "Built for *busy teams.*", "items": [
+        { "icon": "clock", "title": "Faster", "text": "Routine work takes minutes, not days." },
+        { "icon": "shield", "title": "Secure", "text": "Single sign-on, roles and a full audit trail." },
+        { "icon": "users", "title": "Loved", "text": "A clean app people actually use." } ] } },
+    { "id": "proof", "type": "statsCounter", "tone": "light", "transitionIn": { "type": "crossfade" }, "musicCue": "build", "optional": true,
+      "vo": [{ "text": "Teams save hours every single week." }],
+      "props": { "kicker": "Results", "headline": "Real time, *saved.*", "stats": [
+        { "value": 6, "suffix": " h", "label": "saved per manager, per week" }, { "value": 98, "suffix": "%", "label": "on-time payroll" } ] } },
+    { "id": "cta", "type": "ctaEndCard", "tone": "dark", "transitionIn": { "type": "iris" }, "musicCue": "resolve",
+      "vo": [{ "text": "LuraPlus. Book a demo today." }],
+      "props": { "headline": "Run your business *from one platform.*", "button": "Book a demo" } }
+  ]
+}

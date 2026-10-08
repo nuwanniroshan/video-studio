@@ -181,6 +181,9 @@ importers:
 
   packages/studio:
     dependencies:
+      '@vs/brand':
+        specifier: workspace:*
+        version: link:../brand
       '@vs/render':
         specifier: workspace:*
         version: link:../render

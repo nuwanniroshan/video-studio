@@ -14,8 +14,10 @@ import { z } from "zod";
 import { SCENE_DEFS, catalog as sceneCatalog } from "@vs/spec";
 import {
   VOICES, catalog, contactSheets, createProject, getJob, getProject, listBrands, listOutputs, listPresets, listProjects, listTemplates,
-  preview, publicJob, saveAsset, saveSpec, startRender,
+  preview, publicJob, saveAsset, saveSpec, startRender, initStudio,
 } from "@vs/studio";
+
+initStudio();
 
 const log = (m: string) => process.stderr.write(`[video-studio] ${m}\n`);
 const text = (v: unknown) => ({ content: [{ type: "text" as const, text: typeof v === "string" ? v : JSON.stringify(v, null, 1) }] });

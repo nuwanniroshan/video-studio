@@ -4,6 +4,7 @@
  * M2 proper moves this behind Postgres + S3 with the same operations.
  */
 import { EventEmitter } from "node:events";
+import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { z } from "zod";
@@ -13,16 +14,23 @@ import {
 } from "@vs/render";
 import type { LintIssue, RuntimeDoc } from "@vs/runtime";
 
-export const studioHome = () => process.env.VS_STUDIO_HOME ?? path.join(REPO, "studio-data");
+import { StudioError, cacheDir, studioHome } from "./errors.ts";
+import { initBrands, listBrandKits } from "./brands.ts";
+export { StudioError, cacheDir, studioHome };
+export * from "./brands.ts";
+export * from "./brief.ts";
+import { briefToSpec, type Brief } from "./brief.ts";
+import { mixAudio } from "@vs/render";
+
+/** Call once at startup (server, MCP): studio brand folder, seeded from the repo. */
+export function initStudio() { initBrands(studioHome()); }
 const projectsDir = () => { const d = path.join(studioHome(), "projects"); fs.mkdirSync(d, { recursive: true }); return d; };
-export const cacheDir = () => process.env.VS_CACHE ?? path.join(REPO, ".vs-cache");
 const pdir = (id: string) => {
   if (!/^[a-z0-9][a-z0-9-]{0,80}$/.test(id)) throw new StudioError(400, "bad project id");
   const d = path.join(projectsDir(), id);
   if (!fs.existsSync(path.join(d, "spec.json"))) throw new StudioError(404, `no project "${id}"`);
   return d;
 };
-export class StudioError extends Error { constructor(readonly status: number, msg: string, readonly issues?: Issue[]) { super(msg); } }
 
 /* ---------- catalog ---------- */
 
@@ -38,18 +46,20 @@ export function listTemplates() {
   const dir = path.join(REPO, "templates");
   return fs.readdirSync(dir).filter((d) => fs.existsSync(path.join(dir, d, "spec.json"))).map((id) => {
     const spec = JSON.parse(fs.readFileSync(path.join(dir, id, "spec.json"), "utf8"));
-    const readme = fs.existsSync(path.join(dir, id, "README.md")) ? fs.readFileSync(path.join(dir, id, "README.md"), "utf8") : "";
-    const desc = readme.split("\n").find((l) => l.trim() && !l.startsWith("#")) ?? "";
-    return { id, title: spec.title as string, description: desc, scenes: (spec.scenes as unknown[]).length, variants: spec.variants };
+    const meta = fs.existsSync(path.join(dir, id, "template.json")) ? JSON.parse(fs.readFileSync(path.join(dir, id, "template.json"), "utf8")) : {};
+    return { id, name: meta.name ?? id, category: meta.category ?? "", description: meta.description ?? "", length: meta.length ?? "",
+      formats: meta.formats ?? spec.variants.map((v: { aspect: string }) => v.aspect), scenes: (spec.scenes as { type: string }[]).map((s) => s.type),
+      thumbnail: fs.existsSync(path.join(dir, id, "thumb.jpg")) ? `/api/templates/${id}/thumb.jpg` : undefined, variants: spec.variants };
   });
 }
+export const templateThumb = (id: string) => {
+  const f = path.join(REPO, "templates", path.basename(id), "thumb.jpg");
+  if (!fs.existsSync(f)) throw new StudioError(404, "no thumbnail");
+  return f;
+};
 
 export function listBrands() {
-  const dir = env.brandsDir();
-  return fs.readdirSync(dir).filter((d) => fs.existsSync(path.join(dir, d, "brand.json"))).map((id) => {
-    const k = JSON.parse(fs.readFileSync(path.join(dir, id, "brand.json"), "utf8"));
-    return { id, name: k.name as string, primary: k.colors?.primary as string, logo: `/brand/${id}/${k.logo?.onLight}` };
-  });
+  return listBrandKits().map((k) => ({ id: k.id, name: k.name as string, primary: k.colors?.primary as string, logo: k.urls.logoOnLight as string }));
 }
 
 export function listPresets() {
@@ -75,28 +85,112 @@ export function listProjects(): ProjectSummary[] {
     const d = path.join(projectsDir(), id);
     const spec = JSON.parse(fs.readFileSync(path.join(d, "spec.json"), "utf8"));
     const out = path.join(d, "out");
-    const renders = fs.existsSync(out) ? fs.readdirSync(out).filter((v) => v !== "stills" && fs.statSync(path.join(out, v)).isDirectory()) : [];
-    const thumb = fs.existsSync(path.join(out, "stills")) ? fs.readdirSync(path.join(out, "stills")).find((f) => f.endsWith("-sheet.jpg")) : undefined;
-    return { id, title: spec.title, brand: spec.brand, updated: fs.statSync(path.join(d, "spec.json")).mtimeMs, scenes: spec.scenes?.length ?? 0,
-      thumbnail: thumb ? `/files/${id}/out/stills/${thumb}` : undefined, renders };
+    const renders = fs.existsSync(out) ? fs.readdirSync(out).filter((v) => v !== "stills" && !v.startsWith(".") && fs.statSync(path.join(out, v)).isDirectory()) : [];
+    // poster: a frame of the latest render, else the preview thumbnail, else the contact sheet
+    const own = path.join(out, ".thumb.jpg");
+    if (renders.length && (!fs.existsSync(own) || fs.statSync(own).mtimeMs < newestRender(out, renders))) {
+      const mp4 = renders.map((v) => fs.readdirSync(path.join(out, v)).filter((f) => /\.mp4$/.test(f) && !f.startsWith(".")).map((f) => path.join(out, v, f))).flat()[0];
+      if (mp4) spawnSync("ffmpeg", ["-v", "error", "-y", "-ss", String(Math.max(1, probeDuration(mp4) * 0.42)), "-i", mp4, "-frames:v", "1", "-vf", "scale=640:-2", "-q:v", "4", own]);
+    }
+    const sheet = fs.existsSync(path.join(out, "stills")) ? fs.readdirSync(path.join(out, "stills")).find((f) => f.endsWith("-sheet.jpg")) : undefined;
+    const thumb = fs.existsSync(own) ? `/files/${id}/out/.thumb.jpg?v=${Math.round(fs.statSync(own).mtimeMs)}` : sheet ? `/files/${id}/out/stills/${sheet}` : undefined;
+    return { id, title: spec.title, brand: spec.brand, updated: fs.statSync(path.join(d, "spec.json")).mtimeMs, scenes: spec.scenes?.length ?? 0, thumbnail: thumb, renders };
   }).sort((a, b) => b.updated - a.updated);
 }
 
-export function createProject(o: { title: string; template?: string; brand?: string }): { id: string } {
+const ASPECT_ID: Record<string, string> = { "16:9": "landscape", "9:16": "vertical", "1:1": "square", "4:5": "feed" };
+/** Keep the template's variants for chosen aspects, add plain ones for the rest; the first stays "main"-like. */
+function applyFormats(spec: any, formats?: string[]) {
+  if (!formats?.length) return;
+  const keep = spec.variants.filter((v: any) => formats.includes(v.aspect));
+  for (const a of formats) if (!keep.some((v: any) => v.aspect === a))
+    keep.push({ id: ASPECT_ID[a], aspect: a, safeArea: a === "9:16" ? "reels" : "title", ...(a !== "16:9" ? { loudness: -14 } : {}) });
+  keep.sort((x: any, y: any) => formats.indexOf(x.aspect) - formats.indexOf(y.aspect));
+  const seen = new Set<string>();
+  spec.variants = keep.map((v: any) => { let id = v.id; for (let n = 2; seen.has(id); n++) id = `${v.id}-${n}`; seen.add(id); return { ...v, id }; });
+}
+
+function newProjectDir(title: string) {
+  let id = slug(title || "video").toLowerCase().replace(/_/g, "-").slice(0, 40) || "video";
+  if (!/^[a-z0-9]/.test(id)) id = "v-" + id;
+  for (let n = 2; fs.existsSync(path.join(projectsDir(), id)); n++) id = id.replace(/-\d+$/, "") + "-" + n;
+  return { id, dir: path.join(projectsDir(), id) };
+}
+
+/** Temporary uploads (e.g. screenshots in the idea form, before the project exists). */
+export function saveUpload(filename: string, data: Buffer) {
+  const ext = path.extname(filename).toLowerCase();
+  if (![".png", ".jpg", ".jpeg", ".webp"].includes(ext)) throw new StudioError(400, "images only (png, jpg, webp)");
+  const d = path.join(studioHome(), "uploads"); fs.mkdirSync(d, { recursive: true });
+  const name = `${Date.now().toString(36)}-${path.basename(filename, ext).replace(/[^\w-]+/g, "-").slice(0, 30)}${ext}`;
+  fs.writeFileSync(path.join(d, name), data);
+  return `upload:${name}`;
+}
+
+/** New project from a guided brief (no AI): the rules in brief.ts write the storyboard. */
+export function createFromBrief(b: Brief & { brand?: string; title?: string }): { id: string } {
+  const brand = b.brand ?? "luraplus";
+  if (!fs.existsSync(path.join(env.brandsDir(), brand, "brand.json"))) throw new StudioError(400, `unknown brand "${brand}"`);
+  const { id, dir } = newProjectDir(b.title || b.product);
+  fs.mkdirSync(path.join(dir, "assets"), { recursive: true });
+  const shots = (b.screenshots ?? []).map((ref) => {
+    if (!ref.startsWith("upload:")) return ref;
+    const src = path.join(studioHome(), "uploads", path.basename(ref.slice(7)));
+    if (!fs.existsSync(src)) throw new StudioError(400, "an uploaded image expired; upload it again");
+    const name = path.basename(src).replace(/^[a-z0-9]+-/, "");
+    fs.copyFileSync(src, path.join(dir, "assets", name));
+    return `assets/${name}`;
+  });
+  const spec = briefToSpec({ ...b, screenshots: shots }, brand);
+  if (b.title) (spec as any).title = b.title;
+  fs.writeFileSync(path.join(dir, "brief.json"), JSON.stringify(b, null, 2) + "\n");
+  fs.writeFileSync(path.join(dir, "spec.json"), JSON.stringify(spec, null, 2) + "\n");
+  return { id };
+}
+
+function newestRender(out: string, renders: string[]) {
+  return Math.max(0, ...renders.flatMap((v) => fs.readdirSync(path.join(out, v)).filter((f) => f.endsWith(".mp4")).map((f) => fs.statSync(path.join(out, v, f)).mtimeMs)));
+}
+function probeDuration(f: string) {
+  const r = spawnSync("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", f], { encoding: "utf8" });
+  return parseFloat(r.stdout) || 2;
+}
+
+/** A poster still for projects that haven't been rendered (from the first preview). Fire-and-forget. */
+async function ensureThumb(id: string, doc: RuntimeDoc, t: number) {
+  const d = pdir(id);
+  const own = path.join(d, "out", ".thumb.jpg");
+  if (fs.existsSync(own) && Date.now() - fs.statSync(own).mtimeMs < 60_000) return;
+  try {
+    const srv = await runtimeOrigin();
+    const { openPage, seek } = await import("@vs/render");
+    const { browser, page } = await openPage(srv.origin, doc, 1);
+    await seek(page, t);
+    fs.mkdirSync(path.dirname(own), { recursive: true });
+    const tmp = own + ".png";
+    await page.screenshot({ path: tmp });
+    await browser.close();
+    spawnSync("ffmpeg", ["-v", "error", "-y", "-i", tmp, "-vf", "scale=640:-2", "-q:v", "4", own]);
+    fs.rmSync(tmp, { force: true });
+  } catch { /* best effort */ }
+}
+
+export function createProject(o: { title: string; template?: string; brand?: string; formats?: string[] }): { id: string } {
   const template = o.template ?? "feature-launch";
   const src = path.join(REPO, "templates", template);
   if (!fs.existsSync(path.join(src, "spec.json"))) throw new StudioError(400, `unknown template "${template}"`);
   const brand = o.brand ?? "luraplus";
   if (!fs.existsSync(path.join(env.brandsDir(), brand, "brand.json"))) throw new StudioError(400, `unknown brand "${brand}"`);
-  let id = slug(o.title || "video").toLowerCase().replace(/_/g, "-").slice(0, 40) || "video";
-  if (!/^[a-z0-9]/.test(id)) id = "v-" + id;
-  for (let n = 2; fs.existsSync(path.join(projectsDir(), id)); n++) id = id.replace(/-\d+$/, "") + "-" + n;
-  const dst = path.join(projectsDir(), id);
-  fs.cpSync(src, dst, { recursive: true, filter: (f) => !f.includes(`${path.sep}_source`) && !f.endsWith("README.md") });
+  const { id, dir: dst } = newProjectDir(o.title);
+  fs.cpSync(src, dst, { recursive: true, filter: (f) => !f.includes(`${path.sep}_source`) && !/(README\.md|template\.json|thumb\.jpg)$/.test(f) });
   const spec = JSON.parse(fs.readFileSync(path.join(dst, "spec.json"), "utf8"));
   spec.title = o.title || spec.title;
   spec.brand = brand;
   delete spec.$schema;
+  applyFormats(spec, o.formats);
+  // the brand's own voice and music, if it has them
+  const kit = JSON.parse(fs.readFileSync(path.join(env.brandsDir(), brand, "brand.json"), "utf8"));
+  if (kit.voice?.voice) spec.voice = { provider: "kokoro", voice: kit.voice.voice, speed: kit.voice.speed ?? 0.94 };
   fs.writeFileSync(path.join(dst, "spec.json"), JSON.stringify(spec, null, 2) + "\n");
   return { id };
 }
@@ -163,9 +257,26 @@ export async function preview(id: string, variant?: string): Promise<Preview> {
   const { doc, resolved } = p.variants[0];
   const srv = await runtimeOrigin();
   const an = await analyze(srv, doc);
+  if (!fs.existsSync(path.join(d, "out", ".thumb.jpg")) || !listOutputs(id).length) {
+    const s = resolved.scenes.find((x) => ["featureSpotlight", "screenFlow", "mediaBroll", "statsCounter"].includes(x.type)) ?? resolved.scenes[Math.min(1, resolved.scenes.length - 1)];
+    void ensureThumb(id, doc, s.start + Math.min(3, (s.end - s.start) * 0.6));
+  }
   return { variants: p.project.spec.variants.map((x) => x.id), variant: v, doc, lint: an.lint, duration: doc.duration,
     scenes: resolved.scenes.map((s) => ({ id: s.id, start: s.start, end: s.end, vo: s.vo.map((x) => ({ id: x.id, t: x.t, dur: x.dur })) })),
     warnings: resolved.warnings, dropped: resolved.dropped };
+}
+
+/** Draft audio for the preview player: the same mix the render uses (cached). Returns a project-relative path. */
+export async function previewAudio(id: string, variant?: string) {
+  const d = pdir(id);
+  const spec = JSON.parse(fs.readFileSync(path.join(d, "spec.json"), "utf8"));
+  const v = variant ?? spec.variants?.[0]?.id ?? "main";
+  const p = await prepare(path.join(d, "spec.json"), [v], { cacheDir: cacheDir() });
+  const an = await analyze(await runtimeOrigin(), p.variants[0].doc);
+  const out = path.join(d, "out", ".preview", v);
+  fs.mkdirSync(out, { recursive: true });
+  const r = await mixAudio(p, v, p.variants[0].resolved, an, out);
+  return { path: path.relative(d, r.mix), lufs: r.report.lufs };
 }
 
 export async function contactSheets(id: string, variant?: string) {
@@ -237,7 +348,7 @@ export function listOutputs(id: string) {
   const d = pdir(id);
   const out = path.join(d, "out");
   if (!fs.existsSync(out)) return [];
-  return fs.readdirSync(out).filter((v) => v !== "stills" && fs.statSync(path.join(out, v)).isDirectory()).map((v) => ({
+  return fs.readdirSync(out).filter((v) => v !== "stills" && !v.startsWith(".") && fs.statSync(path.join(out, v)).isDirectory()).map((v) => ({
     variant: v,
     files: fs.readdirSync(path.join(out, v)).filter((f) => !f.startsWith(".") && !/^(mix|stem_.*)\.wav$/.test(f) && !f.endsWith(".json")).sort()
       .map((f) => ({ name: f, path: `out/${v}/${f}`, bytes: fs.statSync(path.join(out, v, f)).size })),

@@ -3,7 +3,7 @@
  * Handles text/richText, number, toggle, select, objects, lists, discriminated unions (kind),
  * assets (upload or pick) and hotspots/focus rects drawn on the screenshot.
  */
-import { useRef, useState } from "react";
+import { useRef, useState, type MouseEvent, type ReactNode } from "react";
 import { api, fileUrl, type Json } from "../api.ts";
 
 export interface FormCtx { project: string; assets: string[]; onAssetsChanged(): void }
@@ -51,7 +51,7 @@ function Field({ name, schema: s, value, onChange, required, siblings, ctx, path
     : null;
   if (toggleOpt) return <div className="field optional">{toggleOpt}</div>;
   const remove = opt ? <button className="link small" title="Remove" onClick={() => onChange(undefined)}>remove</button> : null;
-  const head = (extra?: React.ReactNode) => <div className="flabel"><span>{lab}</span>{extra}{remove}</div>;
+  const head = (extra?: ReactNode) => <div className="flabel"><span>{lab}</span>{extra}{remove}</div>;
 
   if (s.oneOf) {
     const kinds = s.oneOf.map((o: Json) => o.properties?.kind?.const);
@@ -133,7 +133,7 @@ function AssetField({ value, onChange, ctx }: { value?: string; onChange(v: stri
   const upload = async (f?: File) => {
     if (!f) return;
     setBusy(true);
-    try { const r = await api.upload(ctx.project, f); ctx.onAssetsChanged(); onChange(r.path); } finally { setBusy(false); }
+    try { const r = await api.uploadAsset(ctx.project, f); ctx.onAssetsChanged(); onChange(r.path); } finally { setBusy(false); }
   };
   return (
     <div className="asset">
@@ -154,11 +154,11 @@ function AssetField({ value, onChange, ctx }: { value?: string; onChange(v: stri
 function SpotField({ kind, value, onChange, screen, ctx, help }: { kind: string; value?: Json; onChange(v: Json): void; screen?: string; ctx: FormCtx; help?: string }) {
   const [corner, setCorner] = useState<{ x: number; y: number } | null>(null);
   if (!screen) return <p className="help">Choose a screenshot first.</p>;
-  const pos = (e: React.MouseEvent) => {
+  const pos = (e: MouseEvent) => {
     const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
     return { x: +((e.clientX - r.left) / r.width).toFixed(3), y: +((e.clientY - r.top) / r.height).toFixed(3) };
   };
-  const click = (e: React.MouseEvent) => {
+  const click = (e: MouseEvent) => {
     const p = pos(e);
     if (kind === "hotspots") return onChange(p);
     if (!corner) return setCorner(p);

@@ -235,3 +235,12 @@
 .spike-grid { position: absolute; inset: 8cqmin; display: grid; grid-template-columns: repeat(4, 1fr); gap: 3cqmin; }
 .spike-card { background: #fff; border-radius: 1.2cqmin; border: 1px solid var(--vs-grey200); box-shadow: var(--vs-shadow-md); padding: 2cqmin; display: flex; flex-direction: column; gap: 1cqmin; font-size: 1.6cqmin; color: var(--vs-grey600); }
 .spike-card b { font-family: var(--vs-font-display); font-size: 2.2cqmin; color: var(--vs-ink); }
+
+/* ---------- brand tone (primary gradient): light-on-colour variants ---------- */
+.tone-brand .sc-value { color: #fff; } .tone-brand .sc-label { color: rgba(255,255,255,.78); } .tone-brand .sc-rule { background: rgba(255,255,255,.35); }
+.tone-brand .fg-card { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.18); box-shadow: none; }
+.tone-brand .fg-title { color: #fff; } .tone-brand .fg-text { color: rgba(255,255,255,.75); }
+.tone-brand .fg-icon { background: rgba(255,255,255,.16); color: #fff; }
+.tone-brand .fs-bullets li { color: rgba(255,255,255,.85); } .tone-brand .fs-bullets .ico { color: #fff; }
+.tone-brand .sf-cap { background: rgba(255,255,255,.14); color: #fff; border-color: rgba(255,255,255,.2); box-shadow: none; }
+.tone-brand .cta-btn { background: #fff; color: var(--vs-primary700); }
