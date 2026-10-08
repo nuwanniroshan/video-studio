@@ -1,0 +1,174 @@
+{
+ "version": 1,
+ "title": "App launch",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "uplifting-tech"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "af_heart",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "vertical",
+   "aspect": "9:16",
+   "safeArea": "reels",
+   "loudness": -14
+  },
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  }
+ ],
+ "scenes": [
+  {
+   "id": "hook",
+   "type": "kineticTitle",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Your whole day, finally in one place."
+    }
+   ],
+   "props": {
+    "headline": "Your whole day, *in one place.*",
+    "style": "typewriter"
+   },
+   "musicCue": "tension"
+  },
+  {
+   "id": "reveal",
+   "type": "logoReveal",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Meet the new Northwind app."
+    }
+   ],
+   "props": {
+    "tagline": "Now on *iPhone and Android.*"
+   },
+   "transitionIn": {
+    "type": "flash"
+   },
+   "musicCue": "reveal"
+  },
+  {
+   "id": "app",
+   "type": "featureSpotlight",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Plan your tasks, see your schedule, and share updates, all from your phone."
+    }
+   ],
+   "props": {
+    "kicker": "The app",
+    "headline": "Plan, track *and share.*",
+    "bullets": [
+     "Tasks and calendar together",
+     "Updates in one tap"
+    ],
+    "visual": {
+     "kind": "panel",
+     "title": "Today",
+     "rows": [
+      {
+       "label": "Design review",
+       "value": "10:00",
+       "status": "info"
+      },
+      {
+       "label": "Ship release notes",
+       "value": "Done",
+       "status": "ok"
+      },
+      {
+       "label": "Team lunch",
+       "value": "12:30",
+       "status": "none"
+      },
+      {
+       "label": "New comment on Roadmap",
+       "status": "new"
+      }
+     ],
+     "action": "Add task"
+    }
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "features",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "It works offline,",
+     "step": 0
+    },
+    {
+     "text": "syncs everywhere,",
+     "step": 1
+    },
+    {
+     "text": "and keeps your data private.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "kicker": "Why you'll love it",
+    "headline": "Fast, synced, *private.*",
+    "items": [
+     {
+      "icon": "cycle",
+      "title": "Works offline",
+      "text": "Syncs the moment you're back."
+     },
+     {
+      "icon": "copy",
+      "title": "Everywhere",
+      "text": "Phone, tablet and web."
+     },
+     {
+      "icon": "lock",
+      "title": "Private",
+      "text": "Your data stays yours."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "push",
+    "direction": "left"
+   }
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Download Northwind free today."
+    }
+   ],
+   "props": {
+    "headline": "Get it *free today.*",
+    "button": "Download now",
+    "click": true
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

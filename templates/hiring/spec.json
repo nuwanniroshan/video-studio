@@ -1,0 +1,186 @@
+{
+ "version": 1,
+ "title": "We're hiring",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "uplifting-tech"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "am_michael",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  },
+  {
+   "id": "vertical",
+   "aspect": "9:16",
+   "safeArea": "reels",
+   "loudness": -14,
+   "scenes": [
+    "hook",
+    "team",
+    "perks",
+    "cta"
+   ]
+  }
+ ],
+ "scenes": [
+  {
+   "id": "hook",
+   "type": "kineticTitle",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Want to build something that matters?"
+    }
+   ],
+   "props": {
+    "kicker": "We're hiring",
+    "headline": "Do the best work *of your career.*",
+    "style": "mask"
+   },
+   "musicCue": "tension"
+  },
+  {
+   "id": "reveal",
+   "type": "logoReveal",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "At Northwind, small teams ship big things."
+    }
+   ],
+   "props": {
+    "tagline": "Small teams, *big impact.*"
+   },
+   "transitionIn": {
+    "type": "flash"
+   },
+   "musicCue": "reveal"
+  },
+  {
+   "id": "team",
+   "type": "mediaBroll",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "You'll work with kind, curious people who care about the craft."
+    }
+   ],
+   "props": {
+    "media": "assets/broll.jpg",
+    "headline": "Kind, curious, *and brilliant.*",
+    "position": "bottom-left",
+    "tint": "darken"
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "perks",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Work from anywhere,",
+     "step": 0
+    },
+    {
+     "text": "learn on the job,",
+     "step": 1
+    },
+    {
+     "text": "and take the time off you need.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "kicker": "Why join",
+    "headline": "Built around *real life.*",
+    "items": [
+     {
+      "icon": "flag",
+      "title": "Remote-first",
+      "text": "Work from anywhere in our time zones."
+     },
+     {
+      "icon": "spark",
+      "title": "Growth budget",
+      "text": "Courses, books and conferences, on us."
+     },
+     {
+      "icon": "cal",
+      "title": "Real time off",
+      "text": "Generous leave, and we mean it."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "iris"
+   }
+  },
+  {
+   "id": "numbers",
+   "type": "statsCounter",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "We're growing fast, and we're just getting started."
+    }
+   ],
+   "props": {
+    "kicker": "The team",
+    "headline": "Growing, *and just getting started.*",
+    "stats": [
+     {
+      "value": 48,
+      "label": "people today"
+     },
+     {
+      "value": 12,
+      "label": "countries"
+     },
+     {
+      "value": 4.8,
+      "decimals": 1,
+      "suffix": "/5",
+      "label": "team rating"
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "optional": true
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "See our open roles and apply today."
+    }
+   ],
+   "props": {
+    "headline": "Your next chapter *starts here.*",
+    "button": "See open roles",
+    "note": "Engineering, design, sales and support."
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

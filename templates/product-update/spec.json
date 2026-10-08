@@ -1,0 +1,134 @@
+{
+ "version": 1,
+ "title": "Product update",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "calm-explainer"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "af_nicole",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  },
+  {
+   "id": "square",
+   "aspect": "1:1",
+   "safeArea": "title",
+   "loudness": -14
+  }
+ ],
+ "scenes": [
+  {
+   "id": "intro",
+   "type": "kineticTitle",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Here's what's new in Northwind this month."
+    }
+   ],
+   "props": {
+    "kicker": "Product update",
+    "headline": "What's new *this month.*",
+    "style": "rise",
+    "align": "left"
+   },
+   "musicCue": "build"
+  },
+  {
+   "id": "headline-feature",
+   "type": "featureSpotlight",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "The big one: reports now build themselves, with live charts you can share in a click."
+    }
+   ],
+   "props": {
+    "kicker": "New",
+    "headline": "Reports that *build themselves.*",
+    "body": "Live charts from your data, ready to share in one click.",
+    "visual": {
+     "kind": "image",
+     "asset": "assets/flow-2.png",
+     "frame": "browser"
+    }
+   },
+   "transitionIn": {
+    "type": "push",
+    "direction": "left"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "more",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Plus faster search,",
+     "step": 0
+    },
+    {
+     "text": "a new dark mode,",
+     "step": 1
+    },
+    {
+     "text": "and smarter notifications.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "kicker": "Also new",
+    "headline": "Small things, *big difference.*",
+    "items": [
+     {
+      "icon": "search",
+      "title": "Faster search",
+      "text": "Results as you type."
+     },
+     {
+      "icon": "spark",
+      "title": "Dark mode",
+      "text": "Easy on the eyes."
+     },
+     {
+      "icon": "bell",
+      "title": "Smarter alerts",
+      "text": "Only what matters."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   }
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Read the full changelog on our website."
+    }
+   ],
+   "props": {
+    "headline": "See *everything that's new.*",
+    "button": "Read the changelog"
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

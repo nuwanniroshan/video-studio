@@ -1,0 +1,205 @@
+{
+ "version": 1,
+ "title": "Company intro",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "calm-explainer"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "bm_george",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  },
+  {
+   "id": "square",
+   "aspect": "1:1",
+   "safeArea": "title",
+   "loudness": -14,
+   "scenes": [
+    "mission",
+    "reveal",
+    "what",
+    "traction",
+    "cta"
+   ]
+  }
+ ],
+ "scenes": [
+  {
+   "id": "mission",
+   "type": "kineticTitle",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Every small business deserves the tools big companies take for granted."
+    }
+   ],
+   "props": {
+    "kicker": "Our mission",
+    "headline": "Big-company tools, *for every business.*",
+    "style": "mask"
+   },
+   "musicCue": "tension"
+  },
+  {
+   "id": "reveal",
+   "type": "logoReveal",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "That's why we built Northwind."
+    }
+   ],
+   "props": {
+    "tagline": "Software for *the rest of us.*"
+   },
+   "transitionIn": {
+    "type": "flash"
+   },
+   "musicCue": "reveal"
+  },
+  {
+   "id": "what",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "We help businesses get paid,",
+     "step": 0
+    },
+    {
+     "text": "manage their teams,",
+     "step": 1
+    },
+    {
+     "text": "and understand their numbers.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "kicker": "What we do",
+    "headline": "One platform, *three jobs done.*",
+    "items": [
+     {
+      "icon": "wallet",
+      "title": "Get paid",
+      "text": "Invoices and payments in one flow."
+     },
+     {
+      "icon": "users",
+      "title": "Run the team",
+      "text": "People, rosters and leave."
+     },
+     {
+      "icon": "chart",
+      "title": "Know the numbers",
+      "text": "Live reports, no spreadsheets."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "traction",
+   "type": "statsCounter",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Today, twelve thousand businesses rely on us, in thirty countries."
+    }
+   ],
+   "props": {
+    "kicker": "Traction",
+    "headline": "Trusted *around the world.*",
+    "stats": [
+     {
+      "value": 12,
+      "suffix": "k",
+      "label": "businesses"
+     },
+     {
+      "value": 30,
+      "label": "countries"
+     },
+     {
+      "value": 99.9,
+      "decimals": 1,
+      "suffix": "%",
+      "label": "uptime"
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "musicCue": "build",
+   "aspectOverrides": {
+    "1:1": {
+     "props": {
+      "stats": [
+       {
+        "value": 12,
+        "suffix": "k",
+        "label": "businesses"
+       },
+       {
+        "value": 30,
+        "label": "countries"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "team",
+   "type": "mediaBroll",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "And we're a team of builders who answer every message ourselves."
+    }
+   ],
+   "props": {
+    "media": "assets/broll.jpg",
+    "headline": "Built by people *who care.*",
+    "position": "bottom-left",
+    "tint": "darken"
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "optional": true
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Let's talk."
+    }
+   ],
+   "props": {
+    "headline": "Let's build *what's next.*",
+    "button": "Get in touch"
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}
