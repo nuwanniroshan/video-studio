@@ -10,6 +10,8 @@ A code-driven motion-graphics video generator. A declarative storyboard spec goe
 
 ## Setup (macOS)
 
+`pnpm video` does this automatically. To do it manually:
+
 ```bash
 brew install espeak-ng ffmpeg
 pnpm install
@@ -18,7 +20,24 @@ scripts/setup-python.sh          # .venv + Kokoro models (~350 MB) into models/
 pnpm build                       # runtime bundle
 ```
 
-## Make a video
+## Make a video: one command
+
+```bash
+pnpm video                      # sets up what's missing, then renders the feature-launch template into ./my-video
+pnpm video my-launch            # your project folder (created from the template the first time)
+pnpm video my-launch -q draft   # quick preview; -q cinema for 60 fps finals; --help for all options
+```
+
+`scripts/make-video.sh` (what `pnpm video` runs) does the following:
+- checks and installs dependencies (only the missing ones);
+- creates the project from a template if it doesn't exist;
+- generates the voice-over and timing;
+- writes stills and contact sheets to `out/stills/`;
+- lints, then renders every variant with all deliverables into `<project>/out/<variant>/`.
+
+Edit `<project>/spec.json` and run it again. Only the changed scenes re-render.
+
+## Step by step
 
 ```bash
 pnpm vs init my-launch --template feature-launch --brand luraplus

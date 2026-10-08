@@ -68,7 +68,7 @@ program.command("validate")
   });
 
 program.command("lint")
-  .description("Layout lint every variant (headless): overflow, safe area, maxChars, missing assets, render-cost warnings")
+  .description("Layout lint every variant (headless). Exit 0 clean, 2 warnings, 1 errors")
   .argument("<spec>")
   .option("-v, --variant <ids>", "comma-separated variants")
   .option("--json")
@@ -77,11 +77,11 @@ program.command("lint")
       const p = await prepare(sp, o.variant ? list(o.variant) : undefined);
       const srv = await serveProject(p.project);
       const res: Record<string, unknown> = {};
-      let n = 0;
-      for (const v of p.variants) { const a = await analyze(srv, v.doc); res[v.id] = a.lint; n += a.lint.length; if (!o.json) { say(`${a.lint.length ? "!" : "✓"} ${v.id}: ${a.lint.length} issue(s)`); a.lint.forEach((l) => say(`  ${l.level} [${l.scene}] ${l.code}: ${l.message}`)); } }
+      let n = 0, errors = 0;
+      for (const v of p.variants) { const a = await analyze(srv, v.doc); res[v.id] = a.lint; n += a.lint.length; errors += a.lint.filter((l) => l.level === "error").length; if (!o.json) { say(`${a.lint.length ? "!" : "✓"} ${v.id}: ${a.lint.length} issue(s)`); a.lint.forEach((l) => say(`  ${l.level} [${l.scene}] ${l.code}: ${l.message}`)); } }
       await srv.close();
       if (o.json) console.log(JSON.stringify(res, null, 1));
-      process.exit(n ? 2 : 0);
+      process.exit(errors ? 1 : n ? 2 : 0); // 1 = errors (render refuses), 2 = warnings only
     } catch (e) { fail(e); }
   });
 

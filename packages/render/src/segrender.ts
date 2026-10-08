@@ -16,7 +16,8 @@ export interface Worker { browser: Browser; page: Page; cdp: CDPSession }
 
 export async function openWorker(origin: string, doc: RuntimeDoc, scale: number): Promise<Worker> {
   const browser = await chromium.launch({ args: CHROMIUM_ARGS });
-  const page = await browser.newPage({ viewport: { width: doc.width, height: doc.height }, deviceScaleFactor: scale });
+  const page = await browser.newPage({ viewport: { width: doc.width, height: doc.height }, deviceScaleFactor: 1 });
+  void scale; // tier scale is applied at capture time (clip.scale)
   await page.route("**/*", (route) => {
     const u = route.request().url();
     return u.startsWith(origin + "/") || u.startsWith("data:") ? route.continue() : route.abort("blockedbyclient");
@@ -78,7 +79,7 @@ export async function renderSegments(o: {
           } else {
             for (let k = 0; k < o.q.sub; k++) {
               await w.page.evaluate((tt) => (window as any).__vs.seek(tt), Math.max(0, subTime(0, i, k, o.q.fps, o.q.sub)));
-              last = await capture(w.cdp, o.q.capture, o.q.jpegQuality);
+              last = await capture(w.cdp, o.q.capture, o.q.jpegQuality, { width: o.doc.width, height: o.doc.height, scale: o.q.scale });
               captures++;
               await enc.write(last);
             }

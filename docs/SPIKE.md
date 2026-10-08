@@ -112,6 +112,8 @@ That gives **about 31 captures/s per task**. Per output frame, that means:
 - A 16 vCPU / 32 GB task costs **$0.63/h on-demand**, about $0.19/h on Spot.
 - The LuraPlus-weight cinema film comes to about **$0.22 on-demand** or $0.07 on Spot. That's inside the PLAN's $0.10–0.40 range.
 
+> **Correction (M1):** the draft tier's 0.5× scale was not applied in M0. `deviceScaleFactor: 0.5` is ignored by CDP screenshots, so "draft" captured at full resolution. M1 scales in the capture call (`clip.scale`). The draft figures above are therefore full-resolution JPEG captures at 30 fps with 1 sub-frame.
+
 ## Quality tiers: decision
 
 Keep the PLAN §10 tiers as they are.

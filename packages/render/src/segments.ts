@@ -66,7 +66,8 @@ export function planSegments(doc: RuntimeDoc, q: QualityTier, ctx: { runtime: st
     // frame range in the first scene's local time (exact: start * fps phase included)
     const local = { a: (s.f0 - first.start * fps), b: (s.f1 - first.start * fps) };
     const key = hashJson({
-      v: 2, runtime: ctx.runtime, brand: ctx.brand, q, w: doc.width, h: doc.height, aspect: doc.aspect,
+      v: 3, // bump when capture/encode changes in ways the inputs below don't capture
+      runtime: ctx.runtime, brand: ctx.brand, q, w: doc.width, h: doc.height, aspect: doc.aspect,
       kind: s.kind, local: [Math.round(local.a * 1e4) / 1e4, Math.round(local.b * 1e4) / 1e4],
       scenes: s.scenes.map((id) => sceneFingerprint(doc, doc.scenes.findIndex((x) => x.id === id))),
     });

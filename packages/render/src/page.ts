@@ -32,9 +32,12 @@ export async function seek(page: Page, t: number) {
   await page.evaluate((tt) => (window as any).__vs.seek(tt), t);
 }
 
-export async function capture(cdp: CDPSession, format: "png" | "jpeg", quality?: number): Promise<Buffer> {
+/** `clip.scale` < 1 downsamples in the compositor (deviceScaleFactor < 1 is ignored by CDP screenshots). */
+export async function capture(cdp: CDPSession, format: "png" | "jpeg", quality?: number,
+  clip?: { width: number; height: number; scale: number }): Promise<Buffer> {
   const { data } = await cdp.send("Page.captureScreenshot", {
     format, quality: format === "jpeg" ? quality : undefined, optimizeForSpeed: true, captureBeyondViewport: false,
+    ...(clip && clip.scale !== 1 ? { clip: { x: 0, y: 0, width: clip.width, height: clip.height, scale: clip.scale } } : {}),
   });
   return Buffer.from(data, "base64");
 }

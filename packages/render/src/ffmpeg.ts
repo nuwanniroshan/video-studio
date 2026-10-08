@@ -24,7 +24,9 @@ export function segmentEncoder(out: string, o: { fps: number; sub: number; codec
   proc: ChildProcessWithoutNullStreams; write(buf: Buffer): Promise<void>; end(): Promise<void>;
 } {
   const blur = o.sub > 1 ? `tmix=frames=${o.sub},select='eq(mod(n\\,${o.sub})\\,${o.sub - 1})',setpts=N/(${o.fps}*TB)` : "null";
-  const vf = o.post ? `${blur},${o.post}` : blur;
+  // JPEG (draft) decodes as full-range yuvj; convert to TV range so every tier encodes the same way
+  const range = o.codec === "mjpeg" ? "scale=in_range=pc:out_range=tv,format=yuv420p" : "";
+  const vf = [blur, o.post, range].filter(Boolean).join(",");
   const proc = spawn("ffmpeg", [
     "-hide_banner", "-loglevel", "error", "-y",
     "-f", "image2pipe", "-framerate", String(o.fps * o.sub), "-c:v", o.codec, "-i", "-",

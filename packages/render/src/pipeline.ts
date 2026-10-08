@@ -115,7 +115,7 @@ export async function render(o: RenderOptions): Promise<{ results: VariantResult
       await run(["-f", "concat", "-safe", "0", "-i", list, "-c", "copy", silent]);
       const file = path.join(outDir, `${base}.mp4`);
       await run(["-i", silent, "-i", audio.mix, "-map", "0:v", "-map", "1:a", "-c:v", "copy", "-c:a", "aac", "-b:a", "320k", "-shortest", "-movflags", "+faststart", file]);
-      const frames = +(await probe(silent, ["-count_packets", "-select_streams", "v:0", "-show_entries", "stream=nb_read_packets", "-of", "csv=p=0"]));
+      const frames = parseInt(await probe(silent, ["-count_packets", "-select_streams", "v:0", "-show_entries", "stream=nb_read_packets", "-of", "csv=p=0"]), 10);
       const want = Math.round(v.doc.duration * q.fps);
       if (frames !== want) throw new Error(`assembled ${frames} frames, expected ${want}`);
       fs.writeFileSync(path.join(outDir, `${base}.timeline.json`), JSON.stringify(v.resolved, null, 1));
