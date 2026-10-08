@@ -32,6 +32,8 @@ const Place = z.object({
   size: num("Text size ×", { min: 0.3, max: 3 }).optional(),
   anchor: z.enum(ANCHORS).optional().meta({ ui: "select", label: "Anchor" }),
   align: z.enum(["left", "center", "right"]).optional().meta({ ui: "select", label: "Text align" }),
+  x2: num("End X %", { min: -50, max: 150 }).optional(),
+  y2: num("End Y %", { min: -50, max: 150 }).optional(),
 }).meta({ label: "Placement override" });
 
 const base = {
@@ -134,7 +136,60 @@ const CounterLayer = z.object({
   ...base,
 });
 
-export const Layer = z.discriminatedUnion("kind", [TextLayer, ShapeLayer, SvgLayer, ImageLayer, IconLayer, LogoLayer, ParticlesLayer, CounterLayer])
+const ArrowLayer = z.object({
+  kind: z.literal("arrow"),
+  x2: num("End X %", { min: -50, max: 150 }).default(70),
+  y2: num("End Y %", { min: -50, max: 150 }).default(50),
+  bend: num("Curve", { min: -1, max: 1, help: "0 = straight; ± bends left or right." }).default(0),
+  head: select("Arrow heads", ["end", "both", "none"], "end"),
+  dashed: toggle("Dashed", false),
+  color: Color("Colour", "auto"),
+  strokeWidth: num("Line width (px at 1080)", { min: 1, max: 20 }).default(4),
+  ...base,
+  enter: select("Entrance", ENTERS, "draw"),
+});
+const Datum = z.object({
+  label: text("Label", 24).optional(),
+  value: z.number().meta({ ui: "number", label: "Value" }),
+  color: OptColor("Colour"),
+  highlight: toggle("Highlight", false),
+});
+const ChartLayer = z.object({
+  kind: z.literal("chart"),
+  chart: select("Chart", ["bars", "columns", "line", "area", "donut", "progress"], "columns"),
+  data: list("Data", Datum, 1, 10),
+  max: num("Scale maximum", { help: "Defaults to the largest value." }).optional(),
+  prefix: text("Value prefix", 4).optional(),
+  suffix: text("Value suffix", 8).optional(),
+  decimals: z.number().int().min(0).max(2).default(0).meta({ ui: "number", label: "Decimals" }),
+  values: toggle("Show values", true),
+  labels: toggle("Show labels", true),
+  color: Color("Colour", "primary"),
+  dim: Color("Other bars", "auto"),
+  stagger: num("Stagger (s)", { min: 0, max: 2 }).default(0.15),
+  ...base,
+  enter: select("Entrance", ENTERS, "none"),
+});
+const ListItem = z.object({
+  text: richText("Item", 90),
+  at: Cue.optional().meta({ ui: "text", label: "Appears at", help: "Defaults to the list's cue plus a stagger." }),
+});
+const ListLayer = z.object({
+  kind: z.literal("list"),
+  items: list("Items", ListItem, 1, 8),
+  marker: select("Marker", ["bullet", "number", "check", "cross", "arrow", "dash", "none"], "bullet"),
+  style: select("Style", ["title", "body", "headline"], "body"),
+  size: num("Size ×", { min: 0.3, max: 3 }).default(1),
+  color: Color("Colour"),
+  markerColor: Color("Marker colour", "primary"),
+  gap: num("Gap (em)", { min: 0, max: 3 }).default(0.6),
+  align: select("Align", ["left", "center"], "left"),
+  stagger: num("Stagger (s)", { min: 0, max: 3 }).default(0.35),
+  ...base,
+});
+
+export const Layer = z.discriminatedUnion("kind", [TextLayer, ShapeLayer, SvgLayer, ImageLayer, IconLayer, LogoLayer, ParticlesLayer, CounterLayer,
+  ArrowLayer, ChartLayer, ListLayer])
   .meta({ label: "Layer" });
 
 const Background = z.object({
@@ -154,11 +209,18 @@ export const compose = defineScene({
   schema: z.object({
     background: Background.default({ style: "tone", angle: 160, motif: "none", motifColor: "auto", motifOpacity: 0.5, vignette: false }),
     camera: select("Camera", ["none", "push-in", "pull-out", "pan-left", "pan-right", "rise", "drift"], "none"),
+    focus: list("Camera focus", z.object({
+      at: Cue.meta({ ui: "text", label: "At cue" }),
+      delay: num("Delay (s)", { min: -5, max: 30 }).default(0),
+      x: num("X %", { min: 0, max: 100 }).default(50),
+      y: num("Y %", { min: 0, max: 100 }).default(50),
+      zoom: num("Zoom", { min: 1, max: 4 }).default(1.6),
+    }), 0, 8, { help: "Moves the camera to a point of the frame at a cue (zoom 1 = back to the whole frame). Replaces the camera move." }).optional(),
     layers: list("Layers", Layer, 1, 28, { help: "Drawn in order: the first layer is at the back." }),
     exit: toggle("Animate out at the end", true),
   }),
   meta: { label: "Composed scene", category: "custom",
-    description: "Free-form layout: you place layers (text, shapes, your own SVG illustrations, images, the logo, icons, particles, counters) on a % grid of the safe frame and give each an entrance at a voice-over cue. Use it to design original scenes that fit the idea instead of a fixed layout.",
+    description: "Free-form layout: you place layers (text, shapes, your own SVG illustrations, images, the logo, icons, particles, counters, arrows, charts, lists) on a % grid of the safe frame and give each an entrance at a voice-over cue. Use it to design original scenes that fit the idea instead of a fixed layout.",
     defaultMusicCue: "build", defaultTransition: { type: "crossfade" } },
   timing: (p) => ({ min: 2.4 + 0.045 * p.layers.reduce((n: number, l: { kind: string; text?: string }) => n + (l.kind === "text" ? words(l.text) : 0), 0) }),
   example: {
@@ -180,6 +242,36 @@ export const compose = defineScene({
         portrait: { x: 50, y: 82, w: 86, anchor: "center", align: "center" } },
     ],
   },
+  fixtures: {
+    diagram: {
+      background: { style: "solid", colors: ["light"], motif: "dots", motifOpacity: 0.4 },
+      focus: [{ at: "start", delay: 2.2, x: 72, y: 50, zoom: 1.5 }],
+      layers: [
+        { kind: "shape", shape: "rect", x: 22, y: 50, w: 22, h: 30, fill: "white", radius: 8, shadow: true },
+        { kind: "icon", icon: "users", x: 22, y: 44, w: 7, color: "primary" },
+        { kind: "text", style: "title", text: "You ask", x: 22, y: 58, w: 20 },
+        { kind: "arrow", x: 35, y: 50, x2: 59, y2: 50, bend: -0.3, delay: 0.4 },
+        { kind: "shape", shape: "circle", x: 72, y: 50, w: 20, fill: "primary", fill2: "accent", delay: 0.8, enter: "pop" },
+        { kind: "text", style: "title", text: "We *answer*", x: 72, y: 50, w: 18, color: "white", accent: "white", delay: 1.0 },
+        { kind: "list", x: 50, y: 88, w: 80, marker: "check", align: "center", items: [{ text: "Fast" }, { text: "Accurate, *every time*" }], delay: 1.2 },
+      ],
+    },
+    charts: {
+      background: { style: "tone" },
+      layers: [
+        { kind: "chart", chart: "columns", x: 26, y: 50, w: 44, h: 70, data: [{ label: "2022", value: 12 }, { label: "2023", value: 30 }, { label: "2024", value: 58, highlight: true }], suffix: "k" },
+        { kind: "chart", chart: "donut", x: 76, y: 30, w: 36, h: 40, data: [{ label: "Repeat buyers", value: 68, highlight: true }, { value: 32 }], suffix: "%" },
+        { kind: "chart", chart: "progress", x: 76, y: 78, w: 40, h: 26, data: [{ label: "Setup", value: 90 }, { label: "Adoption", value: 64 }], max: 100, suffix: "%" },
+      ],
+    },
+    trend: {
+      background: { style: "radial", colors: ["#1B2340", "#0B1020"] },
+      layers: [
+        { kind: "chart", chart: "area", x: 50, y: 52, w: 84, h: 64, data: [{ label: "Jan", value: 4 }, { label: "Feb", value: 6 }, { label: "Mar", value: 5 }, { label: "Apr", value: 9 }, { label: "May", value: 14, highlight: true }] },
+        { kind: "chart", chart: "bars", x: 50, y: 92, w: 70, h: 12, data: [{ label: "Target", value: 12 }], max: 14 },
+      ],
+    },
+  },
   stress: {
     background: { style: "linear", colors: ["primary", "dark"], motif: "dots" },
     layers: [
@@ -188,6 +280,7 @@ export const compose = defineScene({
       { kind: "counter", value: 12500, prefix: "$", suffix: "+", x: 50, y: 90, w: 60, h: 14 },
       { kind: "icon", icon: "spark", x: 10, y: 10, w: 8, badge: "white", loop: "spin" },
       { kind: "particles", style: "confetti", x: 50, y: 50, w: 100, h: 100, count: 40 },
+      { kind: "arrow", x: 10, y: 60, x2: 90, y2: 62, bend: 0.4, head: "both", dashed: true },
     ],
   },
 });

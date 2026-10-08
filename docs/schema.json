@@ -2842,6 +2842,60 @@
                       "drift"
                     ]
                   },
+                  "focus": {
+                    "minItems": 0,
+                    "maxItems": 8,
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "at": {
+                          "type": "string",
+                          "pattern": "^[a-z][a-z0-9-]{0,39}$",
+                          "ui": "text",
+                          "label": "At cue"
+                        },
+                        "delay": {
+                          "default": 0,
+                          "type": "number",
+                          "minimum": -5,
+                          "maximum": 30,
+                          "ui": "number",
+                          "label": "Delay (s)"
+                        },
+                        "x": {
+                          "default": 50,
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "ui": "number",
+                          "label": "X %"
+                        },
+                        "y": {
+                          "default": 50,
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 100,
+                          "ui": "number",
+                          "label": "Y %"
+                        },
+                        "zoom": {
+                          "default": 1.6,
+                          "type": "number",
+                          "minimum": 1,
+                          "maximum": 4,
+                          "ui": "number",
+                          "label": "Zoom"
+                        }
+                      },
+                      "required": [
+                        "at"
+                      ]
+                    },
+                    "ui": "list",
+                    "label": "Camera focus",
+                    "help": "Moves the camera to a point of the frame at a cue (zoom 1 = back to the whole frame). Replaces the camera move."
+                  },
                   "layers": {
                     "minItems": 1,
                     "maxItems": 28,
@@ -3187,6 +3241,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -3254,6 +3322,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -3543,6 +3625,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -3610,6 +3706,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -3847,6 +3957,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -3914,6 +4038,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4195,6 +4333,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4262,6 +4414,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4532,6 +4698,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4599,6 +4779,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4834,6 +5028,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -4901,6 +5109,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -5161,6 +5383,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -5228,6 +5464,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -5522,6 +5772,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -5589,6 +5853,20 @@
                                     "center",
                                     "right"
                                   ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
                                 }
                               },
                               "label": "Placement override"
@@ -5597,6 +5875,1240 @@
                           "required": [
                             "kind",
                             "value"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "arrow"
+                            },
+                            "x2": {
+                              "default": 70,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "End X %"
+                            },
+                            "y2": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "End Y %"
+                            },
+                            "bend": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -1,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Curve",
+                              "help": "0 = straight; ± bends left or right."
+                            },
+                            "head": {
+                              "default": "end",
+                              "ui": "select",
+                              "label": "Arrow heads",
+                              "type": "string",
+                              "enum": [
+                                "end",
+                                "both",
+                                "none"
+                              ]
+                            },
+                            "dashed": {
+                              "default": false,
+                              "ui": "toggle",
+                              "label": "Dashed",
+                              "type": "boolean"
+                            },
+                            "color": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "strokeWidth": {
+                              "default": 4,
+                              "type": "number",
+                              "minimum": 1,
+                              "maximum": 20,
+                              "ui": "number",
+                              "label": "Line width (px at 1080)"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "draw",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "chart"
+                            },
+                            "chart": {
+                              "default": "columns",
+                              "ui": "select",
+                              "label": "Chart",
+                              "type": "string",
+                              "enum": [
+                                "bars",
+                                "columns",
+                                "line",
+                                "area",
+                                "donut",
+                                "progress"
+                              ]
+                            },
+                            "data": {
+                              "minItems": 1,
+                              "maxItems": 10,
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "label": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "ui": "text",
+                                    "label": "Label",
+                                    "maxChars": 24
+                                  },
+                                  "value": {
+                                    "type": "number",
+                                    "ui": "number",
+                                    "label": "Value"
+                                  },
+                                  "color": {
+                                    "ui": "color",
+                                    "label": "Colour",
+                                    "type": "string",
+                                    "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                                  },
+                                  "highlight": {
+                                    "default": false,
+                                    "ui": "toggle",
+                                    "label": "Highlight",
+                                    "type": "boolean"
+                                  }
+                                },
+                                "required": [
+                                  "value"
+                                ]
+                              },
+                              "ui": "list",
+                              "label": "Data"
+                            },
+                            "max": {
+                              "type": "number",
+                              "ui": "number",
+                              "label": "Scale maximum",
+                              "help": "Defaults to the largest value."
+                            },
+                            "prefix": {
+                              "type": "string",
+                              "minLength": 1,
+                              "ui": "text",
+                              "label": "Value prefix",
+                              "maxChars": 4
+                            },
+                            "suffix": {
+                              "type": "string",
+                              "minLength": 1,
+                              "ui": "text",
+                              "label": "Value suffix",
+                              "maxChars": 8
+                            },
+                            "decimals": {
+                              "default": 0,
+                              "ui": "number",
+                              "label": "Decimals",
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 2
+                            },
+                            "values": {
+                              "default": true,
+                              "ui": "toggle",
+                              "label": "Show values",
+                              "type": "boolean"
+                            },
+                            "labels": {
+                              "default": true,
+                              "ui": "toggle",
+                              "label": "Show labels",
+                              "type": "boolean"
+                            },
+                            "color": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "dim": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Other bars",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "stagger": {
+                              "default": 0.15,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 2,
+                              "ui": "number",
+                              "label": "Stagger (s)"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "data"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "list"
+                            },
+                            "items": {
+                              "minItems": 1,
+                              "maxItems": 8,
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": {
+                                  "text": {
+                                    "type": "string",
+                                    "minLength": 1,
+                                    "ui": "richText",
+                                    "label": "Item",
+                                    "maxChars": 90,
+                                    "help": "Wrap words in *asterisks* for the accent colour."
+                                  },
+                                  "at": {
+                                    "ui": "text",
+                                    "label": "Appears at",
+                                    "help": "Defaults to the list's cue plus a stagger.",
+                                    "type": "string",
+                                    "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                                  }
+                                },
+                                "required": [
+                                  "text"
+                                ]
+                              },
+                              "ui": "list",
+                              "label": "Items"
+                            },
+                            "marker": {
+                              "default": "bullet",
+                              "ui": "select",
+                              "label": "Marker",
+                              "type": "string",
+                              "enum": [
+                                "bullet",
+                                "number",
+                                "check",
+                                "cross",
+                                "arrow",
+                                "dash",
+                                "none"
+                              ]
+                            },
+                            "style": {
+                              "default": "body",
+                              "ui": "select",
+                              "label": "Style",
+                              "type": "string",
+                              "enum": [
+                                "title",
+                                "body",
+                                "headline"
+                              ]
+                            },
+                            "size": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 3,
+                              "ui": "number",
+                              "label": "Size ×"
+                            },
+                            "color": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "markerColor": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Marker colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "gap": {
+                              "default": 0.6,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 3,
+                              "ui": "number",
+                              "label": "Gap (em)"
+                            },
+                            "align": {
+                              "default": "left",
+                              "ui": "select",
+                              "label": "Align",
+                              "type": "string",
+                              "enum": [
+                                "left",
+                                "center"
+                              ]
+                            },
+                            "stagger": {
+                              "default": 0.35,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 3,
+                              "ui": "number",
+                              "label": "Stagger (s)"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                },
+                                "x2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End X %"
+                                },
+                                "y2": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "End Y %"
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "items"
                           ]
                         }
                       ],

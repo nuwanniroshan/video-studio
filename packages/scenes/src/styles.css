@@ -313,3 +313,53 @@
 .cm-pt-embers { background: radial-gradient(closest-side, var(--c), color-mix(in srgb, var(--c) 0%, transparent)); }
 .cm-pt-petals { border-radius: 70% 0 70% 0; }
 .cm-logo { display: block; width: 100%; height: auto; object-fit: contain; }
+/* compose: arrows, charts, lists */
+.cl-arrow { pointer-events: none; }
+.cm-arrow { position: absolute; left: 0; top: 0; overflow: visible; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.cm-chart { width: 100%; height: 100%; display: flex; gap: .8em; font-family: var(--vs-font-body); color: inherit; }
+.cm-light .cm-chart { color: var(--vs-ink); } .cm-dark .cm-chart { color: #fff; }
+.cm-chart-columns { flex-direction: row; align-items: stretch; }
+.cm-chart-columns .ch-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .4em; min-width: 0; }
+.cm-chart-columns .ch-track { flex: 1; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.cm-chart-columns .ch-bar { display: block; width: 72%; border-radius: .35em .35em .12em .12em; transform-origin: 50% 100%; }
+.cm-chart-bars, .cm-chart-progress { flex-direction: column; justify-content: center; }
+.cm-chart-bars .ch-item, .cm-chart-progress .ch-item { display: grid; grid-template-columns: minmax(0, 30%) 1fr auto; align-items: center; gap: .7em; }
+.cm-chart-progress .ch-item { grid-template-columns: 1fr auto; grid-template-areas: "lab val" "track track"; row-gap: .35em; }
+.cm-chart-progress .ch-lab { grid-area: lab; } .cm-chart-progress .ch-val { grid-area: val; } .cm-chart-progress .ch-track { grid-area: track; }
+.cm-chart-bars .ch-track, .cm-chart-progress .ch-track { height: 1.1em; }
+.cm-chart-progress .ch-track { background: color-mix(in srgb, currentColor 12%, transparent); border-radius: 99px; overflow: hidden; height: .7em; }
+.cm-chart-bars .ch-bar, .cm-chart-progress .ch-bar { display: block; height: 100%; border-radius: .2em .5em .5em .2em; transform-origin: 0 50%; }
+.cm-chart-progress .ch-bar { border-radius: 99px; }
+.ch-val { font-family: var(--vs-font-display); font-weight: 700; font-size: 1.45em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ch-lab { opacity: .75; font-size: .95em; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+.cm-chart-bars .ch-lab { text-align: right; }
+.cm-chart-progress .ch-lab { text-align: left; opacity: .85; }
+.cm-chart-line, .cm-chart-area { flex-direction: column; }
+.ch-plot { position: relative; flex: 1; }
+.ch-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.ch-line { fill: none; stroke-width: max(3px, .45cqmin); stroke-linecap: round; stroke-linejoin: round; }
+.ch-dot { position: absolute; width: .7em; height: .7em; margin: -.35em 0 0 -.35em; border-radius: 50%; box-shadow: 0 0 0 .18em var(--vs-light); }
+.cm-dark .ch-dot { box-shadow: 0 0 0 .18em var(--vs-dark); }
+.ch-dot.hi { width: 1.1em; height: 1.1em; margin: -.55em 0 0 -.55em; }
+.ch-pv { position: absolute; transform: translate(-50%, -170%); font-family: var(--vs-font-display); font-weight: 700; white-space: nowrap; }
+.ch-axis { display: flex; justify-content: space-between; gap: .4em; }
+.ch-axis .ch-lab { flex: 1; } .ch-axis .ch-lab:first-child { text-align: left; } .ch-axis .ch-lab:last-child { text-align: right; }
+.cm-chart-donut { align-items: center; justify-content: center; }
+.ch-ring { position: relative; height: 100%; aspect-ratio: 1; max-width: 100%; }
+.ch-ring svg { width: 100%; height: 100%; display: block; }
+.ch-ring circle { fill: none; stroke-width: 13; }
+.ch-bgring { stroke: color-mix(in srgb, currentColor 10%, transparent); }
+.ch-seg { stroke-dasharray: 0 1; }
+.ch-mid { position: absolute; inset: 22%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: .2em; }
+.ch-big { font-family: var(--vs-font-display); font-weight: 700; font-size: 3.2em; line-height: 1; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cm-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--gap, .6em); width: 100%; }
+.cm-light .cm-list { color: var(--vs-ink); } .cm-dark .cm-list { color: #fff; }
+.cm-list.center { align-items: center; }
+.cm-list li { display: flex; align-items: baseline; gap: .6em; }
+.cm-list .mk { flex: none; color: var(--mk); font-family: var(--vs-font-display); font-weight: 700; min-width: 1em; display: inline-flex; justify-content: center; }
+.cm-list .mk-dot { display: inline-block; width: .42em; height: .42em; border-radius: 50%; background: var(--mk); transform: translateY(-.12em); }
+.cm-list .mk-ico { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; transform: translateY(.12em); }
+.cm-list-number .mk { min-width: 1.4em; }
+.cm-list .li-t { min-width: 0; }
+.cm-list .accent { color: var(--cm-accent, var(--vs-primary-text, var(--vs-primary))); }
+.cm-dark .cm-list .accent { color: var(--vs-primary-on-dark, var(--vs-primary400)); }

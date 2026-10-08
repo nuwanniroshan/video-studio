@@ -15,6 +15,8 @@ export interface SceneDef<S extends z.ZodType = z.ZodType> {
   example: z.input<S>;
   /** Longest-allowed text, for the layout-lint stress fixture. */
   stress: z.input<S>;
+  /** More golden-frame fixtures (name → props), for scenes with many shapes. */
+  fixtures?: Record<string, z.input<S>>;
 }
 
 export const words = (s?: string) => (s ? s.replace(/\*/g, "").trim().split(/\s+/).length : 0);

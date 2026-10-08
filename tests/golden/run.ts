@@ -29,11 +29,11 @@ let fail = 0, pass = 0, created = 0;
 const lintErrors: string[] = [];
 for (const d of SCENE_DEFS) {
   if (only && d.type !== only) continue;
-  for (const fx of ["example", "stress"] as const) {
+  for (const fx of ["example", "stress", ...Object.keys(d.fixtures ?? {})]) {
     // a one-scene spec per fixture; VO-free so timing is deterministic without TTS
     const spec = { version: 1, title: `golden ${d.type} ${fx}`, brand: "luraplus", fps: 30, music: { mode: "none" },
       variants: ASPECTS.map((a) => ({ id: (a === "16:9" ? "l" : "p") + a.replace(":", "x"), aspect: a, safeArea: "title" })),
-      scenes: [{ id: "s", type: d.type, tone: toneFor(d.type), duration: { mode: "fixed", seconds: 6 }, props: d[fx] }] };
+      scenes: [{ id: "s", type: d.type, tone: toneFor(d.type), duration: { mode: "fixed", seconds: 6 }, props: fx === "example" || fx === "stress" ? d[fx] : d.fixtures![fx] }] };
     const sp = path.join(OUT, `fixture-${d.type}-${fx}.json`);
     fs.writeFileSync(sp, JSON.stringify(spec));
     const p = loadProject(sp, { cacheDir: path.join(OUT, "cache") });
