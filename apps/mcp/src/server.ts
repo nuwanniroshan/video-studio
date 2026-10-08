@@ -15,7 +15,7 @@ import { SCENE_DEFS, catalog as sceneCatalog } from "@vs/spec";
 import {
   VOICES, applyTheme, brandView, catalog, contactSheets, createVideoProject, fontLibrary, getJob, getProject, getTheme, listOutputs, listPresets, listProjects,
   listTemplates, listThemes, preview, publicJob, saveAsset, saveBrandFile, saveProjectBrand, saveSpec, startRender, initStudio,
-  KINDS,
+  KINDS, saveScene,
 } from "@vs/studio";
 
 initStudio();
@@ -158,6 +158,18 @@ server.registerTool("update_spec", {
 }, wrap(({ project, spec }: { project: string; spec: Record<string, unknown> }) => {
   const r = saveSpec(project, spec);
   return r.ok ? text({ ok: true, revision: r.revision, next: "check_timing, then render_stills" }) : { isError: true, ...text({ ok: false, issues: r.issues }) };
+}));
+
+server.registerTool("set_scene", {
+  title: "Add, replace or remove one scene",
+  description: `Save one scene at a time instead of the whole spec (keeps each call small). scene: a full scene object; it replaces the scene
+with the same id, or is inserted at position (default: the end). reset: true drops all other scenes first (use it for the first scene
+when you replace a draft). remove: a scene id to delete. The whole spec is validated; on errors nothing is saved.`,
+  inputSchema: { project: z.string(), scene: z.record(z.string(), z.unknown()).optional(), position: z.number().int().min(0).optional(),
+    reset: z.boolean().optional(), remove: z.string().optional() },
+}, wrap((a: { project: string; scene?: Record<string, unknown>; position?: number; reset?: boolean; remove?: string }) => {
+  const r = saveScene(a.project, a);
+  return r.ok ? text({ ok: true, revision: r.revision, scenes: r.scenes }) : { isError: true, ...text({ ok: false, issues: r.issues }) };
 }));
 
 server.registerTool("add_asset", {

@@ -37,7 +37,7 @@ export async function agentStatus() {
     models: [{ id: "sonnet", label: "Fast (Sonnet)" }, { id: "opus", label: "Best quality (Opus)" }] };
 }
 
-const TOOLS = ["get_spec", "list_scenes", "get_scene_schema", "update_spec", "check_timing", "render_stills", "get_brand", "list_themes", "set_brand"];
+const TOOLS = ["get_spec", "list_scenes", "get_scene_schema", "update_spec", "set_scene", "check_timing", "render_stills", "get_brand", "list_themes", "set_brand"];
 const DENY = ["render_video", "render_status", "list_outputs", "create_project", "list_projects", "list_templates", "add_asset"];
 const q = (s: string) => `mcp__video-studio__${s}`;
 
@@ -47,7 +47,9 @@ never mention JSON, specs, tools or file paths in your final message, and write 
 
 Workflow:
 1. get_spec (the current storyboard, its formats and uploaded images) and list_scenes. Use get_scene_schema for every scene type you use.
-2. Write the storyboard and save it with update_spec (the whole spec). Fix every validation issue it returns and save again.
+2. Write the storyboard ONE SCENE PER CALL with set_scene (the first with reset: true to replace a draft; then the rest in order).
+   Long single replies time out, so never put more than one scene in a call. Use update_spec only for small whole-spec edits
+   (formats, music). Fix every validation issue a call returns and call it again.
 3. check_timing. Fix every lint issue (shorten text, split a scene) and any duration far from the target.
 4. render_stills and LOOK at the contact sheet: wrapped or orphaned headline words, empty or lopsided areas, overlaps, text near edges,
    visuals out of order with the voice-over, anything that looks generic. Fix and re-check until it looks premium. Two or three review rounds.
@@ -156,6 +158,7 @@ function describeTool(name: string, input: any): string {
     case "list_scenes": return "Browsing the scene library";
     case "get_scene_schema": return `Checking the ${SCENE[input?.type] ?? input?.type} scene`;
     case "update_spec": return `Writing the storyboard (${input?.spec?.scenes?.length ?? "?"} scenes)`;
+    case "set_scene": return input?.remove ? `Removing the ${input.remove} scene` : `Designing the ${input?.scene?.id ?? ""} scene`;
     case "check_timing": return "Timing the voice-over and checking the layout";
     case "render_stills": return "Rendering frames to review";
     case "get_brand": case "list_themes": return "Looking at the brand";
@@ -164,10 +167,10 @@ function describeTool(name: string, input: any): string {
   }
 }
 function describeResult(name: string, ok: boolean, text: string): string | undefined {
-  if (!ok) return name === "update_spec" ? "Found problems; fixing them" : `Problem: ${text.slice(0, 160)}`;
+  if (!ok) return name === "update_spec" || name === "set_scene" ? "Found problems; fixing them" : `Problem: ${text.slice(0, 160)}`;
   try {
     const j = JSON.parse(text);
-    if (name === "update_spec") return `Saved (revision ${j.revision})`;
+    if (name === "update_spec" || name === "set_scene") return `Saved (revision ${j.revision})`;
     if (name === "check_timing") return `${Math.round(j.duration)} s · ${j.scenes.length} scenes · ${j.lint.length ? `${j.lint.length} layout issue${j.lint.length > 1 ? "s" : ""}` : "no layout issues"}`;
   } catch { /* not json */ }
   if (name === "render_stills") return /lint: clean/.test(text) ? "Frames rendered; layout clean" : "Frames rendered";
@@ -189,14 +192,14 @@ export function startAgent(project: string, o: { mode: "create" | "revise"; inst
   step({ kind: "info", text: o.mode === "create" ? "Starting the agent" : `Working on: “${o.instruction!.trim().slice(0, 140)}”` });
 
   const onEvent = (e: AgentEvent) => {
-    if (e.kind === "start") { if (!e.tools.includes("update_spec")) step({ kind: "error", text: "The studio tools did not connect" }); return; }
+    if (e.kind === "start") { if (!e.tools.includes("set_scene")) step({ kind: "error", text: "The studio tools did not connect" }); return; }
     if (e.kind === "say") return step({ kind: "say", text: e.text });
     if (e.kind === "tool") { pending.set(e.id, job.steps.length); return step({ kind: "tool", tool: e.name, text: describeTool(e.name, e.input) }); }
     if (e.kind === "tool-result") {
       const i = pending.get(e.id);
       const s = i !== undefined ? job.steps[i] : undefined;
       if (s) { s.ok = e.ok; s.detail = describeResult(e.name, e.ok, e.text); }
-      if (e.name === "update_spec" && e.ok) job.revisions++;
+      if ((e.name === "update_spec" || e.name === "set_scene") && e.ok) job.revisions++;
       if (e.name === "render_stills" && e.ok) {
         const st = path.join(d, "out", "stills");
         const since = s?.at ?? 0;

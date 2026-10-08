@@ -21,7 +21,7 @@ export { StudioError, cacheDir, studioHome };
 export * from "./brands.ts";
 export * from "./brief.ts";
 export * from "./idea.ts";
-import { briefToSpec, type Brief } from "./brief.ts";
+import { briefToSpec, type Brief, type Goal } from "./brief.ts";
 import { ideaToBrief, type IdeaInput } from "./idea.ts";
 import { mixAudio } from "@vs/render";
 
@@ -199,8 +199,17 @@ export function createVideoProject(o: NewVideo): { id: string } {
       spec.title = title;
       applyFormats(spec, o.formats);
     } else {
-      const brief = o.brief ? { ...o.brief, screenshots: shots } : ideaToBrief({ ...(o as IdeaInput), name: brandName, screenshots: shots, goal: kindById(o.kind)?.id !== "auto" ? kindById(o.kind)?.goal : undefined });
-      spec = briefToSpec({ ...brief, product: brief.product || kit.name }, id);
+      const goal = kindById(o.kind)?.id !== "auto" ? kindById(o.kind)?.goal : undefined;
+      const draft = (g?: Goal) => {
+        const brief = o.brief ? { ...o.brief, screenshots: shots } : ideaToBrief({ ...(o as IdeaInput), name: brandName, screenshots: shots, goal: g });
+        return briefToSpec({ ...brief, product: brief.product || kit.name }, id);
+      };
+      // the rule-based draft is only a starting point: if the chosen type's shape does not fit the text (e.g. an explainer
+      // with fewer than two steps), fall back to the guessed shape, then to a plain promo
+      try { spec = draft(goal); } catch (e) {
+        if (!(e instanceof StudioError) || o.brief) throw e;
+        try { spec = draft(undefined); } catch { spec = draft("promo"); }
+      }
       spec.title = title;
     }
     spec.brand = id;
@@ -258,6 +267,32 @@ export function getProject(id: string) {
   const d = pdir(id);
   const assets = fs.existsSync(path.join(d, "assets")) ? fs.readdirSync(path.join(d, "assets")).filter((f) => !f.startsWith(".")) : [];
   return { id, dir: d, spec: JSON.parse(fs.readFileSync(path.join(d, "spec.json"), "utf8")), assets: assets.map((a) => `assets/${a}`) };
+}
+
+/**
+ * Add, replace or remove one scene (by id) and save. Lets the agent write a storyboard scene by scene, so no single
+ * reply has to hold the whole spec. `reset` drops every other scene first (to replace a draft).
+ */
+export function saveScene(id: string, o: { scene?: Record<string, unknown>; remove?: string; position?: number; reset?: boolean }): { ok: boolean; issues: Issue[]; revision?: number; scenes?: string[] } {
+  const spec = getProject(id).spec;
+  let scenes: Record<string, unknown>[] = o.reset ? [] : [...spec.scenes];
+  if (o.remove) {
+    if (!scenes.some((s) => s.id === o.remove)) return { ok: false, issues: [{ path: "remove", message: `no scene "${o.remove}"` }] };
+    scenes = scenes.filter((s) => s.id !== o.remove);
+    for (const v of spec.variants ?? []) if (v.scenes) v.scenes = v.scenes.filter((x: string) => x !== o.remove);
+  }
+  if (o.scene) {
+    const i = scenes.findIndex((s) => s.id === o.scene!.id);
+    if (i >= 0 && o.position === undefined) scenes[i] = o.scene;
+    else {
+      if (i >= 0) scenes.splice(i, 1);
+      scenes.splice(Math.max(0, Math.min(o.position ?? scenes.length, scenes.length)), 0, o.scene);
+    }
+  }
+  if (o.reset) for (const v of spec.variants ?? []) delete v.scenes;
+  if (!scenes.length) return { ok: false, issues: [{ path: "scenes", message: "a storyboard needs at least one scene" }] };
+  const r = saveSpec(id, { ...spec, scenes });
+  return { ...r, scenes: scenes.map((s) => `${s.id} (${s.type})`) };
 }
 
 /** Validate and save; every save keeps an immutable revision. Invalid specs are not saved. */
