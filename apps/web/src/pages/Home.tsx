@@ -26,13 +26,13 @@ export function Home() {
         <div><h1>Videos</h1><p>Make motion-graphics videos with voice-over, music and sound design.</p></div>
       </div>
       <div className="starts">
-        <a className="start t" href="#/templates"><div className="deco" /><div className="arrow">→</div>
-          <h2>Start from a template</h2><p>Launches, promos, announcements, how-tos and social teasers, ready to make your own.</p></a>
-        <a className="start i" href="#/idea"><div className="deco" /><div className="arrow">→</div>
-          <h2>Describe your idea</h2><p>Tell us the product, the message and the key points. We write the storyboard, voice-over and music.</p></a>
+        <a className="start t" href="#/new"><div className="deco" /><div className="arrow">→</div>
+          <h2>{Icon.wand} Create with AI</h2><p>Describe your idea, upload your brand or pick a theme, choose voice and sizes. The agent designs every scene.</p></a>
+        <a className="start i" href="#/templates"><div className="deco" /><div className="arrow">→</div>
+          <h2>Start from a template</h2><p>Launches, promos, events, hiring, how-tos and social teasers, ready to make your own.</p></a>
       </div>
       <div className="row" style={{ marginBottom: 14 }}><h2>Recent</h2><span className="muted small">{projects?.length ?? 0} videos</span></div>
-      {projects && !projects.length && <div className="empty">No videos yet. Start from a template or describe your idea above.</div>}
+      {projects && !projects.length && <div className="empty">No videos yet. Create one with AI or start from a template above.</div>}
       <div className="grid-cards">
         {projects?.map((p) => (
           <a key={p.id} href={`#/p/${p.id}`} className="card vcard">
@@ -42,7 +42,7 @@ export function Home() {
             </div>
             <div className="body">
               <div className="t">{p.title}</div>
-              <div className="m"><span className="chip accent">{p.brand}</span><span className="muted small">{p.scenes} scenes · edited {timeAgo(p.updated)}</span></div>
+              <div className="m"><span className="chip"><i className="dot" style={{ background: p.brand.primary }} />{p.brand.name}</span><span className="muted small">{p.scenes} scenes · edited {timeAgo(p.updated)}</span></div>
               <div className="acts">
                 <span className="btn sm">Edit</span>
                 {p.renders.length > 0 && <span className="btn sm" onClick={(e) => { e.preventDefault(); location.hash = `#/p/${p.id}/watch`; }}>{Icon.play} Watch</span>}

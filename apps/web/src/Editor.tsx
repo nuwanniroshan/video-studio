@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { SCENE_ICON, api, setIn, type BrandKit, type Catalog, type Issue, type Job, type Json, type PreviewRes } from "./api.ts";
+import { SCENE_ICON, api, navigate, setIn, type AgentJob, type AgentStatus, type BrandKit, type Catalog, type Issue, type Job, type Json, type PreviewRes } from "./api.ts";
+import { AgentLog, plain, useAgentJob } from "./components/AgentLog.tsx";
 import { SchemaForm, type FormCtx } from "./components/SchemaForm.tsx";
-import { Icon, Spinner } from "./components/ui.tsx";
+import { Icon, Spinner, Swatches } from "./components/ui.tsx";
 
 const headlineOf = (s: Json) => String(s.props?.headline ?? s.props?.title ?? s.props?.tagline ?? s.props?.kicker ?? "").replace(/\*/g, "");
 
 export function Editor({ id }: { id: string }) {
   const [cat, setCat] = useState<Catalog | null>(null);
-  const [brands, setBrands] = useState<BrandKit[]>([]);
+  const [brand, setBrand] = useState<BrandKit | null>(null);
+  const [agentSt, setAgentSt] = useState<AgentStatus | null>(null);
+  const [askOpen, setAskOpen] = useState(false);
+  const [agentJob, setAgentJob] = useState<string | null>(null);
   const [spec, setSpec] = useState<Json>(null);
   const [assets, setAssets] = useState<string[]>([]);
   const [sel, setSel] = useState<number | "video">("video");
@@ -25,7 +29,9 @@ export function Editor({ id }: { id: string }) {
 
   useEffect(() => {
     api.catalog().then(setCat);
-    api.brandkits().then(setBrands);
+    api.brand(id).then(setBrand).catch(() => {});
+    api.agentStatus().then(setAgentSt).catch(() => {});
+    api.agentJobs(id).then((js) => { const live = js.find((j) => j.status === "running"); if (live) { setAgentJob(live.id); setAskOpen(true); } });
     api.outputs(id).then((o) => setHasRenders(o.length > 0));
     api.project(id).then((p) => { setSpec(p.spec); setAssets(p.assets); setVariant(p.spec.variants?.[0]?.id ?? "main"); });
   }, [id]);
@@ -49,6 +55,10 @@ export function Editor({ id }: { id: string }) {
       if (r.ok) refreshPreview();
     }, 700);
   };
+
+  const reload = () => api.project(id).then((p) => { setSpec(p.spec); setAssets(p.assets); setIssues([]); setSaveState("saved"); refreshPreview(); });
+  const agent = useAgentJob(agentJob, () => reload());
+  const agentBusy = agent?.status === "running";
 
   const ctx: FormCtx = useMemo(() => ({ project: id, assets, onAssetsChanged: () => api.project(id).then((p) => setAssets(p.assets)) }), [id, assets]);
   if (!spec || !cat) return <div className="page muted">Loading…</div>;
@@ -83,10 +93,12 @@ export function Editor({ id }: { id: string }) {
         <input className="title" value={spec.title} onChange={(e) => update({ ...spec, title: e.target.value })} />
         <span className={`save ${saveState}`}><span className="dot" />{{ saved: "All changes saved", saving: "Saving…", dirty: "Editing…", invalid: "Not saved: see the issue above the preview" }[saveState]}</span>
         <span className="spacer" />
+        {agentSt?.available && <button className={`btn ${agentBusy ? "" : "ai"}`} onClick={() => setAskOpen(true)}>{agentBusy ? <Spinner /> : Icon.wand} {agentBusy ? "Agent working…" : "Ask AI"}</button>}
+        <a className="btn" href={`#/p/${id}/brand`}>{Icon.palette} Brand</a>
         {hasRenders && <a className="btn" href={`#/p/${id}/watch`}>{Icon.film} Watch</a>}
-        <button className="btn primary" onClick={() => setShowRender(true)}>Render video</button>
+        <button className="btn primary" disabled={agentBusy} onClick={() => setShowRender(true)}>Render video</button>
       </header>
-      <div className="cols">
+      <div className={`cols ${agentBusy ? "locked" : ""}`}>
         <aside className="rail">
           <div className={`scard ${sel === "video" ? "sel" : ""}`} onClick={() => setSel("video")}>
             <div className="top"><span className="tone brand" /><span className="ty">VIDEO SETTINGS</span></div>
@@ -127,10 +139,12 @@ export function Editor({ id }: { id: string }) {
 
         <aside className="insp">
           {sel === "video"
-            ? <VideoSettings spec={spec} cat={cat} brands={brands} update={update} />
+            ? <VideoSettings id={id} spec={spec} cat={cat} brand={brand} update={update} />
             : scenes[sel] && <SceneInspector key={scenes[sel].id + sel} scene={scenes[sel]} index={sel} cat={cat} ctx={ctx} onChange={(s) => update(setIn(spec, ["scenes", sel], s))} />}
         </aside>
       </div>
+      {agentBusy && <div className="lockmsg">{Icon.wand} The agent is editing this video. The preview updates when it finishes.</div>}
+      {askOpen && <AskAgent id={id} job={agent} onStarted={(j) => setAgentJob(j)} onClose={() => setAskOpen(false)} />}
       {showRender && <RenderDialog id={id} spec={spec} onClose={() => setShowRender(false)} onDone={() => setHasRenders(true)} />}
     </div>
   );
@@ -264,24 +278,25 @@ function SceneInspector({ scene, onChange, cat, ctx, index }: { scene: Json; ind
   );
 }
 
-function VideoSettings({ spec, cat, brands, update }: { spec: Json; cat: Catalog; brands: BrandKit[]; update(s: Json): void }) {
+function VideoSettings({ id, spec, cat, brand, update }: { id: string; spec: Json; cat: Catalog; brand: BrandKit | null; update(s: Json): void }) {
   const music = spec.music ?? { mode: "preset", preset: "uplifting-tech" };
   const voice = spec.voice ?? { provider: "kokoro", voice: "af_heart", speed: 0.94 };
   const setV = (i: number, v: Json) => update(setIn(spec, ["variants", i], v));
   const [playing, setPlaying] = useState(false);
   const listen = async () => {
     setPlaying(true);
-    try { const a = new Audio(await api.voiceTest({ text: spec.scenes[0]?.vo?.[0]?.text ?? "Hello there.", voice: voice.voice, speed: voice.speed, brand: spec.brand })); a.onended = () => setPlaying(false); await a.play(); }
+    try { const a = new Audio(await api.voiceTest({ text: spec.scenes[0]?.vo?.[0]?.text ?? "Hello there.", voice: voice.voice, speed: voice.speed, project: id })); a.onended = () => setPlaying(false); await a.play(); }
     catch { setPlaying(false); }
   };
   return (
     <>
       <div className="insp-head"><h3>Video settings</h3><p>These apply to every scene and format.</p></div>
       <div className="insp-sec"><h4>Brand</h4>
-        <div className="brand-pick" style={{ gridTemplateColumns: "1fr 1fr" }}>{brands.map((b) => (
-          <button key={b.id} className={`toggle-card ${spec.brand === b.id ? "on" : ""}`} onClick={() => update({ ...spec, brand: b.id })}>
-            {b.urls.logoOnLight ? <img src={b.urls.logoOnLight} alt="" /> : <b>{b.name}</b>}<span className="small" style={{ fontWeight: 600 }}>{b.name}</span></button>))}</div>
-        <a href="#/brands" className="small">Manage brand kits →</a></div>
+        {brand && <a className="brandsum" href={`#/p/${id}/brand`}>
+          <div className="logos"><div style={{ background: brand.colors.dark }}>{brand.urls.logoOnDark && <img src={brand.urls.logoOnDark} alt="" />}</div>
+            <div style={{ background: brand.colors.light }}>{brand.urls.logoOnLight && <img src={brand.urls.logoOnLight} alt="" />}</div></div>
+          <div className="row"><div style={{ flex: 1 }}><b>{brand.name}</b><div className="tiny muted">{brand.fonts.display?.family} · {brand.fonts.body?.family}</div></div><Swatches colors={brand.colors} /></div>
+          <span className="link sm">Edit logo, colours, fonts or theme →</span></a>}</div>
       <div className="insp-sec"><h4>Sound</h4>
         <div className="field"><div className="flabel">Music</div>
           <select value={music.mode === "none" ? "none" : music.preset} onChange={(e) => update({ ...spec, music: e.target.value === "none" ? { mode: "none" } : { mode: "preset", preset: e.target.value, ...(e.target.value === "uplifting-tech" ? { bpm: 96 } : {}) } })}>
@@ -356,6 +371,43 @@ function RenderDialog({ id, spec, onClose, onDone }: { id: string; spec: Json; o
             {job?.status === "done" && <a className="btn primary lg" href={`#/p/${id}/watch`}>{Icon.play} Watch video</a>}
             {job?.status !== "done" && <button className="btn primary lg" disabled={!!busy || !variants.length} onClick={start}>{busy ? <><Spinner /> Rendering…</> : "Start render"}</button>}
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const SUGGEST = ["Make it shorter and punchier", "Rewrite it for a more formal audience", "Add a scene with a customer quote", "Make the opening hook stronger", "Use my screenshots more"];
+function AskAgent({ id, job, onStarted, onClose }: { id: string; job: AgentJob | null; onStarted(j: string): void; onClose(): void }) {
+  const [text, setText] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+  const running = job?.status === "running";
+  const send = async () => {
+    setBusy(true); setErr("");
+    try { const j = await api.agent(id, { mode: "revise", instruction: text }); onStarted(j.id); setText(""); } catch (e) { setErr((e as Error).message); }
+    setBusy(false);
+  };
+  return (
+    <div className="scrim" onClick={onClose}>
+      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+        <div className="drawer-head"><span className="orb live" style={{ width: 32, height: 32 }}>{Icon.wand}</span><h2 style={{ flex: 1 }}>Ask the AI agent</h2>
+          {running && <button className="btn sm" onClick={() => job && api.stopAgent(job.id)}>{Icon.stop} Stop</button>}
+          <button className="btn ghost sm" onClick={onClose}>{running ? "Hide" : "Close"}</button></div>
+        <div className="drawer-body">
+          {!running && <>
+            <p className="muted" style={{ margin: 0 }}>Describe a change in plain words. The agent edits the scenes, checks timing and looks at the frames. Every save keeps a revision.</p>
+            <textarea rows={4} autoFocus value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. Make it 15 seconds for Instagram and end on the free-trial offer" />
+            <div className="row wrap" style={{ gap: 6 }}>{SUGGEST.map((s) => <button key={s} className="chip-btn" onClick={() => setText(s)}>{s}</button>)}</div>
+            {err && <div className="banner bad">{err}</div>}
+            <button className="btn primary lg" disabled={!text.trim() || busy} onClick={send}>{busy ? <Spinner /> : Icon.wand} Make the change</button>
+          </>}
+          {job && <>
+            <div className="brief"><span className="tiny muted">{job.mode === "create" ? "Creating the video" : "You asked"}</span><p>{job.mode === "create" ? "From your idea" : job.instruction}</p></div>
+            <AgentLog job={job} compact />
+            {!running && job.summary && <div className={`asummary ${job.status}`}><b>{job.status === "done" ? "Done" : "Note"}</b><p>{plain(job.summary)}</p></div>}
+            {!running && <button className="btn" onClick={() => navigate(`#/p/${id}/build/${job.id}`)}>See all steps and frames</button>}
+          </>}
         </div>
       </div>
     </div>

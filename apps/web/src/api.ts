@@ -13,8 +13,18 @@ async function req<T>(method: string, url: string, body?: unknown): Promise<T> {
   if (!r.ok && r.status !== 422) throw Object.assign(new Error(data.error ?? r.statusText), { issues: data.issues });
   return data as T;
 }
-export interface Template { id: string; name: string; category: string; description: string; length: string; formats: string[]; scenes: string[]; thumbnail?: string }
-export interface BrandKit { id: string; name: string; base?: { primary: string; accent: string; dark: string; light: string; ink: string }; colors: Record<string, string>;
+export interface Template { id: string; name: string; category: string; description: string; length: string; formats: string[]; scenes: string[]; thumbnail?: string; theme?: string }
+export interface Base { primary: string; accent: string; dark: string; light: string; ink: string }
+export interface Theme { id: string; name: string; description: string; category: string; base: Base; colors: Record<string, string>; fonts: Record<string, string>;
+  fontFamilies: Record<string, string>; fontUrls: Record<string, string>; music: string; voice: { voice: string; speed: number } }
+export interface AgentStep { at: number; kind: "info" | "tool" | "say" | "sheet" | "error" | "done"; text: string; detail?: string; tool?: string; ok?: boolean; image?: string }
+export interface AgentJob { id: string; project: string; mode: "create" | "revise"; instruction: string; model: string; status: "running" | "done" | "error" | "stopped";
+  steps: AgentStep[]; summary?: string; revisions: number; started: number; finished?: number; costUsd?: number }
+export interface AgentStatus { provider: string; label: string; available: boolean; detail: string; models: { id: string; label: string }[] }
+export interface NewVideo { title?: string; idea?: string; name?: string; audience?: string; points?: string[]; cta?: string; url?: string; length?: number; formats?: string[];
+  music?: string; voice?: string; speed?: number; tone?: string; template?: string; screenshots?: string[];
+  brand?: { theme: string; name?: string } | { custom: Json }; agent?: boolean; model?: string }
+export interface BrandKit { id: string; name: string; theme?: string; wordmark?: { onDark: boolean; onLight: boolean }; base?: { primary: string; accent: string; dark: string; light: string; ink: string }; colors: Record<string, string>;
   fonts: Record<string, { family: string; file: string }>; logo: Record<string, string>; voice?: { voice: string; speed: number };
   pronunciations?: Record<string, { ipa?: string; respell?: string }>; cta?: { url: string }; music?: { preset: string };
   urls: { logoOnDark?: string; logoOnLight?: string; mark?: string; fonts: Record<string, string> } }
@@ -26,24 +36,28 @@ export interface Brief { goal: string; product: string; message: string; problem
 export const api = {
   catalog: () => req<Catalog>("GET", "/api/catalog"),
   templates: () => req<Template[]>("GET", "/api/templates"),
-  brandkits: () => req<BrandKit[]>("GET", "/api/brandkits"),
-  brandkit: (id: string) => req<BrandKit>("GET", `/api/brandkits/${id}`),
-  saveBrand: (id: string | null, b: Json) => req<BrandKit>(id ? "PUT" : "POST", id ? `/api/brandkits/${id}` : "/api/brandkits", b),
-  deleteBrand: (id: string) => req("DELETE", `/api/brandkits/${id}`),
-  brandFile: (id: string, kind: string, f: File) => { const fd = new FormData(); fd.append("file", f); return req<BrandKit>("POST", `/api/brandkits/${id}/files?kind=${kind}`, fd); },
+  themes: () => req<Theme[]>("GET", "/api/themes"),
+  brand: (id: string) => req<BrandKit>("GET", `/api/projects/${id}/brand`),
+  saveBrand: (id: string, b: Json) => req<BrandKit>("PUT", `/api/projects/${id}/brand`, b),
+  applyTheme: (id: string, theme: string) => req<BrandKit>("POST", `/api/projects/${id}/brand/theme`, { theme }),
+  removeLogo: (id: string) => req<BrandKit>("DELETE", `/api/projects/${id}/brand/logo`),
+  brandFile: (id: string, kind: string, f: File) => { const fd = new FormData(); fd.append("file", f); return req<BrandKit>("POST", `/api/projects/${id}/brand/files?kind=${kind}`, fd); },
   fonts: () => req<FontOpt[]>("GET", "/api/fonts"),
-  voiceTest: async (b: { text: string; voice?: string; speed?: number; pronunciations?: Json; brand?: string }) => {
+  voiceTest: async (b: { text: string; voice?: string; speed?: number; pronunciations?: Json; project?: string }) => {
     const r = await fetch("/api/voice-test", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(b) });
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? "voice test failed");
     return URL.createObjectURL(await r.blob());
   },
   upload: (f: File) => { const fd = new FormData(); fd.append("file", f); return req<{ ref: string }>("POST", "/api/uploads", fd); },
-  briefPreview: (b: Brief) => req<Json>("POST", "/api/brief-preview", b),
-  fromBrief: (b: Brief) => req<{ id: string }>("POST", "/api/projects/from-brief", b),
+  ideaPreview: (b: NewVideo) => req<{ brief: Brief; spec: Json }>("POST", "/api/idea-preview", b),
+  newVideo: (b: NewVideo) => req<{ id: string; agentJob?: string }>("POST", "/api/projects/new", b),
+  request: (id: string) => req<NewVideo>("GET", `/api/projects/${id}/request`),
+  agentStatus: () => req<AgentStatus>("GET", "/api/agent/status"),
+  agent: (id: string, b: { instruction?: string; mode?: "create" | "revise"; model?: string }) => req<AgentJob>("POST", `/api/projects/${id}/agent`, b),
+  agentJobs: (id: string) => req<AgentJob[]>("GET", `/api/projects/${id}/agent`),
+  stopAgent: (job: string) => req<AgentJob>("POST", `/api/agent/${job}/stop`),
   previewAudio: (id: string, variant?: string) => req<{ url: string; lufs: number }>("POST", `/api/projects/${id}/preview-audio`, { variant }),
-  brands: () => req<{ id: string; name: string; primary: string; logo: string }[]>("GET", "/api/brands"),
-  projects: () => req<{ id: string; title: string; brand: string; updated: number; scenes: number; thumbnail?: string; renders: string[] }[]>("GET", "/api/projects"),
-  create: (b: { title: string; template: string; brand: string; formats?: string[] }) => req<{ id: string }>("POST", "/api/projects", b),
+  projects: () => req<{ id: string; title: string; brand: { name: string; primary: string; theme?: string }; updated: number; scenes: number; thumbnail?: string; renders: string[] }[]>("GET", "/api/projects"),
   remove: (id: string) => req("DELETE", `/api/projects/${id}`),
   project: (id: string) => req<{ id: string; spec: Json; assets: string[] }>("GET", `/api/projects/${id}`),
   save: (id: string, spec: Json) => req<{ ok: boolean; issues: Issue[] }>("PUT", `/api/projects/${id}/spec`, spec),

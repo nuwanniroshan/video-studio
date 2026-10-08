@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { SCENE_ICON, SCENE_NAME, api, navigate, type BrandKit, type Template } from "../api.ts";
-import { BrandPicker, FormatPicker, Spinner } from "../components/ui.tsx";
+import { SCENE_ICON, SCENE_NAME, api, navigate, type Template, type Theme } from "../api.ts";
+import { FormatPicker, Icon, Spinner, ThemeGrid } from "../components/ui.tsx";
 
 export function Templates() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -10,7 +10,7 @@ export function Templates() {
   const cats = ["All", ...new Set(templates.map((t) => t.category).filter(Boolean))];
   return (
     <div className="page">
-      <div className="page-head"><div><h1>Templates</h1><p>Pick a starting point. Everything is editable: text, images, scenes, music and voice.</p></div></div>
+      <div className="page-head"><div><h1>Templates</h1><p>Proven storyboards to start from. Use one as it is, or let the AI agent rewrite it for your idea. <a href="#/new">Or start from a blank idea →</a></p></div></div>
       <div className="seg" style={{ marginBottom: 18 }}>{cats.map((c) => <button key={c} className={cat === c ? "on" : ""} onClick={() => setCat(c)}>{c}</button>)}</div>
       <div className="grid-cards">
         {templates.filter((t) => cat === "All" || t.category === cat).map((t) => (
@@ -33,28 +33,30 @@ export function Templates() {
 }
 
 function UseTemplate({ t, onClose }: { t: Template; onClose(): void }) {
-  const [brands, setBrands] = useState<BrandKit[]>([]);
-  const [brand, setBrand] = useState("luraplus");
-  const [title, setTitle] = useState("");
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [theme, setTheme] = useState(t.theme ?? "classic");
+  const [name, setName] = useState("");
   const [formats, setFormats] = useState<string[]>(t.formats);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState("");
-  useEffect(() => { api.brandkits().then((b) => { setBrands(b); if (b.length && !b.some((x) => x.id === brand)) setBrand(b[0].id); }); }, []); // eslint-disable-line
+  useEffect(() => { api.themes().then(setThemes); }, []);
   const create = async () => {
     setBusy(true); setErr("");
-    try { const { id } = await api.create({ title: title || t.name, template: t.id, brand, formats }); navigate(`#/p/${id}`); }
+    try { const { id } = await api.newVideo({ title: name ? `${name}: ${t.name}` : t.name, name: name || undefined, template: t.id, brand: { theme, name: name || undefined }, formats }); navigate(`#/p/${id}`); }
     catch (e) { setErr((e as Error).message); setBusy(false); }
   };
   return (
     <div className="scrim" onClick={onClose}>
-      <div className="drawer" onClick={(e) => e.stopPropagation()}>
+      <div className="drawer wide" onClick={(e) => e.stopPropagation()}>
         <div className="drawer-head"><h2 style={{ flex: 1 }}>{t.name}</h2><button className="btn ghost sm" onClick={onClose}>Close</button></div>
         <div className="drawer-body">
           {t.thumbnail && <img src={t.thumbnail} alt="" style={{ width: "100%", borderRadius: 12, background: "#0E1222", aspectRatio: "16/9", objectFit: "contain" }} />}
           <p className="muted" style={{ margin: 0 }}>{t.description}</p>
-          <label className="f"><span className="l">Video name</span><input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.name} autoFocus /></label>
-          <div className="f"><span className="l">Brand</span><BrandPicker brands={brands} value={brand} onChange={setBrand} /></div>
-          <div className="f"><span className="l">Formats</span><FormatPicker value={formats} onChange={setFormats} /><p className="help">Each format is rendered separately and laid out for its screen.</p></div>
+          <a className="aicta" href={`#/new?template=${t.id}`}>{Icon.wand}<div><b>Adapt it to my idea</b><span>Describe your product; the AI agent rewrites every scene and you choose branding, voice and sizes.</span></div><span>→</span></a>
+          <div className="divider"><span>or use it as it is</span></div>
+          <label className="f"><span className="l">Product or company name</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Replaces the sample name in the text" /></label>
+          <div className="f"><span className="l">Theme</span><ThemeGrid themes={themes} value={theme} onChange={setTheme} name={name || "Your brand"} /></div>
+          <div className="f"><span className="l">Video sizes</span><FormatPicker value={formats} onChange={setFormats} /></div>
           {err && <div className="banner bad">{err}</div>}
         </div>
         <div className="drawer-foot"><button className="btn" onClick={onClose}>Cancel</button><button className="btn primary" disabled={busy} onClick={create}>{busy ? <><Spinner /> Creating…</> : "Use this template"}</button></div>
