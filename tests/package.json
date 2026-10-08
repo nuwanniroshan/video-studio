@@ -8,6 +8,7 @@
     "@vs/storage": "workspace:*",
     "@vs/runtime": "workspace:*",
     "playwright": "^1.63.0",
-    "@vs/timing": "workspace:*"
+    "@vs/timing": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.32.1"
   }
 }

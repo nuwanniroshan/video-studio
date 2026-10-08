@@ -8,6 +8,22 @@ A code-driven motion-graphics video generator. A declarative storyboard spec goe
 - **M1 results:** [`docs/M1.md`](docs/M1.md).
 - **Authoring with Claude Code:** [`.claude/skills/video-studio/SKILL.md`](.claude/skills/video-studio/SKILL.md).
 
+## Web studio (non-technical)
+
+```bash
+pnpm studio      # opens http://127.0.0.1:5190
+```
+
+From the studio you can:
+- create a video from a template;
+- edit scenes in forms (with image upload and click-to-place cursor points);
+- preview live;
+- render, then download.
+
+## Ask Claude to make it
+
+Describe the video to Claude Code or Claude Desktop, and it uses the `video-studio` tools to plan, check and render it. Setup and options are in [`docs/CLAUDE-INTEGRATION.md`](docs/CLAUDE-INTEGRATION.md).
+
 ## Setup (macOS)
 
 `pnpm video` does this automatically. To do it manually:

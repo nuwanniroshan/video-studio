@@ -1,0 +1,16 @@
+{
+  "name": "video-studio-local",
+  "owner": {
+    "name": "Swivel"
+  },
+  "plugins": [
+    {
+      "name": "video-studio",
+      "source": "./plugins/video-studio",
+      "description": "Make motion-graphics videos from an idea: storyboard, voice-over, music, render."
+    }
+  ],
+  "metadata": {
+    "description": "Local marketplace for the video-studio plugin (this repo)."
+  }
+}

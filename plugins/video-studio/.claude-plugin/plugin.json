@@ -1,0 +1,6 @@
+{
+  "name": "video-studio",
+  "version": "0.1.0",
+  "description": "Make motion-graphics videos (promos, feature launches, explainers, social cutdowns) from an idea. Claude writes the storyboard, checks the frames, and renders video with voice-over and music, locally.",
+  "author": { "name": "Swivel" }
+}
