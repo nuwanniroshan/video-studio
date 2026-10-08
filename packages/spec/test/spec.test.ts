@@ -112,3 +112,32 @@ describe("assets", () => {
     expect(listAssets("logoReveal", {})).toEqual([]);
   });
 });
+
+describe("compose scene", async () => {
+  const { catalog, svgIssue } = await import("../src/index.ts");
+  const ok = '<svg viewBox="0 0 10 10"><path d="M0 0h10" stroke="currentColor"/><circle cx="5" cy="5" r="2" style="fill:var(--vs-accent)"/><use href="#a"/></svg>';
+  it("accepts plain vector markup", () => expect(svgIssue(ok)).toBeNull());
+  it.each([
+    ['<svg><script>alert(1)</script></svg>', /script/],
+    ['<svg onload="x()"></svg>', /event handlers/],
+    ['<svg><image href="https://x.test/a.png"/></svg>', /image/],
+    ['<svg><use href="https://x.test/s.svg#a"/></svg>', /links/],
+    ['<svg><rect style="fill:url(https://x.test/p)"/></svg>', /url/],
+    ['<svg><foreignObject><div/></foreignObject></svg>', /foreignObject/],
+    ['<svg><iframe/></svg>', /iframe/],
+    ['<svg><video/></svg>', /not allowed/],
+    ['<div></div>', /start with <svg/],
+  ])("rejects %s", (s, why) => expect(svgIssue(s)).toMatch(why));
+  it("validates its example and stress fixtures, and rejects unsafe SVG in a layer", () => {
+    const d = catalog.compose;
+    expect(d.schema.safeParse(d.example).success).toBe(true);
+    expect(d.schema.safeParse(d.stress).success).toBe(true);
+    expect(d.schema.safeParse({ layers: [{ kind: "svg", svg: '<svg onclick="x()"></svg>' }] }).success).toBe(false);
+  });
+  it("accepts brand tokens or hex colours only", () => {
+    const d = catalog.compose;
+    expect(d.schema.safeParse({ layers: [{ kind: "shape", fill: "accent" }] }).success).toBe(true);
+    expect(d.schema.safeParse({ layers: [{ kind: "shape", fill: "#12AB34" }] }).success).toBe(true);
+    expect(d.schema.safeParse({ layers: [{ kind: "shape", fill: "red; background:url(x)" }] }).success).toBe(false);
+  });
+});

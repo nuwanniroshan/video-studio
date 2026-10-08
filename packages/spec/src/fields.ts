@@ -6,7 +6,7 @@ import { z } from "zod";
 
 export type UiKind =
   | "text" | "richText" | "number" | "color" | "asset" | "assetList" | "list" | "select" | "toggle"
-  | "hotspots" | "cursorPath" | "focusRect" | "uiKit";
+  | "hotspots" | "cursorPath" | "focusRect" | "uiKit" | "code";
 export interface FieldMeta { ui: UiKind; label: string; help?: string; maxChars?: number; group?: string }
 
 const withMeta = <T extends z.ZodType>(s: T, m: FieldMeta) => s.meta(m as unknown as Record<string, unknown>) as T;

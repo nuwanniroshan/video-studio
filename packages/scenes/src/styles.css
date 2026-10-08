@@ -246,3 +246,70 @@
 .tone-brand .fs-bullets li { color: rgba(255,255,255,.85); } .tone-brand .fs-bullets .ico { color: #fff; }
 .tone-brand .sf-cap { background: rgba(255,255,255,.14); color: #fff; border-color: rgba(255,255,255,.2); box-shadow: none; }
 .tone-brand .cta-btn { background: #fff; color: var(--vs-primary700); }
+
+/* ---------- compose (free-form layers; positions in % of the safe frame) ---------- */
+.cm-motif, .cm-vignette { position: absolute; inset: 0; pointer-events: none; }
+.cm-motif svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.cm-motif-grid { background-image: linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px); background-size: 5.926cqmin 5.926cqmin; }
+.cm-motif-dots { background-image: radial-gradient(currentColor .16cqmin, transparent .2cqmin); background-size: 3.2cqmin 3.2cqmin; }
+.cm-motif-lines { background-image: repeating-linear-gradient(45deg, currentColor 0 1px, transparent 1px 2.6cqmin); }
+.cm-motif-rings { background-image: repeating-radial-gradient(circle at 50% 50%, transparent 0 5cqmin, currentColor 5cqmin calc(5cqmin + 1px)); }
+.cm-vignette { background: radial-gradient(ellipse 85% 75% at 50% 50%, transparent 55%, rgba(0,0,0,.5)); }
+.cm-cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.cm-frame { position: absolute; top: var(--sa-t, 0); right: var(--sa-r, 0); bottom: var(--sa-b, 0); left: var(--sa-l, 0); }
+.cl { position: absolute; transform-origin: 50% 50%; }
+.cl-mv, .cl-in { width: 100%; height: 100%; transform-origin: 50% 50%; }
+.cl-text, .cl-counter .cl-text { width: 100%; color: var(--vs-ink); text-wrap: balance; }
+/* default colours follow the measured background (cm-dark / cm-light), not the scene's tone */
+.cm-dark .cl-text { color: #fff; }
+.cl-text .accent { color: var(--cm-accent, var(--vs-primary-text, var(--vs-primary))); }
+.cm-dark .cl-text .accent { color: var(--cm-accent, var(--vs-primary400)); }
+.tone-brand.cm-dark .cl-text .accent { color: var(--cm-accent, var(--vs-primary100)); }
+.cm-s-display, .cm-s-headline, .cm-s-title, .cm-s-stat { font-family: var(--vs-font-display); font-weight: 600; line-height: 1.02; letter-spacing: -0.035em; }
+.cm-s-title { line-height: 1.08; letter-spacing: -0.025em; }
+.cm-s-display { font-weight: 700; letter-spacing: -0.045em; line-height: .96; }
+.cm-s-stat { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; line-height: 1; }
+.cm-s-quote { font-family: var(--vs-font-display); font-weight: 500; line-height: 1.15; letter-spacing: -0.02em; }
+.cm-s-body { font-family: var(--vs-font-body); font-weight: 400; line-height: 1.45; text-wrap: pretty; }
+.cm-light .cm-s-body:not([style*="color"]) { color: var(--vs-grey600); }
+.cm-dark .cm-s-body:not([style*="color"]) { color: rgba(255,255,255,.72); }
+.cm-s-label { font-family: var(--vs-font-mono); font-weight: 500; letter-spacing: .16em; text-transform: uppercase; line-height: 1.3; }
+.cm-light .cm-s-label:not([style*="color"]) { color: var(--vs-primary-text, var(--vs-primary)); }
+.cm-dark .cm-s-label:not([style*="color"]) { color: var(--vs-primary400); }
+.tone-brand.cm-dark .cm-s-label:not([style*="color"]) { color: var(--vs-primary100); }
+.cl-text .ch { display: inline-block; }
+.cm-deco-underline .accent { background: linear-gradient(var(--cm-deco), var(--cm-deco)) 0 92% / 100% .09em no-repeat; padding-bottom: .04em; }
+.cm-deco-marker .accent { background: linear-gradient(color-mix(in srgb, var(--cm-deco) 38%, transparent), color-mix(in srgb, var(--cm-deco) 38%, transparent)) 0 78% / 100% .42em no-repeat; }
+.cm-deco-pill, .cm-deco-box { background: var(--cm-deco); padding: .28em .8em; width: auto !important; display: inline-block; max-width: 100%; }
+.cm-deco-pill { border-radius: 999px; }
+.cm-deco-box { border-radius: .18em; }
+.cm-shape { width: 100%; height: 100%; }
+.cm-circle, .cm-ring { border-radius: 50%; }
+.cm-pill { border-radius: 999px; }
+.cm-line { border-radius: 999px; }
+.cm-triangle { clip-path: polygon(50% 4%, 96% 92%, 4% 92%); }
+.cm-blob { border-radius: 42% 58% 63% 37% / 41% 44% 56% 59%; }
+.cm-arc svg, .cm-svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.cm-media { width: 100%; height: 100%; overflow: hidden; position: relative; }
+.cm-img { display: block; width: 100%; height: 100%; transform-origin: 50% 50%; }
+.cm-frame-rounded { border-radius: 2cqmin; }
+.cm-frame-card { border-radius: 2cqmin; box-shadow: var(--vs-shadow-xl); }
+.cm-frame-circle { border-radius: 50%; }
+.cm-frame-polaroid { background: #fff; padding: 4% 4% 18%; box-shadow: var(--vs-shadow-xl); border-radius: .4cqmin; }
+.cm-frame-polaroid .cm-img { height: 100%; }
+.cm-frame-phone { border-radius: 4.5cqmin; border: 1.1cqmin solid #0B0D12; box-shadow: var(--vs-shadow-xl); background: #0B0D12; }
+.cm-frame-phone .cm-img { border-radius: 3.4cqmin; }
+.cm-frame-browser { overflow: visible; }
+.cm-frame-browser .browser { width: 100%; height: 100%; }
+.cm-frame-browser .browser-view { overflow: hidden; }
+.cm-icon { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 28%; }
+.cm-icon .cm-ico { width: 62%; height: 62%; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.cm-icon:not(.badge) .cm-ico { width: 100%; height: 100%; }
+.cm-pt { position: absolute; left: 0; top: 0; display: block; background: var(--c); border-radius: 50%; will-change: auto; }
+.cm-pt-steam { background: radial-gradient(closest-side, color-mix(in srgb, var(--c) 45%, transparent), color-mix(in srgb, var(--c) 12%, transparent) 55%, transparent); }
+.cm-pt-bubbles { background: transparent; box-shadow: inset 0 0 0 max(1.5px, .16cqmin) var(--c); }
+.cm-pt-sparkles { border-radius: 0; clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%); }
+.cm-pt-confetti { border-radius: .15cqmin; }
+.cm-pt-embers { background: radial-gradient(closest-side, var(--c), color-mix(in srgb, var(--c) 0%, transparent)); }
+.cm-pt-petals { border-radius: 70% 0 70% 0; }
+.cm-logo { display: block; width: 100%; height: auto; object-fit: contain; }

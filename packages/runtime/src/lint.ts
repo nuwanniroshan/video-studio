@@ -31,6 +31,7 @@ export function lintScene(id: string, root: HTMLElement, stage: { w: number; h: 
   for (const img of root.querySelectorAll("img")) {
     if (!img.complete || img.naturalWidth === 0) out.push({ level: "error", scene: id, code: "missing-asset", message: `image failed to load: ${img.getAttribute("src")}` });
   }
+  if (root.dataset.badCues) out.push({ level: "warning", scene: id, code: "unknown-cue", message: `unknown layer cue ${root.dataset.badCues}` });
   // heavy shadows are the most expensive effect on CPU raster (SPIKE.md): warn when many coexist
   let heavy = 0;
   for (const el of root.querySelectorAll<HTMLElement>("*")) {

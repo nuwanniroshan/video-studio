@@ -2550,6 +2550,3079 @@
               "type",
               "props"
             ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9-]{0,39}$"
+              },
+              "tone": {
+                "default": "light",
+                "ui": "select",
+                "label": "Tone",
+                "type": "string",
+                "enum": [
+                  "light",
+                  "dark",
+                  "brand"
+                ]
+              },
+              "transitionIn": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "cut",
+                      "crossfade",
+                      "push",
+                      "iris",
+                      "flash"
+                    ],
+                    "ui": "select",
+                    "label": "Transition"
+                  },
+                  "duration": {
+                    "ui": "number",
+                    "label": "Duration (s)",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 3
+                  },
+                  "direction": {
+                    "ui": "select",
+                    "label": "Direction",
+                    "type": "string",
+                    "enum": [
+                      "up",
+                      "down",
+                      "left",
+                      "right"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              },
+              "musicCue": {
+                "ui": "select",
+                "label": "Music cue",
+                "type": "string",
+                "enum": [
+                  "tension",
+                  "build",
+                  "reveal",
+                  "groove",
+                  "breath",
+                  "resolve"
+                ]
+              },
+              "duration": {
+                "default": {
+                  "mode": "auto"
+                },
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "auto"
+                      },
+                      "min": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 60
+                      }
+                    },
+                    "required": [
+                      "mode"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "mode": {
+                        "type": "string",
+                        "const": "fixed"
+                      },
+                      "seconds": {
+                        "type": "number",
+                        "exclusiveMinimum": 0,
+                        "maximum": 120
+                      }
+                    },
+                    "required": [
+                      "mode",
+                      "seconds"
+                    ]
+                  }
+                ]
+              },
+              "vo": {
+                "default": [],
+                "maxItems": 12,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "help": "Defaults to v1, v2… within the scene.",
+                      "type": "string",
+                      "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                    },
+                    "text": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 320,
+                      "ui": "text",
+                      "label": "Voice-over line"
+                    },
+                    "phonemes": {
+                      "type": "string"
+                    },
+                    "asset": {
+                      "type": "string",
+                      "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$"
+                    },
+                    "step": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "maximum": 9007199254740991
+                    }
+                  },
+                  "required": [
+                    "text"
+                  ]
+                }
+              },
+              "optional": {
+                "default": false,
+                "type": "boolean"
+              },
+              "aspectOverrides": {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string",
+                  "enum": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:5"
+                  ]
+                },
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "props": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    }
+                  },
+                  "required": [
+                    "props"
+                  ]
+                }
+              },
+              "type": {
+                "type": "string",
+                "const": "compose"
+              },
+              "props": {
+                "type": "object",
+                "properties": {
+                  "background": {
+                    "default": {
+                      "style": "tone",
+                      "angle": 160,
+                      "motif": "none",
+                      "motifColor": "auto",
+                      "motifOpacity": 0.5,
+                      "vignette": false
+                    },
+                    "type": "object",
+                    "properties": {
+                      "style": {
+                        "default": "tone",
+                        "ui": "select",
+                        "label": "Background",
+                        "help": "tone = the house background for the scene's tone.",
+                        "type": "string",
+                        "enum": [
+                          "tone",
+                          "solid",
+                          "linear",
+                          "radial",
+                          "spotlight",
+                          "split",
+                          "none"
+                        ]
+                      },
+                      "colors": {
+                        "minItems": 0,
+                        "maxItems": 3,
+                        "type": "array",
+                        "items": {
+                          "default": "primary",
+                          "ui": "color",
+                          "label": "Colour",
+                          "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                          "type": "string",
+                          "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                        },
+                        "ui": "list",
+                        "label": "Colours"
+                      },
+                      "angle": {
+                        "default": 160,
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 360,
+                        "ui": "number",
+                        "label": "Angle °"
+                      },
+                      "motif": {
+                        "default": "none",
+                        "ui": "select",
+                        "label": "Pattern",
+                        "type": "string",
+                        "enum": [
+                          "none",
+                          "grid",
+                          "dots",
+                          "lines",
+                          "rings",
+                          "waves",
+                          "grain"
+                        ]
+                      },
+                      "motifColor": {
+                        "default": "auto",
+                        "ui": "color",
+                        "label": "Pattern colour",
+                        "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                        "type": "string",
+                        "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                      },
+                      "motifOpacity": {
+                        "default": 0.5,
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1,
+                        "ui": "number",
+                        "label": "Pattern strength"
+                      },
+                      "vignette": {
+                        "default": false,
+                        "ui": "toggle",
+                        "label": "Vignette",
+                        "type": "boolean"
+                      }
+                    },
+                    "label": "Background"
+                  },
+                  "camera": {
+                    "default": "none",
+                    "ui": "select",
+                    "label": "Camera",
+                    "type": "string",
+                    "enum": [
+                      "none",
+                      "push-in",
+                      "pull-out",
+                      "pan-left",
+                      "pan-right",
+                      "rise",
+                      "drift"
+                    ]
+                  },
+                  "layers": {
+                    "minItems": 1,
+                    "maxItems": 28,
+                    "type": "array",
+                    "items": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "text"
+                            },
+                            "text": {
+                              "type": "string",
+                              "minLength": 1,
+                              "ui": "richText",
+                              "label": "Text",
+                              "maxChars": 160,
+                              "help": "Wrap words in *asterisks* for the accent colour."
+                            },
+                            "style": {
+                              "default": "headline",
+                              "ui": "select",
+                              "label": "Style",
+                              "type": "string",
+                              "enum": [
+                                "display",
+                                "headline",
+                                "title",
+                                "body",
+                                "label",
+                                "quote",
+                                "stat"
+                              ]
+                            },
+                            "size": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 3,
+                              "ui": "number",
+                              "label": "Size ×"
+                            },
+                            "font": {
+                              "default": "auto",
+                              "ui": "select",
+                              "label": "Font",
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "display",
+                                "body",
+                                "mono"
+                              ]
+                            },
+                            "weight": {
+                              "default": "auto",
+                              "ui": "select",
+                              "label": "Weight",
+                              "type": "string",
+                              "enum": [
+                                "300",
+                                "400",
+                                "500",
+                                "600",
+                                "700",
+                                "800",
+                                "900",
+                                "auto"
+                              ]
+                            },
+                            "color": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "accent": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Accent colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "align": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Align",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "left",
+                                "right"
+                              ]
+                            },
+                            "italic": {
+                              "default": false,
+                              "ui": "toggle",
+                              "label": "Italic",
+                              "type": "boolean"
+                            },
+                            "caps": {
+                              "default": false,
+                              "ui": "toggle",
+                              "label": "Uppercase",
+                              "type": "boolean"
+                            },
+                            "tracking": {
+                              "type": "number",
+                              "minimum": -0.1,
+                              "maximum": 0.6,
+                              "ui": "number",
+                              "label": "Letter spacing (em)"
+                            },
+                            "deco": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Decoration",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "underline",
+                                "marker",
+                                "pill",
+                                "box"
+                              ]
+                            },
+                            "decoColor": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Decoration colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "text"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "shape"
+                            },
+                            "shape": {
+                              "default": "rect",
+                              "ui": "select",
+                              "label": "Shape",
+                              "type": "string",
+                              "enum": [
+                                "rect",
+                                "circle",
+                                "pill",
+                                "line",
+                                "ring",
+                                "arc",
+                                "triangle",
+                                "blob"
+                              ]
+                            },
+                            "fill": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Fill",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "fill2": {
+                              "ui": "color",
+                              "label": "Gradient to",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "gradientAngle": {
+                              "default": 135,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Gradient angle °"
+                            },
+                            "stroke": {
+                              "ui": "color",
+                              "label": "Outline",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "strokeWidth": {
+                              "default": 4,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 60,
+                              "ui": "number",
+                              "label": "Outline width (px at 1080)"
+                            },
+                            "radius": {
+                              "default": 4,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 50,
+                              "ui": "number",
+                              "label": "Corner radius %"
+                            },
+                            "shadow": {
+                              "default": false,
+                              "ui": "toggle",
+                              "label": "Shadow",
+                              "type": "boolean"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "svg"
+                            },
+                            "svg": {
+                              "type": "string",
+                              "minLength": 10,
+                              "ui": "code",
+                              "label": "SVG markup",
+                              "help": "Plain vector markup (paths, shapes, gradients). Use currentColor or var(--vs-primary) for brand colours."
+                            },
+                            "color": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Colour (currentColor)",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "svg"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "image"
+                            },
+                            "src": {
+                              "type": "string",
+                              "pattern": "^(sha256:[0-9a-f]{64}|(?!\\/)(?!.*\\.\\.)[\\w./ -]+\\.(png|jpe?g|webp|svg|gif|mp4|mov|webm|wav|mp3|m4a))$",
+                              "ui": "asset",
+                              "label": "Image"
+                            },
+                            "fit": {
+                              "default": "cover",
+                              "ui": "select",
+                              "label": "Fit",
+                              "type": "string",
+                              "enum": [
+                                "cover",
+                                "contain"
+                              ]
+                            },
+                            "frame": {
+                              "default": "rounded",
+                              "ui": "select",
+                              "label": "Frame",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "rounded",
+                                "card",
+                                "polaroid",
+                                "circle",
+                                "browser",
+                                "phone"
+                              ]
+                            },
+                            "zoom": {
+                              "default": "in",
+                              "ui": "select",
+                              "label": "Slow zoom",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "in",
+                                "out"
+                              ]
+                            },
+                            "focusX": {
+                              "default": 0.5,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Focus X"
+                            },
+                            "focusY": {
+                              "default": 0.5,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Focus Y"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "src"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "icon"
+                            },
+                            "icon": {
+                              "type": "string",
+                              "enum": [
+                                "home",
+                                "brief",
+                                "users",
+                                "cal",
+                                "clock",
+                                "target",
+                                "chart",
+                                "gear",
+                                "search",
+                                "bell",
+                                "check",
+                                "lock",
+                                "unlock",
+                                "spark",
+                                "file",
+                                "shield",
+                                "arrow",
+                                "key",
+                                "list",
+                                "wallet",
+                                "box",
+                                "flag",
+                                "cycle",
+                                "msg",
+                                "policy",
+                                "copy"
+                              ],
+                              "ui": "select",
+                              "label": "Icon"
+                            },
+                            "color": {
+                              "default": "primary",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "badge": {
+                              "ui": "color",
+                              "label": "Badge background",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "icon"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "logo"
+                            },
+                            "version": {
+                              "default": "auto",
+                              "ui": "select",
+                              "label": "Version",
+                              "help": "auto picks the logo made for the scene's tone.",
+                              "type": "string",
+                              "enum": [
+                                "auto",
+                                "on-dark",
+                                "on-light"
+                              ]
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "particles"
+                            },
+                            "style": {
+                              "default": "dust",
+                              "ui": "select",
+                              "label": "Style",
+                              "type": "string",
+                              "enum": [
+                                "steam",
+                                "bubbles",
+                                "sparkles",
+                                "confetti",
+                                "dust",
+                                "snow",
+                                "embers",
+                                "petals"
+                              ]
+                            },
+                            "color": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "color2": {
+                              "ui": "color",
+                              "label": "Second colour",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "count": {
+                              "default": 16,
+                              "ui": "number",
+                              "label": "Count",
+                              "type": "integer",
+                              "minimum": 3,
+                              "maximum": 40
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind"
+                          ]
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "counter"
+                            },
+                            "value": {
+                              "type": "number",
+                              "ui": "number",
+                              "label": "Number"
+                            },
+                            "from": {
+                              "default": 0,
+                              "type": "number",
+                              "ui": "number",
+                              "label": "Counts from"
+                            },
+                            "decimals": {
+                              "default": 0,
+                              "ui": "number",
+                              "label": "Decimals",
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 3
+                            },
+                            "prefix": {
+                              "type": "string",
+                              "minLength": 1,
+                              "ui": "text",
+                              "label": "Prefix",
+                              "maxChars": 4
+                            },
+                            "suffix": {
+                              "type": "string",
+                              "minLength": 1,
+                              "ui": "text",
+                              "label": "Suffix",
+                              "maxChars": 8
+                            },
+                            "style": {
+                              "default": "stat",
+                              "ui": "select",
+                              "label": "Style",
+                              "type": "string",
+                              "enum": [
+                                "display",
+                                "headline",
+                                "title",
+                                "body",
+                                "label",
+                                "quote",
+                                "stat"
+                              ]
+                            },
+                            "size": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 3,
+                              "ui": "number",
+                              "label": "Size ×"
+                            },
+                            "color": {
+                              "default": "auto",
+                              "ui": "color",
+                              "label": "Colour",
+                              "help": "auto, primary, primary-light, primary-dark, primary-soft, accent, accent-soft, ink, dark, light, muted, white, black or #RRGGBB.",
+                              "type": "string",
+                              "pattern": "^(#[0-9a-fA-F]{6}|auto|primary|primary-light|primary-dark|primary-soft|accent|accent-soft|ink|dark|light|muted|white|black)$"
+                            },
+                            "countFor": {
+                              "default": 1.6,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 6,
+                              "ui": "number",
+                              "label": "Count duration (s)"
+                            },
+                            "name": {
+                              "ui": "text",
+                              "label": "Layer name",
+                              "help": "Only for you; not shown.",
+                              "type": "string",
+                              "maxLength": 40
+                            },
+                            "x": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "X %",
+                              "help": "Position of the anchor, as % of the safe frame width (0 = left edge)."
+                            },
+                            "y": {
+                              "default": 50,
+                              "type": "number",
+                              "minimum": -50,
+                              "maximum": 150,
+                              "ui": "number",
+                              "label": "Y %",
+                              "help": "% of the safe frame height (0 = top)."
+                            },
+                            "w": {
+                              "type": "number",
+                              "minimum": 0.5,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Width %"
+                            },
+                            "h": {
+                              "type": "number",
+                              "minimum": 0.2,
+                              "maximum": 200,
+                              "ui": "number",
+                              "label": "Height %"
+                            },
+                            "anchor": {
+                              "default": "center",
+                              "ui": "select",
+                              "label": "Anchor",
+                              "type": "string",
+                              "enum": [
+                                "center",
+                                "top-left",
+                                "top",
+                                "top-right",
+                                "left",
+                                "right",
+                                "bottom-left",
+                                "bottom",
+                                "bottom-right"
+                              ]
+                            },
+                            "rotate": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -360,
+                              "maximum": 360,
+                              "ui": "number",
+                              "label": "Rotate °"
+                            },
+                            "opacity": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1,
+                              "ui": "number",
+                              "label": "Opacity"
+                            },
+                            "at": {
+                              "default": "start",
+                              "ui": "text",
+                              "label": "Starts at",
+                              "help": "start, end or a voice-over line id (v1, v2…).",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "delay": {
+                              "default": 0,
+                              "type": "number",
+                              "minimum": -5,
+                              "maximum": 30,
+                              "ui": "number",
+                              "label": "Delay (s)"
+                            },
+                            "enter": {
+                              "default": "rise",
+                              "ui": "select",
+                              "label": "Entrance",
+                              "type": "string",
+                              "enum": [
+                                "rise",
+                                "fade",
+                                "drop",
+                                "left",
+                                "right",
+                                "scale",
+                                "pop",
+                                "zoom",
+                                "blur",
+                                "wipe",
+                                "reveal",
+                                "iris",
+                                "draw",
+                                "words",
+                                "letters",
+                                "typewriter",
+                                "none"
+                              ]
+                            },
+                            "speed": {
+                              "default": 1,
+                              "type": "number",
+                              "minimum": 0.3,
+                              "maximum": 4,
+                              "ui": "number",
+                              "label": "Entrance length ×"
+                            },
+                            "until": {
+                              "ui": "text",
+                              "label": "Leaves at",
+                              "help": "Optional cue at which the layer animates out.",
+                              "type": "string",
+                              "pattern": "^[a-z][a-z0-9-]{0,39}$"
+                            },
+                            "loop": {
+                              "default": "none",
+                              "ui": "select",
+                              "label": "Idle motion",
+                              "type": "string",
+                              "enum": [
+                                "none",
+                                "float",
+                                "sway",
+                                "spin",
+                                "pulse",
+                                "drift",
+                                "breathe"
+                              ]
+                            },
+                            "portrait": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            },
+                            "square": {
+                              "type": "object",
+                              "properties": {
+                                "x": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "X %"
+                                },
+                                "y": {
+                                  "type": "number",
+                                  "minimum": -50,
+                                  "maximum": 150,
+                                  "ui": "number",
+                                  "label": "Y %"
+                                },
+                                "w": {
+                                  "type": "number",
+                                  "minimum": 0.5,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Width %"
+                                },
+                                "h": {
+                                  "type": "number",
+                                  "minimum": 0.2,
+                                  "maximum": 200,
+                                  "ui": "number",
+                                  "label": "Height %"
+                                },
+                                "size": {
+                                  "type": "number",
+                                  "minimum": 0.3,
+                                  "maximum": 3,
+                                  "ui": "number",
+                                  "label": "Text size ×"
+                                },
+                                "anchor": {
+                                  "ui": "select",
+                                  "label": "Anchor",
+                                  "type": "string",
+                                  "enum": [
+                                    "center",
+                                    "top-left",
+                                    "top",
+                                    "top-right",
+                                    "left",
+                                    "right",
+                                    "bottom-left",
+                                    "bottom",
+                                    "bottom-right"
+                                  ]
+                                },
+                                "align": {
+                                  "ui": "select",
+                                  "label": "Text align",
+                                  "type": "string",
+                                  "enum": [
+                                    "left",
+                                    "center",
+                                    "right"
+                                  ]
+                                }
+                              },
+                              "label": "Placement override"
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "value"
+                          ]
+                        }
+                      ],
+                      "label": "Layer"
+                    },
+                    "ui": "list",
+                    "label": "Layers",
+                    "help": "Drawn in order: the first layer is at the back."
+                  },
+                  "exit": {
+                    "default": true,
+                    "ui": "toggle",
+                    "label": "Animate out at the end",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "layers"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "props"
+            ]
           }
         ]
       }

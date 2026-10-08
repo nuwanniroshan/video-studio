@@ -7,3 +7,4 @@ export * from "./brand.ts";
 export { jsonSchema } from "./json-schema.ts";
 export * from "./maxchars.ts";
 export * from "./assets.ts";
+export * from "./svg.ts";
