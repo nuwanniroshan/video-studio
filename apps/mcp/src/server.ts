@@ -13,8 +13,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { SCENE_DEFS, catalog as sceneCatalog } from "@vs/spec";
 import {
-  VOICES, catalog, contactSheets, createProject, getJob, getProject, listBrands, listOutputs, listPresets, listProjects, listTemplates,
-  preview, publicJob, saveAsset, saveSpec, startRender, initStudio,
+  VOICES, applyTheme, brandView, catalog, contactSheets, createVideoProject, fontLibrary, getJob, getProject, getTheme, listOutputs, listPresets, listProjects,
+  listTemplates, listThemes, preview, publicJob, saveAsset, saveBrandFile, saveProjectBrand, saveSpec, startRender, initStudio,
 } from "@vs/studio";
 
 initStudio();
@@ -36,17 +36,27 @@ function imageContent(file: string, maxW = 1568) {
 
 const server = new McpServer({ name: "video-studio", version: "0.1.0" }, {
   instructions: `Make motion-graphics videos (promos, feature launches, explainers, social cutdowns) from an idea.
-Workflow: list_templates → create_project → get_spec → write the storyboard with update_spec (use list_scenes / get_scene_schema for props)
-→ check_timing → render_stills and LOOK at the contact sheets; fix overflow, empty space, ordering → render_video → render_status until done.
+Workflow: list_templates (templates + brand themes) → create_project (idea, theme or brand colours, formats, voice) → set_logo if the user
+has a logo → get_spec → write the storyboard with update_spec (use list_scenes / get_scene_schema for props) → check_timing →
+render_stills and LOOK at the contact sheets; fix overflow, empty space, ordering → render_video → render_status until done.
+Every project has its own brand (get_brand / set_brand); there is no shared brand library.
 Scenes never take durations: they last as long as their voice-over. Use *asterisks* for accent words in headlines.
 The user can also open the project in the web studio at ${STUDIO} (run \`pnpm studio\` in the repo).`,
 });
 
+const themeSummary = () => listThemes().map((t) => ({ id: t.id, name: t.name, description: t.description, category: t.category, colors: t.base, fonts: t.fontFamilies, music: t.music }));
 server.registerTool("list_templates", {
-  title: "List templates and brands",
-  description: "Templates to start a video from, brand kits, music presets and voices.",
+  title: "List templates, themes, voices",
+  description: "Templates to start a video from (optional: you can also write the storyboard from scratch), brand themes (looks for projects without their own branding), fonts, music presets and voices.",
   inputSchema: {},
-}, wrap(() => text({ templates: listTemplates().map(({ variants: _v, ...t }) => t), brands: listBrands().map(({ logo: _l, ...b }) => b), musicPresets: listPresets(), voices: VOICES })));
+}, wrap(() => text({ templates: listTemplates().map(({ variants: _v, thumbnail: _t, ...t }) => t), themes: themeSummary(),
+  fonts: fontLibrary().map((f) => ({ id: f.id, family: f.family, style: f.style, roles: f.roles })), musicPresets: listPresets(), voices: VOICES })));
+
+server.registerTool("list_themes", {
+  title: "List brand themes",
+  description: "Ready-made looks (colours, fonts, music, voice) for projects without their own brand.",
+  inputSchema: {},
+}, wrap(() => text(themeSummary())));
 
 server.registerTool("list_scenes", {
   title: "List scene types",
@@ -71,13 +81,61 @@ server.registerTool("list_projects", {
   inputSchema: {},
 }, wrap(() => text(listProjects().map(({ thumbnail: _t, ...p }) => ({ ...p, updated: new Date(p.updated).toISOString(), studioUrl: `${STUDIO}/#/p/${p.id}` })))));
 
+const Hex = z.string().regex(/^#[0-9a-fA-F]{6}$/);
 server.registerTool("create_project", {
   title: "Create a video project",
-  description: "Create a project from a template (default feature-launch) and brand kit. Returns the project id and its starting spec; rewrite the spec with update_spec.",
-  inputSchema: { title: z.string().describe("video name"), template: z.string().optional(), brand: z.string().optional() },
-}, wrap((a: { title: string; template?: string; brand?: string }) => {
-  const { id } = createProject(a);
+  description: `Create a project with its own brand and a complete first-draft storyboard: from a template, or written from the idea. Then rewrite the
+spec with update_spec. Brand: pass theme (see list_themes) or your own colors (+ optional fonts); brandName is the product/company name.`,
+  inputSchema: {
+    title: z.string().optional().describe("video name"),
+    idea: z.string().optional().describe("what the video is about (free text); required without a template"),
+    template: z.string().optional().describe("template id, optional"),
+    brandName: z.string().optional(), website: z.string().optional(),
+    theme: z.string().optional().describe("theme id; default classic"),
+    colors: z.object({ primary: Hex, accent: Hex, dark: Hex, light: Hex, ink: Hex }).optional().describe("own brand colours instead of a theme"),
+    fonts: z.object({ display: z.string(), body: z.string(), mono: z.string() }).partial().optional().describe("font library ids (list_templates → fonts)"),
+    formats: z.array(z.enum(["16:9", "9:16", "1:1", "4:5"])).optional(),
+    voice: z.string().optional(), music: z.string().optional().describe("music preset or none"), length: z.number().optional().describe("target seconds"),
+  },
+}, wrap((a: any) => {
+  const brand = a.colors ? { custom: { name: a.brandName || a.title || "Brand", base: a.colors,
+    fonts: Object.fromEntries(Object.entries(a.fonts ?? {}).map(([r, id]) => [r, { library: id }])) } } : a.theme ? { theme: getTheme(a.theme).id, name: a.brandName } : a.brandName ? { theme: "classic", name: a.brandName } : undefined;
+  const { id } = createVideoProject({ title: a.title, idea: a.idea, template: a.template, brand, name: a.brandName, url: a.website, formats: a.formats, voice: a.voice, music: a.music, length: a.length });
   return text({ project: id, studioUrl: `${STUDIO}/#/p/${id}`, spec: getProject(id).spec });
+}));
+
+server.registerTool("get_brand", {
+  title: "Get the project's brand",
+  description: "The project's own brand: name, colours, fonts, logo, voice, music, website.",
+  inputSchema: { project: z.string() },
+}, wrap(({ project }: { project: string }) => { const { urls: _u, ...b } = brandView(project); return text(b); }));
+
+server.registerTool("set_brand", {
+  title: "Change the project's brand",
+  description: "Switch to a theme, or set the brand name, colours, fonts, website, music or voice. Only the fields you pass change.",
+  inputSchema: { project: z.string(), theme: z.string().optional(), name: z.string().optional(), website: z.string().optional(),
+    colors: z.object({ primary: Hex, accent: Hex, dark: Hex, light: Hex, ink: Hex }).partial().optional(),
+    fonts: z.object({ display: z.string(), body: z.string(), mono: z.string() }).partial().optional(),
+    music: z.string().optional(), voice: z.string().optional() },
+}, wrap((a: any) => {
+  if (a.theme) applyTheme(a.project, a.theme);
+  const cur = brandView(a.project);
+  const touched = a.name || a.website !== undefined || a.colors || a.fonts || a.music || a.voice;
+  if (touched) saveProjectBrand(a.project, { name: a.name ?? cur.name, base: { ...cur.base, ...(a.colors ?? {}) }, ctaUrl: a.website,
+    fonts: a.fonts ? Object.fromEntries(Object.entries(a.fonts).map(([r, id]) => [r, { library: id }])) : undefined,
+    music: a.music, voice: a.voice ? { voice: a.voice, speed: cur.voice?.speed ?? 0.94 } : undefined });
+  const { urls: _u, ...b } = brandView(a.project);
+  return text({ ok: true, brand: b });
+}));
+
+server.registerTool("set_logo", {
+  title: "Set the project's logo",
+  description: "Use a local logo file (png, svg, webp, jpg; transparent background works best) for the project's brand. which: both (default), dark (for dark backgrounds) or light.",
+  inputSchema: { project: z.string(), file: z.string().describe("absolute path"), which: z.enum(["both", "dark", "light"]).optional() },
+}, wrap(({ project, file, which }: { project: string; file: string; which?: string }) => {
+  const kind = which === "dark" ? "logoOnDark" : which === "light" ? "logoOnLight" : "logo";
+  saveBrandFile(project, kind, path.basename(file), fs.readFileSync(file));
+  return text({ ok: true });
 }));
 
 server.registerTool("get_spec", {

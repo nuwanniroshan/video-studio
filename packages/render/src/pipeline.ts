@@ -44,7 +44,7 @@ export async function prepare(specPath: string, variantIds?: string[], o: { cach
   return { project, vo, variants };
 }
 
-export const serveProject = (p: Project) => serve({ brandsDir: path.dirname(p.brandDir), assetsDir: p.store.dir("assets") });
+export const serveProject = (p: Project) => serve({ brandsDir: path.dirname(p.brandDir), brandDir: (id) => (id === p.brand.id ? p.brandDir : null), assetsDir: p.store.dir("assets") });
 
 /** Analyze pass: one headless page collects SFX markers and layout lint (incl. maxChars). */
 export async function analyze(srv: Served, doc: RuntimeDoc): Promise<LoadResult> {

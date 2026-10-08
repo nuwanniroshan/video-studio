@@ -21,7 +21,18 @@ export function deriveColors(b: BaseColors): Record<string, string> {
     grey900: grey(0.95), grey800: grey(0.86), grey700: grey(0.76), grey600: grey(0.64), grey500: grey(0.52), grey400: grey(0.36),
     grey300: grey(0.2), grey200: grey(0.11), grey100: grey(0.06), grey50: b.light, grey25: mix(b.light, W, 0.6),
     dark: b.dark, light: b.light,
+    // legibility helpers for light/bright primaries (lime, amber): text on primary, primary as text on light
+    onPrimary: onColor(b.primary), primaryText: textSafe(b.primary, b.light, b.ink),
   };
+}
+
+const lum = (h: string) => { const [r, g, bl] = hex(h).map((v) => { const c = v / 255; return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; }); return 0.2126 * r + 0.7152 * g + 0.0722 * bl; };
+/** WCAG contrast ratio between two colours. */
+export const contrast = (a: string, b: string) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); };
+/** `c` darkened towards `ink` just enough to read as large text (≥ 3:1) on `bg`. */
+export function textSafe(c: string, bg: string, ink: string) {
+  for (let t = 0; t <= 1; t += 0.05) { const m = mix(c, ink, t); if (contrast(m, bg) >= 3) return m; }
+  return ink;
 }
 
 /** Readable text colour on a background. */

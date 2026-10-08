@@ -11,9 +11,10 @@ import fastifyStatic from "@fastify/static";
 import multipart from "@fastify/multipart";
 import { REPO, type Quality } from "@vs/render";
 import {
-  StudioError, initStudio, listBrandKits, brandView, saveBrand, saveBrandFile, deleteBrand, testVoice, fontLibrary, fontFile, templateThumb,
-  saveUpload, createFromBrief, previewAudio, briefToSpec, type BrandFileKind, catalog, contactSheets, createProject, deleteProject, getJob, getProject, listBrands, listJobs, listOutputs,
-  listProjects, listTemplates, preview, projectFile, publicJob, runtimeOrigin, saveAsset, saveSpec, startRender,
+  StudioError, initStudio, brandView, saveProjectBrand, saveBrandFile, removeBrandLogo, applyTheme, listThemes, testVoice, fontLibrary, fontFile, templateThumb,
+  saveUpload, previewAudio, briefToSpec, ideaToBrief, type BrandFileKind, catalog, contactSheets, createVideoProject, deleteProject, getJob, getProject, listJobs, listOutputs,
+  listProjects, listTemplates, preview, projectFile, projectRequest, publicJob, runtimeOrigin, saveAsset, saveSpec, startRender,
+  agentStatus, startAgent, stopAgent, getAgentJob, listAgentJobs, publicAgentJob,
 } from "@vs/studio";
 
 initStudio();
@@ -32,21 +33,21 @@ app.setErrorHandler((e, _req, reply) => {
 type P = { Params: { id: string } };
 app.get("/api/catalog", async () => catalog());
 app.get("/api/templates", async () => listTemplates());
-app.get("/api/brands", async () => listBrands());
+app.get("/api/themes", async () => listThemes());
 app.get<{ Params: { id: string } }>("/api/templates/:id/thumb.jpg", async (req, reply) => reply.type("image/jpeg").send(fs.createReadStream(templateThumb(req.params.id))));
 app.get("/api/fonts", async () => fontLibrary());
 app.get<{ Params: { file: string } }>("/api/fonts/:file", async (req, reply) => reply.type("font/ttf").send(fs.createReadStream(fontFile(req.params.file))));
-app.get("/api/brandkits", async () => listBrandKits());
-app.get<P>("/api/brandkits/:id", async (req) => brandView(req.params.id));
-app.post<{ Body: any }>("/api/brandkits", async (req) => saveBrand(undefined, req.body as never));
-app.put<P & { Body: any }>("/api/brandkits/:id", async (req) => saveBrand(req.params.id, req.body as never));
-app.delete<P>("/api/brandkits/:id", async (req) => { deleteBrand(req.params.id); return { ok: true }; });
-app.post<P & { Querystring: { kind: BrandFileKind } }>("/api/brandkits/:id/files", async (req) => {
+// each project owns its brand
+app.get<P>("/api/projects/:id/brand", async (req) => brandView(req.params.id));
+app.put<P & { Body: any }>("/api/projects/:id/brand", async (req) => saveProjectBrand(req.params.id, req.body as never));
+app.post<P & { Body: { theme: string } }>("/api/projects/:id/brand/theme", async (req) => applyTheme(req.params.id, req.body.theme));
+app.delete<P>("/api/projects/:id/brand/logo", async (req) => removeBrandLogo(req.params.id));
+app.post<P & { Querystring: { kind: BrandFileKind } }>("/api/projects/:id/brand/files", async (req) => {
   const f = await req.file();
   if (!f) throw new StudioError(400, "no file");
   return saveBrandFile(req.params.id, req.query.kind, f.filename, await f.toBuffer());
 });
-app.post<{ Body: { text: string; voice?: string; speed?: number; pronunciations?: Record<string, unknown>; brand?: string } }>("/api/voice-test", async (req, reply) => {
+app.post<{ Body: { text: string; voice?: string; speed?: number; pronunciations?: Record<string, unknown>; project?: string } }>("/api/voice-test", async (req, reply) => {
   const r = await testVoice(req.body);
   return reply.type("audio/wav").send(fs.createReadStream(r.wav));
 });
@@ -55,17 +56,41 @@ app.post("/api/uploads", async (req) => {
   if (!f) throw new StudioError(400, "no file");
   return { ref: saveUpload(f.filename, await f.toBuffer()) };
 });
-app.post("/api/brief-preview", async (req) => {
+// the rule-based outline for an idea (shown while typing; no AI)
+app.post("/api/idea-preview", async (req) => {
   const b = req.body as any;
-  return briefToSpec({ ...b, screenshots: (b.screenshots ?? []).map((_: string, i: number) => `assets/screenshot-${i + 1}.png`) }, b.brand ?? "luraplus");
+  const brief = ideaToBrief({ ...b, idea: b.idea || "Your product makes work simple.", screenshots: (b.screenshots ?? []).map((_: string, i: number) => `assets/screenshot-${i + 1}.png`) });
+  return { brief, spec: briefToSpec({ ...brief, product: brief.product }, "preview") };
 });
-app.post<{ Body: any }>("/api/projects/from-brief", async (req) => createFromBrief(req.body as never));
+// new project: own brand + first draft; with agent:true the AI agent then writes the storyboard
+app.post<{ Body: any }>("/api/projects/new", async (req) => {
+  const { agent, model, ...o } = (req.body ?? {}) as { agent?: boolean; model?: string; [k: string]: unknown };
+  const { id } = createVideoProject(o);
+  const job = agent ? startAgent(id, { mode: "create", model }) : null;
+  return { id, agentJob: job?.id };
+});
+app.get<P>("/api/projects/:id/request", async (req) => projectRequest(req.params.id) ?? {});
+// the agent
+app.get("/api/agent/status", async () => agentStatus());
+app.post<P & { Body: { instruction?: string; mode?: "create" | "revise"; model?: string } }>("/api/projects/:id/agent", async (req) =>
+  publicAgentJob(startAgent(req.params.id, { mode: req.body?.mode ?? "revise", instruction: req.body?.instruction, model: req.body?.model })));
+app.get<P>("/api/projects/:id/agent", async (req) => listAgentJobs(req.params.id));
+app.post<{ Params: { job: string } }>("/api/agent/:job/stop", async (req) => stopAgent(req.params.job));
+app.get<{ Params: { job: string } }>("/api/agent/:job/events", (req, reply) => {
+  const job = getAgentJob(req.params.job);
+  if (!job) return reply.status(404).send({ error: "no such agent run" });
+  reply.raw.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache", connection: "keep-alive" });
+  const send = (j: unknown) => reply.raw.write(`data: ${JSON.stringify(j)}\n\n`);
+  send(publicAgentJob(job));
+  const on = (j: unknown) => send(j);
+  job.events.on("update", on);
+  req.raw.on("close", () => job.events.off("update", on));
+});
 app.post<P & { Body: { variant?: string } }>("/api/projects/:id/preview-audio", async (req) => {
   const r = await previewAudio(req.params.id, req.body?.variant);
   return { url: `/files/${req.params.id}/${r.path}?v=${Date.now()}`, lufs: r.lufs };
 });
 app.get("/api/projects", async () => listProjects());
-app.post<{ Body: { title: string; template?: string; brand?: string; formats?: string[] } }>("/api/projects", async (req) => createProject(req.body));
 app.get<P>("/api/projects/:id", async (req) => { const p = getProject(req.params.id); return { id: p.id, spec: p.spec, assets: p.assets }; });
 app.delete<P>("/api/projects/:id", async (req) => { deleteProject(req.params.id); return { ok: true }; });
 app.put<P>("/api/projects/:id/spec", async (req, reply) => {

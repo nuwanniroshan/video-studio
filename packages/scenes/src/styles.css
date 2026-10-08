@@ -43,6 +43,8 @@
 .tone-dark .vs-sub, .tone-brand .vs-sub { color: rgba(255,255,255,.62); }
 .tone-dark .vs-kicker { color: var(--vs-primary400); }
 .tone-brand .vs-kicker { color: var(--vs-primary100); }
+/* bright primaries (lime, amber) are darkened for text on light scenes; same colour for typical brands */
+.tone-light .vs-kicker, .tone-light .vs-h1 .accent, .tone-light .vs-h2 .accent, .tone-light .sc-value { color: var(--vs-primary-text, var(--vs-primary)); }
 [data-orient="portrait"] .vs-kicker { font-size: 2.3cqmin; }
 [data-orient="portrait"] .vs-sub { font-size: 3.3cqmin; }
 .copy { display: flex; flex-direction: column; gap: 2.4cqmin; }
@@ -56,7 +58,7 @@
 .chip.amber { background: var(--vs-warning50); color: var(--vs-warning600); }
 .chip.violet { background: var(--vs-accent50); color: var(--vs-accent); }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: .74cqmin; height: 3.7cqmin; padding: 0 1.67cqmin; border-radius: .74cqmin; font-weight: 600; font-size: 1.39cqmin; white-space: nowrap; }
-.btn.primary { background: var(--vs-primary); color: #fff; box-shadow: 0 1px 2px color-mix(in srgb, var(--vs-primary600) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.18); }
+.btn.primary { background: var(--vs-primary); color: var(--vs-on-primary, #fff); box-shadow: 0 1px 2px color-mix(in srgb, var(--vs-primary600) 40%, transparent), inset 0 1px 0 rgba(255,255,255,.18); }
 .ico { width: 1.67cqmin; height: 1.67cqmin; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
 .cursor { position: absolute; left: 0; top: 0; width: 2.6cqmin; height: 2.6cqmin; z-index: 50; pointer-events: none; transform-origin: 20% 12%; }
 .cursor svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 3px rgba(0,0,0,.28)); }
@@ -218,7 +220,7 @@
 .cta-logo img { display: block; width: 100%; height: auto; }
 .cta-h1 { max-width: 100%; }
 .cta-actions { display: flex; align-items: center; gap: 3cqmin; flex-wrap: wrap; justify-content: center; }
-.cta-btn { display: inline-flex; align-items: center; gap: 1.3cqmin; height: 7cqmin; padding: 0 3.5cqmin; border-radius: 1.3cqmin; background: var(--vs-primary); color: #fff;
+.cta-btn { display: inline-flex; align-items: center; gap: 1.3cqmin; height: 7cqmin; padding: 0 3.5cqmin; border-radius: 1.3cqmin; background: var(--vs-primary); color: var(--vs-on-primary, #fff);
   font-family: var(--vs-font-display); font-weight: 600; font-size: 2.78cqmin; letter-spacing: -.01em;
   box-shadow: 0 2cqmin 5.5cqmin color-mix(in srgb, var(--vs-primary) 45%, transparent), inset 0 1px 0 rgba(255,255,255,.25); white-space: nowrap; }
 .cta-btn .ico { width: 2.8cqmin; height: 2.8cqmin; stroke-width: 2.2; }

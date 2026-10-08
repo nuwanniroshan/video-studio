@@ -121,6 +121,8 @@ importers:
         specifier: ^6.4.4
         version: 6.4.4(@types/node@20.19.43)(tsx@4.23.15)
 
+  packages/ai: {}
+
   packages/brand: {}
 
   packages/engine:
@@ -181,6 +183,9 @@ importers:
 
   packages/studio:
     dependencies:
+      '@vs/ai':
+        specifier: workspace:*
+        version: link:../ai
       '@vs/brand':
         specifier: workspace:*
         version: link:../brand

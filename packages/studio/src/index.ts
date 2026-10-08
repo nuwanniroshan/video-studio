@@ -14,23 +14,18 @@ import {
 } from "@vs/render";
 import type { LintIssue, RuntimeDoc } from "@vs/runtime";
 
-import { StudioError, cacheDir, studioHome } from "./errors.ts";
-import { initBrands, listBrandKits } from "./brands.ts";
+import { StudioError, cacheDir, pdir, projectsDir, studioHome, validId } from "./errors.ts";
+import { migrateProjectBrands, themeInput, writeBrand, type BrandInput } from "./brands.ts";
 export { StudioError, cacheDir, studioHome };
 export * from "./brands.ts";
 export * from "./brief.ts";
+export * from "./idea.ts";
 import { briefToSpec, type Brief } from "./brief.ts";
+import { ideaToBrief, type IdeaInput } from "./idea.ts";
 import { mixAudio } from "@vs/render";
 
-/** Call once at startup (server, MCP): studio brand folder, seeded from the repo. */
-export function initStudio() { initBrands(studioHome()); }
-const projectsDir = () => { const d = path.join(studioHome(), "projects"); fs.mkdirSync(d, { recursive: true }); return d; };
-const pdir = (id: string) => {
-  if (!/^[a-z0-9][a-z0-9-]{0,80}$/.test(id)) throw new StudioError(400, "bad project id");
-  const d = path.join(projectsDir(), id);
-  if (!fs.existsSync(path.join(d, "spec.json"))) throw new StudioError(404, `no project "${id}"`);
-  return d;
-};
+/** Call once at startup (server, MCP): gives projects from older versions their own brand. */
+export function initStudio() { migrateProjectBrands(); }
 
 /* ---------- catalog ---------- */
 
@@ -47,20 +42,16 @@ export function listTemplates() {
   return fs.readdirSync(dir).filter((d) => fs.existsSync(path.join(dir, d, "spec.json"))).map((id) => {
     const spec = JSON.parse(fs.readFileSync(path.join(dir, id, "spec.json"), "utf8"));
     const meta = fs.existsSync(path.join(dir, id, "template.json")) ? JSON.parse(fs.readFileSync(path.join(dir, id, "template.json"), "utf8")) : {};
-    return { id, name: meta.name ?? id, category: meta.category ?? "", description: meta.description ?? "", length: meta.length ?? "",
+    return { id, name: meta.name ?? id, theme: meta.theme as string | undefined, product: meta.product as string | undefined, order: meta.order ?? 99, category: meta.category ?? "", description: meta.description ?? "", length: meta.length ?? "",
       formats: meta.formats ?? spec.variants.map((v: { aspect: string }) => v.aspect), scenes: (spec.scenes as { type: string }[]).map((s) => s.type),
       thumbnail: fs.existsSync(path.join(dir, id, "thumb.jpg")) ? `/api/templates/${id}/thumb.jpg` : undefined, variants: spec.variants };
-  });
+  }).sort((a, b) => a.order - b.order);
 }
 export const templateThumb = (id: string) => {
   const f = path.join(REPO, "templates", path.basename(id), "thumb.jpg");
   if (!fs.existsSync(f)) throw new StudioError(404, "no thumbnail");
   return f;
 };
-
-export function listBrands() {
-  return listBrandKits().map((k) => ({ id: k.id, name: k.name as string, primary: k.colors?.primary as string, logo: k.urls.logoOnLight as string }));
-}
 
 export function listPresets() {
   const d = path.join(REPO, "python/vsaudio/score/presets");
@@ -78,7 +69,7 @@ export function catalog() {
 
 /* ---------- projects ---------- */
 
-export interface ProjectSummary { id: string; title: string; brand: string; updated: number; scenes: number; thumbnail?: string; renders: string[] }
+export interface ProjectSummary { id: string; title: string; brand: { name: string; primary: string; theme?: string }; updated: number; scenes: number; thumbnail?: string; renders: string[]; agent?: string }
 
 export function listProjects(): ProjectSummary[] {
   return fs.readdirSync(projectsDir()).filter((id) => fs.existsSync(path.join(projectsDir(), id, "spec.json"))).map((id) => {
@@ -94,7 +85,8 @@ export function listProjects(): ProjectSummary[] {
     }
     const sheet = fs.existsSync(path.join(out, "stills")) ? fs.readdirSync(path.join(out, "stills")).find((f) => f.endsWith("-sheet.jpg")) : undefined;
     const thumb = fs.existsSync(own) ? `/files/${id}/out/.thumb.jpg?v=${Math.round(fs.statSync(own).mtimeMs)}` : sheet ? `/files/${id}/out/stills/${sheet}` : undefined;
-    return { id, title: spec.title, brand: spec.brand, updated: fs.statSync(path.join(d, "spec.json")).mtimeMs, scenes: spec.scenes?.length ?? 0, thumbnail: thumb, renders };
+    const kit = fs.existsSync(path.join(d, "brand", "brand.json")) ? JSON.parse(fs.readFileSync(path.join(d, "brand", "brand.json"), "utf8")) : {};
+    return { id, title: spec.title, brand: { name: kit.name ?? spec.brand, primary: kit.colors?.primary ?? "#888888", theme: kit.theme }, updated: fs.statSync(path.join(d, "spec.json")).mtimeMs, scenes: spec.scenes?.length ?? 0, thumbnail: thumb, renders };
   }).sort((a, b) => b.updated - a.updated);
 }
 
@@ -127,25 +119,82 @@ export function saveUpload(filename: string, data: Buffer) {
   return `upload:${name}`;
 }
 
-/** New project from a guided brief (no AI): the rules in brief.ts write the storyboard. */
-export function createFromBrief(b: Brief & { brand?: string; title?: string }): { id: string } {
-  const brand = b.brand ?? "luraplus";
-  if (!fs.existsSync(path.join(env.brandsDir(), brand, "brand.json"))) throw new StudioError(400, `unknown brand "${brand}"`);
-  const { id, dir } = newProjectDir(b.title || b.product);
+export type BrandChoice = { theme: string; name?: string } | { custom: BrandInput };
+export interface NewVideo extends Partial<IdeaInput> {
+  title?: string;
+  /** start from this template's storyboard (else a draft is written from the idea) */
+  template?: string;
+  /** the project's own brand: a theme, or the user's colours/fonts (logos are uploaded after) */
+  brand?: BrandChoice;
+  speed?: number;
+  /** a guided brief instead of free text */
+  brief?: Brief;
+}
+
+/** Copy an uploaded image (upload:<name>) or keep a project path. */
+function takeUpload(dir: string, ref: string) {
+  if (!ref.startsWith("upload:")) return ref;
+  const src = path.join(studioHome(), "uploads", path.basename(ref.slice(7)));
+  if (!fs.existsSync(src)) throw new StudioError(400, "an uploaded image expired; upload it again");
+  const name = path.basename(src).replace(/^[a-z0-9]+-/, "");
   fs.mkdirSync(path.join(dir, "assets"), { recursive: true });
-  const shots = (b.screenshots ?? []).map((ref) => {
-    if (!ref.startsWith("upload:")) return ref;
-    const src = path.join(studioHome(), "uploads", path.basename(ref.slice(7)));
-    if (!fs.existsSync(src)) throw new StudioError(400, "an uploaded image expired; upload it again");
-    const name = path.basename(src).replace(/^[a-z0-9]+-/, "");
-    fs.copyFileSync(src, path.join(dir, "assets", name));
-    return `assets/${name}`;
-  });
-  const spec = briefToSpec({ ...b, screenshots: shots }, brand);
-  if (b.title) (spec as any).title = b.title;
-  fs.writeFileSync(path.join(dir, "brief.json"), JSON.stringify(b, null, 2) + "\n");
-  fs.writeFileSync(path.join(dir, "spec.json"), JSON.stringify(spec, null, 2) + "\n");
+  fs.copyFileSync(src, path.join(dir, "assets", name));
+  return `assets/${name}`;
+}
+
+/**
+ * New project: its own brand (theme or custom), uploaded images, and a complete first storyboard:
+ * the template's, or one written from the idea by rules (no AI). An agent can then rewrite it.
+ */
+export function createVideoProject(o: NewVideo): { id: string } {
+  const tpl = o.template ? listTemplates().find((t) => t.id === o.template) : undefined;
+  if (o.template && !tpl) throw new StudioError(400, `unknown template "${o.template}"`);
+  if (!tpl && !o.brief && !o.idea?.trim()) throw new StudioError(400, "describe the video or pick a template");
+  const brandName = ("custom" in (o.brand ?? {}) ? (o.brand as { custom: BrandInput }).custom.name : (o.brand as { name?: string } | undefined)?.name) || o.name || o.brief?.product;
+  const title = o.title?.trim() || brandName || tpl?.name || (o.idea ?? "").split(/[.!?\n]/)[0].slice(0, 60) || "New video";
+  const { id, dir } = newProjectDir(title);
+  try {
+    fs.mkdirSync(path.join(dir, "assets"), { recursive: true });
+    // brand
+    const choice = o.brand ?? { theme: tpl?.theme ?? "classic" };
+    const input = "custom" in choice ? choice.custom : themeInput(choice.theme, brandName || title);
+    if (o.url) input.ctaUrl = o.url;
+    if (o.voice) input.voice = { voice: o.voice, speed: o.speed ?? input.voice?.speed ?? 0.94 };
+    if (o.music && o.music !== "none") input.music = o.music;
+    const kit = writeBrand(path.join(dir, "brand"), id, input);
+    const shots = (o.screenshots ?? []).map((r) => takeUpload(dir, r));
+    // storyboard
+    let spec: any;
+    if (tpl) {
+      const src = path.join(REPO, "templates", tpl.id);
+      if (fs.existsSync(path.join(src, "assets"))) fs.cpSync(path.join(src, "assets"), path.join(dir, "assets"), { recursive: true });
+      let text = fs.readFileSync(path.join(src, "spec.json"), "utf8");
+      if (tpl.product && kit.name) text = text.split(tpl.product).join(kit.name.replace(/["\\]/g, ""));
+      spec = JSON.parse(text);
+      delete spec.$schema;
+      spec.title = title;
+      applyFormats(spec, o.formats);
+    } else {
+      const brief = o.brief ? { ...o.brief, screenshots: shots } : ideaToBrief({ ...(o as IdeaInput), name: brandName, screenshots: shots });
+      spec = briefToSpec({ ...brief, product: brief.product || kit.name }, id);
+      spec.title = title;
+    }
+    spec.brand = id;
+    spec.voice = { provider: "kokoro", voice: kit.voice.voice, speed: kit.voice.speed };
+    if (o.music === "none") spec.music = { mode: "none" };
+    else spec.music = { ...(spec.music?.mode === "preset" ? spec.music : {}), mode: "preset", preset: kit.music.preset };
+    if (kit.music.preset !== (spec.music.preset)) delete spec.music.bpm;
+    fs.writeFileSync(path.join(dir, "spec.json"), JSON.stringify(spec, null, 2) + "\n");
+    fs.writeFileSync(path.join(dir, "request.json"), JSON.stringify({ ...o, brand: choice, screenshots: shots, created: new Date().toISOString() }, null, 2) + "\n");
+    const r = validateSpec(migrate(spec));
+    if (!r.ok) throw new StudioError(422, "the first draft is invalid", r.issues);
+  } catch (e) { fs.rmSync(dir, { recursive: true, force: true }); throw e; }
   return { id };
+}
+/** The original request (idea, options) a project was created from. */
+export function projectRequest(id: string): (NewVideo & { created?: string }) | null {
+  const f = path.join(pdir(id), "request.json");
+  return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, "utf8")) : null;
 }
 
 function newestRender(out: string, renders: string[]) {
@@ -175,24 +224,10 @@ async function ensureThumb(id: string, doc: RuntimeDoc, t: number) {
   } catch { /* best effort */ }
 }
 
-export function createProject(o: { title: string; template?: string; brand?: string; formats?: string[] }): { id: string } {
+/** New project from a template (kept for the CLI/MCP): same as createVideoProject({ template }). */
+export function createProject(o: { title: string; template?: string; theme?: string; formats?: string[] }): { id: string } {
   const template = o.template ?? "feature-launch";
-  const src = path.join(REPO, "templates", template);
-  if (!fs.existsSync(path.join(src, "spec.json"))) throw new StudioError(400, `unknown template "${template}"`);
-  const brand = o.brand ?? "luraplus";
-  if (!fs.existsSync(path.join(env.brandsDir(), brand, "brand.json"))) throw new StudioError(400, `unknown brand "${brand}"`);
-  const { id, dir: dst } = newProjectDir(o.title);
-  fs.cpSync(src, dst, { recursive: true, filter: (f) => !f.includes(`${path.sep}_source`) && !/(README\.md|template\.json|thumb\.jpg)$/.test(f) });
-  const spec = JSON.parse(fs.readFileSync(path.join(dst, "spec.json"), "utf8"));
-  spec.title = o.title || spec.title;
-  spec.brand = brand;
-  delete spec.$schema;
-  applyFormats(spec, o.formats);
-  // the brand's own voice and music, if it has them
-  const kit = JSON.parse(fs.readFileSync(path.join(env.brandsDir(), brand, "brand.json"), "utf8"));
-  if (kit.voice?.voice) spec.voice = { provider: "kokoro", voice: kit.voice.voice, speed: kit.voice.speed ?? 0.94 };
-  fs.writeFileSync(path.join(dst, "spec.json"), JSON.stringify(spec, null, 2) + "\n");
-  return { id };
+  return createVideoProject({ title: o.title, template, formats: o.formats, ...(o.theme ? { brand: { theme: o.theme } } : {}) });
 }
 
 export function getProject(id: string) {
@@ -242,7 +277,8 @@ export function projectFile(id: string, rel: string): string {
 let runtimeServer: Promise<Served> | null = null;
 /** One localhost server for runtime, brands and content-addressed assets (all projects share the cache). */
 export function runtimeOrigin(): Promise<Served> {
-  runtimeServer ??= serve({ brandsDir: env.brandsDir(), assetsDir: path.join(cacheDir(), "assets") });
+  runtimeServer ??= serve({ brandsDir: env.brandsDir(), assetsDir: path.join(cacheDir(), "assets"),
+    brandDir: (id) => { const d = path.join(projectsDir(), id, "brand"); return validId(id) && fs.existsSync(path.join(d, "brand.json")) ? d : null; } });
   return runtimeServer;
 }
 
@@ -354,3 +390,4 @@ export function listOutputs(id: string) {
       .map((f) => ({ name: f, path: `out/${v}/${f}`, bytes: fs.statSync(path.join(out, v, f)).size })),
   }));
 }
+export * from "./agent.ts";

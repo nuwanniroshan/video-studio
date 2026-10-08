@@ -1,0 +1,24 @@
+{
+  "id": "citrus",
+  "name": "Citrus",
+  "description": "Sunny yellow-orange with teal. Friendly, upbeat, approachable.",
+  "category": "Lifestyle",
+  "order": 11,
+  "base": {
+    "primary": "#F59E0B",
+    "accent": "#0EA5A4",
+    "dark": "#1A1405",
+    "light": "#FFFBEB",
+    "ink": "#1C1917"
+  },
+  "fonts": {
+    "display": "dmsans",
+    "body": "opensans",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "af_heart",
+    "speed": 0.94
+  }
+}

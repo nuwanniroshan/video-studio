@@ -12,7 +12,8 @@
     "@vs/storage": "workspace:*",
     "@vs/runtime": "workspace:*",
     "zod": "^4.0.0",
-    "@vs/brand": "workspace:*"
+    "@vs/brand": "workspace:*",
+    "@vs/ai": "workspace:*"
   },
   "scripts": {
     "typecheck": "tsc -p .",

@@ -6,3 +6,5 @@ build
 .turbo
 **/dist
 .git
+.vs-cache
+studio-data

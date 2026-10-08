@@ -1,0 +1,24 @@
+{
+  "id": "classic",
+  "name": "Classic Blue",
+  "description": "Clean SaaS blue with a violet accent. Safe for any product.",
+  "category": "Business",
+  "order": 1,
+  "base": {
+    "primary": "#3782F7",
+    "accent": "#7C5CFC",
+    "dark": "#070B14",
+    "light": "#F7F8FA",
+    "ink": "#0E1116"
+  },
+  "fonts": {
+    "display": "onest",
+    "body": "opensans",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "af_heart",
+    "speed": 0.94
+  }
+}

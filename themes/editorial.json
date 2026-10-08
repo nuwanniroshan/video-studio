@@ -1,0 +1,24 @@
+{
+  "id": "editorial",
+  "name": "Editorial",
+  "description": "Serif headlines, terracotta and ink on cream. Premium and thoughtful.",
+  "category": "Premium",
+  "order": 5,
+  "base": {
+    "primary": "#B4532A",
+    "accent": "#1E3A8A",
+    "dark": "#16130F",
+    "light": "#FAF6EF",
+    "ink": "#1C1917"
+  },
+  "fonts": {
+    "display": "playfair",
+    "body": "opensans",
+    "mono": "plexmono"
+  },
+  "music": "calm-explainer",
+  "voice": {
+    "voice": "bm_george",
+    "speed": 0.94
+  }
+}

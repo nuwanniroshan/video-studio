@@ -1,0 +1,24 @@
+{
+  "id": "ocean",
+  "name": "Ocean",
+  "description": "Sky blue and teal on deep navy. Fresh and calm.",
+  "category": "Business",
+  "order": 2,
+  "base": {
+    "primary": "#0EA5E9",
+    "accent": "#14B8A6",
+    "dark": "#04121F",
+    "light": "#F2F8FB",
+    "ink": "#0B1B2B"
+  },
+  "fonts": {
+    "display": "manrope",
+    "body": "inter",
+    "mono": "plexmono"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "af_nicole",
+    "speed": 0.94
+  }
+}

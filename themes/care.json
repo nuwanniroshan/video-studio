@@ -1,0 +1,24 @@
+{
+  "id": "care",
+  "name": "Care",
+  "description": "Soft teal and sky. Trustworthy for health and wellbeing.",
+  "category": "Health",
+  "order": 7,
+  "base": {
+    "primary": "#0D9488",
+    "accent": "#38BDF8",
+    "dark": "#062321",
+    "light": "#F2FAF9",
+    "ink": "#0B2523"
+  },
+  "fonts": {
+    "display": "manrope",
+    "body": "opensans",
+    "mono": "plexmono"
+  },
+  "music": "calm-explainer",
+  "voice": {
+    "voice": "af_nicole",
+    "speed": 0.94
+  }
+}

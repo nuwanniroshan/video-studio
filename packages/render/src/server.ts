@@ -15,7 +15,11 @@ const MIME: Record<string, string> = {
   ".ttf": "font/ttf", ".otf": "font/otf", ".woff2": "font/woff2", ".woff": "font/woff",
 };
 
-export interface ServeOptions { brandsDir: string; assetsDir?: string }
+export interface ServeOptions {
+  brandsDir: string; assetsDir?: string;
+  /** Brand folder for an id outside brandsDir (project-owned brands); null falls back to brandsDir/<id>. */
+  brandDir?: (id: string) => string | null;
+}
 export interface Served { origin: string; close(): Promise<void> }
 
 function safeJoin(root: string, rel: string): string | null {
@@ -24,18 +28,19 @@ function safeJoin(root: string, rel: string): string | null {
 }
 
 export async function serve(opt: ServeOptions): Promise<Served> {
+  const brandRoot = (id: string) => opt.brandDir?.(id) ?? path.join(opt.brandsDir, id);
   const server = http.createServer((req, res) => {
     const url = new URL(req.url ?? "/", "http://x");
     let file: string | null = null;
     let m: RegExpMatchArray | null;
     if ((m = url.pathname.match(/^\/brand\/([a-z0-9-]+)\/brand\.css$/))) {
-      const kitPath = path.join(opt.brandsDir, m[1], "brand.json");
+      const kitPath = path.join(brandRoot(m[1]), "brand.json");
       if (!fs.existsSync(kitPath)) return void res.writeHead(404).end();
       const kit = JSON.parse(fs.readFileSync(kitPath, "utf8")) as BrandKit;
       res.writeHead(200, { "content-type": MIME[".css"] });
       return void res.end(brandCss(kit, `/brand/${m[1]}/`));
     }
-    if ((m = url.pathname.match(/^\/brand\/([a-z0-9-]+)\/(.+)$/))) file = safeJoin(path.join(opt.brandsDir, m[1]), m[2]);
+    if ((m = url.pathname.match(/^\/brand\/([a-z0-9-]+)\/(.+)$/))) file = safeJoin(brandRoot(m[1]), m[2]);
     else if ((m = url.pathname.match(/^\/assets\/(.+)$/)) && opt.assetsDir) file = safeJoin(opt.assetsDir, m[1]);
     else if ((m = url.pathname.match(/^\/runtime\/(.*)$/))) file = safeJoin(runtimeDist, m[1] || "index.html");
     if (!file || !fs.existsSync(file) || !fs.statSync(file).isFile()) return void res.writeHead(404).end();

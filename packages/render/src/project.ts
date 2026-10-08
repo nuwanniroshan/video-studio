@@ -21,14 +21,17 @@ export function loadProject(specPath: string, o: { cacheDir?: string; brandsDir?
   const r = validateSpec(migrate(raw));
   if (!r.ok) throw new SpecError(`${specPath}: invalid spec`, r.issues);
   const spec = r.spec;
+  // a project's own brand (<project>/brand/) wins over the shared brand kits
+  const specDir0 = path.dirname(path.resolve(specPath));
   const brandsDir = o.brandsDir ?? env.brandsDir();
-  const brandDir = path.join(brandsDir, spec.brand);
-  if (!fs.existsSync(path.join(brandDir, "brand.json"))) throw new SpecError(`brand "${spec.brand}" not found in ${brandsDir}`, [{ path: "brand", message: "unknown brand kit" }]);
+  const local = path.join(specDir0, "brand");
+  const brandDir = fs.existsSync(path.join(local, "brand.json")) ? local : path.join(brandsDir, spec.brand);
+  if (!fs.existsSync(path.join(brandDir, "brand.json"))) throw new SpecError(`brand "${spec.brand}" not found (no ${local} and not in ${brandsDir})`, [{ path: "brand", message: "unknown brand kit" }]);
   const brand = BrandKit.parse(JSON.parse(fs.readFileSync(path.join(brandDir, "brand.json"), "utf8")));
-  const files = [brand.fonts.display.file, brand.fonts.body.file, brand.fonts.mono.file, brand.logo.onDark, brand.logo.onLight];
+  const files = [brand.fonts.display.file, brand.fonts.body.file, brand.fonts.mono.file, brand.logo.onDark, brand.logo.onLight].filter((f) => fs.existsSync(path.join(brandDir, f)));
   const brandHash = hashJson({ kit: brand, files: files.map((f) => sha256File(path.join(brandDir, f))) });
   const store = new LocalStore(o.cacheDir ?? env.cacheDir());
-  const specDir = path.dirname(path.resolve(specPath));
+  const specDir = specDir0;
   // content-address every referenced asset
   const assetUrls = new Map<string, string>();
   for (const s of spec.scenes) {
