@@ -23,6 +23,10 @@ export function deriveColors(b: BaseColors): Record<string, string> {
     dark: b.dark, light: b.light,
     // legibility helpers for light/bright primaries (lime, amber): text on primary, primary as text on light
     onPrimary: onColor(b.primary), primaryText: textSafe(b.primary, b.light, b.ink),
+    // primary as text on dark backgrounds: the usual light tint; for a very dark primary the accent colour,
+    // or the tint lightened just enough to read
+    primaryOnDark: contrast(mix(b.primary, W, 0.18), b.dark) >= 3 ? mix(b.primary, W, 0.18)
+      : contrast(b.accent, b.dark) >= 3 ? b.accent : textSafe(mix(b.primary, W, 0.18), b.dark, W),
   };
 }
 

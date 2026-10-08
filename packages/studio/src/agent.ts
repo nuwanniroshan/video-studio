@@ -118,7 +118,7 @@ function createPrompt(project: string) {
   if (req.screenshots?.length) lines.push(`Uploaded images to use: ${req.screenshots.join(", ")}.`);
   if (req.brand?.theme === "auto") lines.push("", `The user left the look to you. First call set_brand with five colours (primary, accent, dark, light, ink) and fonts
 (display, body, mono) that suit the concept; keep the brand name and website. Fonts: ${FONTS}. Choose a music preset that fits too
-(set_brand music: ${fs.readdirSync(path.join(REPO, "python/vsaudio/score/presets")).filter((f) => f.endsWith(".yaml")).map((f) => f.slice(0, -5)).join(", ")}). Make sure primary reads on both light and dark backgrounds.`);
+(set_brand music: ${fs.readdirSync(path.join(REPO, "python/vsaudio/score/presets")).filter((f) => f.endsWith(".yaml")).map((f) => f.slice(0, -5)).join(", ")}). primary is the accent for headline payoffs and must read on BOTH light and dark backgrounds: a mid-tone, not near-black or near-white (put deep colours in dark and ink).`);
   else if (!req.template) lines.push("", "The brand colours and fonts are set by the user; design within them (you may use any shade of them).");
   lines.push("", "Make the best possible video for this idea, then give me your short summary.");
   return lines.join("\n");
