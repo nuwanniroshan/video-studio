@@ -68,7 +68,7 @@ function lintCompose(id: string, root: HTMLElement, stage: { w: number; h: numbe
     const txt = el.textContent?.trim();
     if (!txt) continue;
     const cs = getComputedStyle(el);
-    const minPx = (el.classList.contains("cm-s-label") ? 16 : 20) * k;
+    const minPx = (el.classList.contains("cm-s-label") ? 19 : 21) * k;
     if (parseFloat(cs.fontSize) < minPx - 0.5) {
       out.push({ level: "warning", scene: id, code: "text-small", message: `text smaller than ${Math.round(minPx)} px is hard to read on phones: "${txt.slice(0, 40)}" (${parseFloat(cs.fontSize).toFixed(0)} px); make it bigger or cut it` });
     }

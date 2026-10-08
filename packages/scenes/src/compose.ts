@@ -29,7 +29,7 @@ const TOKENS: Record<string, string> = {
 export const color = (c?: string) => (!c || c === "auto" ? undefined : TOKENS[c] ?? c);
 
 /** Base font size per text style, in % of the stage's short side. */
-const SIZE: Record<string, number> = { display: 12, headline: 7.4, title: 4.6, body: 2.4, label: 1.7, quote: 5.2, stat: 16 };
+const SIZE: Record<string, number> = { display: 12, headline: 7.4, title: 4.6, body: 2.5, label: 2.1, quote: 5.2, stat: 16 };
 const TEXT_W: Record<string, number> = { display: 90, headline: 80, title: 70, body: 60, label: 60, quote: 80, stat: 50 };
 const DEFAULT_W: Record<string, number> = { shape: 20, svg: 20, image: 40, icon: 6, particles: 30, logo: 30, chart: 56, list: 60 };
 const AX: Record<string, [number, number]> = {
