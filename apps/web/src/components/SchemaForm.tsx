@@ -19,7 +19,7 @@ export function blank(s: Json): Json {
   if (s.oneOf) return blank(s.oneOf[0]);
   if (s.anyOf) return blank(s.anyOf.find((x: Json) => x.type !== "null") ?? s.anyOf[0]);
   switch (s.type) {
-    case "string": return s.ui === "asset" ? "" : "New text";
+    case "string": return s.ui === "asset" ? "" : s.ui === "code" ? '<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="currentColor"/></svg>' : s.ui === "color" ? "primary" : "New text";
     case "number": case "integer": return s.minimum ?? 0;
     case "boolean": return false;
     case "array": return Array.from({ length: s.minItems ?? 0 }, () => blank(s.items));
@@ -77,6 +77,7 @@ function Field({ name, schema: s, value, onChange, required, siblings, ctx, path
   switch (s.type) {
     case "string": {
       const v = value ?? "";
+      if (s.ui === "code") return <div className="field">{head()}<textarea className="code" rows={6} spellCheck={false} value={v} onChange={(e) => onChange(e.target.value)} />{s.help && <p className="help">{s.help}</p>}</div>;
       const long = (s.maxChars ?? 0) > 70;
       const over = s.maxChars && v.replace(/\*/g, "").length > s.maxChars;
       const counter = s.maxChars ? <span className={`count ${over ? "over" : ""}`}>{v.replace(/\*/g, "").length}/{s.maxChars}</span> : null;

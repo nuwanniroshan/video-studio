@@ -25,7 +25,7 @@ export function Create() {
   const [url, setUrl] = useState(""); const [cta, setCta] = useState(""); const [audience, setAudience] = useState("");
   const [shots, setShots] = useState<{ ref: string; url: string; name: string }[]>([]);
   const [template, setTemplate] = useState<string>("");
-  const [brandMode, setBrandMode] = useState<"theme" | "custom">("theme");
+  const [brandMode, setBrandMode] = useState<"auto" | "theme" | "custom">("auto");
   const [theme, setTheme] = useState("midnight");
   const [custom, setCustom] = useState<CustomBrand>({ name: "", base: DEFAULT_BASE, fonts: { display: { library: "onest" }, body: { library: "inter" }, mono: { library: "jetbrains" } } });
   const [files, setFiles] = useState<PendingFiles>({});
@@ -45,6 +45,7 @@ export function Create() {
     api.themes().then(setThemes); api.templates().then(setTemplates); api.fonts().then(setFonts);
     api.catalog().then((c) => { setVoices(c.voices); setPresets(c.presets); });
     api.agentStatus().then((s) => { setAgent(s); if (!s.available) setUseAgent(false); }).catch(() => setUseAgent(false));
+    if (new URLSearchParams(location.hash.split("?")[1] ?? "").get("template")) setBrandMode("theme");
     const t = new URLSearchParams(location.hash.split("?")[1] ?? "").get("template"); if (t) setTemplate(t);
   }, []);
   useEffect(() => { const u = files.logo && URL.createObjectURL(files.logo); setLogoUrl(u); }, [files.logo]);
@@ -52,17 +53,19 @@ export function Create() {
   const prevName = useRef("");
   useEffect(() => { const prev = prevName.current; setCustom((c) => (c.name === prev ? { ...c, name } : c)); prevName.current = name; }, [name]);
 
+  const aiOn = !!agent?.available && useAgent;
+  const mode = brandMode === "auto" && !aiOn ? "theme" : brandMode;
   const th = themes.find((t) => t.id === theme);
   const tpl = templates.find((t) => t.id === template);
   const effVoice = voice ?? th?.voice.voice ?? "af_heart";
-  const effMusic = music ?? (brandMode === "theme" ? th?.music : undefined) ?? "uplifting-tech";
+  const effMusic = music ?? (mode === "theme" ? th?.music : undefined) ?? (mode === "auto" ? "auto" : "uplifting-tech");
   const look = useMemo(() => {
-    if (brandMode === "theme" && th) return { colors: th.colors, display: th.fontUrls.display, body: th.fontUrls.body };
+    if (mode !== "custom" && th) return { colors: th.colors, display: th.fontUrls.display, body: th.fontUrls.body };
     const b = custom.base, f = (r: "display" | "body") => fonts.find((x) => x.id === custom.fonts[r]?.library)?.url;
     return { colors: { ...b, primary400: mixHex(b.primary, "#FFFFFF", 0.18), primary50: mixHex(b.primary, "#FFFFFF", 0.9) }, display: f("display"), body: f("body") };
-  }, [brandMode, th, custom, fonts]);
+  }, [mode, th, custom, fonts]);
 
-  const canCreate = (idea.trim().length >= 12 || !!tpl) && (brandMode === "theme" || custom.name.trim() || name.trim());
+  const canCreate = (idea.trim().length >= 12 || !!tpl) && (mode !== "custom" || custom.name.trim() || name.trim());
   const listen = async () => {
     setPlaying(true);
     try { const a = new Audio(await api.voiceTest({ text: `Meet ${name || "your product"}. ${idea.split(/[.!?\n]/)[0] || "Here's what's new."}`.slice(0, 200), voice: effVoice, speed })); a.onended = () => setPlaying(false); await a.play(); }
@@ -72,11 +75,11 @@ export function Create() {
     setErr("");
     try {
       setBusy("Setting up your project…");
-      const brand: NewVideo["brand"] = brandMode === "theme" ? { theme, name: name.trim() || undefined } : { custom: { ...custom, name: custom.name.trim() || name.trim() } };
+      const brand: NewVideo["brand"] = mode === "auto" ? { theme: "auto", name: name.trim() || undefined } : mode === "theme" ? { theme, name: name.trim() || undefined } : { custom: { ...custom, name: custom.name.trim() || name.trim() } };
       const body: NewVideo = { idea: idea.trim(), name: name.trim() || undefined, url: url.trim() || undefined, cta: cta.trim() || undefined, audience: audience.trim() || undefined,
-        length, formats, voice: effVoice, speed, music: effMusic, template: template || undefined, screenshots: shots.map((s) => s.ref), brand };
+        length, formats, voice: effVoice, speed, music: effMusic === "auto" ? undefined : effMusic, template: template || undefined, screenshots: shots.map((s) => s.ref), brand };
       const { id } = await api.newVideo(body);
-      if (brandMode === "custom") {
+      if (mode === "custom") {
         setBusy("Uploading your brand…");
         for (const [kind, f] of Object.entries(files)) if (f) await api.brandFile(id, kind, f);
       }
@@ -121,21 +124,24 @@ export function Create() {
             <div className="section-title"><span className="n">2</span><h3>Starting point</h3></div>
             <div className="starts-row">
               <button type="button" className={`sp ${!template ? "on" : ""}`} onClick={() => setTemplate("")}>
-                <div className="sp-art agentic">{Icon.wand}</div><b>{agent?.available ? "Designed by the agent" : "From my idea"}</b>
-                <span>{agent?.available ? "Scenes chosen and written for your idea" : "A first draft from your description"}</span></button>
+                <div className="sp-art agentic">{Icon.wand}</div><b>{aiOn ? "Original" : "From my idea"}</b>
+                <span>{aiOn ? "Designed from scratch for your idea" : "A first draft from your description"}</span></button>
               {templates.map((t) => (
-                <button key={t.id} type="button" className={`sp ${template === t.id ? "on" : ""}`} onClick={() => { setTemplate(t.id); if (t.theme && brandMode === "theme") setTheme(t.theme); if (t.formats?.length) setFormats(t.formats.slice(0, 2)); }}>
+                <button key={t.id} type="button" className={`sp ${template === t.id ? "on" : ""}`} onClick={() => { setTemplate(t.id); if (t.theme && brandMode !== "custom") { setBrandMode("theme"); setTheme(t.theme); } if (t.formats?.length) setFormats(t.formats.slice(0, 2)); }}>
                   <div className="sp-art" style={{ backgroundImage: t.thumbnail ? `url(${t.thumbnail})` : undefined }} /><b>{t.name}</b><span>{t.length} · {t.category}</span></button>
               ))}
             </div>
+            {!tpl && aiOn && <p className="help">The agent invents the concept, layouts, illustrations and motion for this idea. Or pick a template above to start from a proven structure.</p>}
             {tpl && <p className="help">{tpl.description} {agent?.available && useAgent ? "The agent rewrites it for your idea." : "Edit the words in the editor after creating."}</p>}
           </section>
 
           <section className="card section">
             <div className="section-title"><span className="n">3</span><h3>Branding</h3><span className="spacer" />
-              <div className="seg"><button className={brandMode === "theme" ? "on" : ""} onClick={() => setBrandMode("theme")}>Choose a theme</button>
-                <button className={brandMode === "custom" ? "on" : ""} onClick={() => setBrandMode("custom")}>Use my brand</button></div></div>
-            {brandMode === "theme" ? <>
+              <div className="seg">{aiOn && <button className={mode === "auto" ? "on" : ""} onClick={() => setBrandMode("auto")}>Designed for my idea</button>}
+                <button className={mode === "theme" ? "on" : ""} onClick={() => setBrandMode("theme")}>Choose a theme</button>
+                <button className={mode === "custom" ? "on" : ""} onClick={() => setBrandMode("custom")}>Use my brand</button></div></div>
+            {mode === "auto" ? <p className="help">The agent chooses colours, fonts and music that suit the idea (a café gets warm tones and a serif, a fintech gets something crisp). You can change everything later on the video's Brand page.</p>
+            : mode === "theme" ? <>
               <ThemeGrid themes={themes} value={theme} onChange={setTheme} name={name || "Your brand"} />
               <p className="help">The brand belongs to this video only. You can upload a logo or tweak colours later in the video's Brand page.</p>
             </> : <BrandFields value={custom} onChange={setCustom} files={files} setFiles={setFiles} fonts={fonts} />}
@@ -151,6 +157,7 @@ export function Create() {
                 <input type="range" min={0.8} max={1.15} step={0.01} value={speed} onChange={(e) => setSpeed(+e.target.value)} style={{ height: 38 }} /></div>
             </div>
             <div className="f"><span className="l">Music</span><div className="seg">
+              {mode === "auto" && <button className={effMusic === "auto" ? "on" : ""} onClick={() => setMusic(null)}>Agent's choice</button>}
               {presets.map((p) => <button key={p} className={effMusic === p ? "on" : ""} onClick={() => setMusic(p)}>{p === "uplifting-tech" ? "Uplifting" : p === "calm-explainer" ? "Calm" : p.replace(/-/g, " ")}</button>)}
               <button className={effMusic === "none" ? "on" : ""} onClick={() => setMusic("none")}>No music</button></div></div>
           </section>
@@ -165,13 +172,14 @@ export function Create() {
         </div>
 
         <aside className="card summary">
-          <LookPreview colors={look.colors} display={look.display} body={look.body} name={(brandMode === "custom" ? custom.name : name) || "Your brand"} logoDark={brandMode === "custom" ? logoUrl : undefined} />
+          {mode === "auto" ? <div className="look-auto">{Icon.wand}<b>{name || "Your brand"}</b><span>Colours, fonts and music designed for your idea</span></div> :
+          <LookPreview colors={look.colors} display={look.display} body={look.body} name={(mode === "custom" ? custom.name : name) || "Your brand"} logoDark={mode === "custom" ? logoUrl : undefined} />}
           <dl>
-            <dt>Brand</dt><dd>{brandMode === "theme" ? `${th?.name ?? ""} theme` : custom.name || name || "Your brand"}</dd>
-            <dt>Start</dt><dd>{tpl ? tpl.name : agent?.available && useAgent ? "Designed by the agent" : "Draft from idea"}</dd>
+            <dt>Brand</dt><dd>{mode === "auto" ? "Designed by the agent" : mode === "theme" ? `${th?.name ?? ""} theme` : custom.name || name || "Your brand"}</dd>
+            <dt>Start</dt><dd>{tpl ? `${tpl.name} template` : aiOn ? "Original" : "Draft from idea"}</dd>
             <dt>Sizes</dt><dd>{formats.join(" · ")}</dd>
             <dt>Length</dt><dd>~{length} s</dd>
-            <dt>Voice</dt><dd>{voices.find((v) => v.id === effVoice)?.label.split(" (")[0] ?? effVoice} · {effMusic === "none" ? "no music" : effMusic.replace(/-/g, " ")}</dd>
+            <dt>Voice</dt><dd>{voices.find((v) => v.id === effVoice)?.label.split(" (")[0] ?? effVoice} · {effMusic === "none" ? "no music" : effMusic === "auto" ? "music chosen by the agent" : effMusic.replace(/-/g, " ")}</dd>
           </dl>
           <div className={`agentbox ${agent?.available ? "" : "off"}`}>
             {agent === null ? <span className="row small muted"><Spinner /> Checking the AI agent…</span> : agent.available ? <>
@@ -183,7 +191,7 @@ export function Create() {
           {err && <div className="banner bad">{err}</div>}
           <button className="btn primary lg" disabled={!canCreate || !!busy} onClick={create}>
             {busy ? <><Spinner /> {busy}</> : useAgent && agent?.available ? <>{Icon.wand} Create with AI</> : "Create video"}</button>
-          {!canCreate && <span className="help" style={{ textAlign: "center" }}>{brandMode === "custom" && !custom.name.trim() && !name.trim() ? "Add your brand name." : "Describe your idea (or pick a template) to continue."}</span>}
+          {!canCreate && <span className="help" style={{ textAlign: "center" }}>{mode === "custom" && !custom.name.trim() && !name.trim() ? "Add your brand name." : "Describe your idea (or pick a template) to continue."}</span>}
         </aside>
       </div>
     </div>

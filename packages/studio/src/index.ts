@@ -53,6 +53,25 @@ export const templateThumb = (id: string) => {
   return f;
 };
 
+/** A theme that suits the subject, by keyword (no AI). */
+export function guessTheme(text: string): string {
+  const t = text.toLowerCase();
+  // whole words; a trailing * allows any ending (bake* = bakery, baker, baked…)
+  const rules: [string, string][] = [
+    ["coffee* cafe* barista* bake* restaurant* bistro* wine* chocolat* tea teas artisan* craft* boutique* bookshop* bookstore* interior* furniture*", "editorial"],
+    ["health* clinic* doctor* dental dentist* therap* care wellness yoga medit* pharma* nurse*", "care"],
+    ["garden* plant* eco green* sustainab* organic farm* outdoor* hike* hiking nature solar", "evergreen"],
+    ["bank* financ* insur* accounting accountant* invoic* payroll legal law lawyer* tax taxes invest* loan*", "trust"],
+    ["sale sales discount* offer* deal deals fashion beauty party festival* music concert* game games gaming", "pop"],
+    ["travel* beach* surf* swim* pool boat* airline* holiday* ocean* sea", "ocean"],
+    ["food* pizza* burger* juice* smoothie* kids family fitness gym* sport* running", "citrus"],
+    ["luxury jewel* watch watches hotel* spa premium property properties", "royal"],
+    ["ai developer* api apis cloud security cyber* data devops saas platform*", "midnight"],
+  ];
+  const re = (words: string) => new RegExp(`\\b(${words.split(" ").map((w) => w.endsWith("*") ? `${w.slice(0, -1)}\\w*` : w).join("|")})\\b`, "u");
+  return rules.find(([w]) => re(w).test(t))?.[1] ?? "classic";
+}
+
 export function listPresets() {
   const d = path.join(REPO, "python/vsaudio/score/presets");
   return fs.readdirSync(d).filter((f) => f.endsWith(".yaml")).map((f) => f.replace(/\.yaml$/, ""));
@@ -157,7 +176,8 @@ export function createVideoProject(o: NewVideo): { id: string } {
     fs.mkdirSync(path.join(dir, "assets"), { recursive: true });
     // brand
     const choice = o.brand ?? { theme: tpl?.theme ?? "classic" };
-    const input = "custom" in choice ? choice.custom : themeInput(choice.theme, brandName || title);
+    // "auto": the agent designs the look; until then (or without an agent) a theme guessed from the idea stands in
+    const input = "custom" in choice ? choice.custom : themeInput(choice.theme === "auto" ? guessTheme(`${o.idea ?? ""} ${brandName ?? ""}`) : choice.theme, brandName || title);
     if (o.url) input.ctaUrl = o.url;
     if (o.voice) input.voice = { voice: o.voice, speed: o.speed ?? input.voice?.speed ?? 0.94 };
     if (o.music && o.music !== "none") input.music = o.music;

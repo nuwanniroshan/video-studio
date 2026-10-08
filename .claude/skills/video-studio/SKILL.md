@@ -114,6 +114,7 @@ The CLI runs from the repo root as `pnpm vs …` (or `node apps/cli/bin/vs.mjs �
 - **Muted viewing:** text must carry the story with the sound off, because feeds autoplay muted. Keep headlines to about 3–8 words with a two-tone payoff.
 - **VO and visuals:** order VO clauses to match the visual order (e.g. "weighted goals, blind reviews, calibration" because that's the order on screen). About 2.2–2.6 words per second at speed 0.94; around 70% VO density feels unhurried.
 - **One idea per scene.** Prefer `featureSpotlight` with a real screenshot over generic panels when you have product images.
+- **Original designs.** When no template fits the subject, build scenes with `compose` (free layers with cue-timed entrances and your own SVG illustrations; `pnpm vs scenes --json` has its schema). The order rules above are the house pattern for software promos, not a requirement.
 - **Portrait (9:16):** use `safeArea: "reels"` so text avoids the platform UI. screenFlow zooms to each step's `focus` rect.
 
 ## Troubleshooting

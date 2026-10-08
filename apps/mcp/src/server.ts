@@ -41,6 +41,9 @@ has a logo → get_spec → write the storyboard with update_spec (use list_scen
 render_stills and LOOK at the contact sheets; fix overflow, empty space, ordering → render_video → render_status until done.
 Every project has its own brand (get_brand / set_brand); there is no shared brand library.
 Scenes never take durations: they last as long as their voice-over. Use *asterisks* for accent words in headlines.
+Templates are optional. Without one, design an original video for the idea: pick a concept, visual world and story arc that suit the
+subject, and build most scenes with the "compose" scene (free layers: text, shapes, your own SVG illustrations, images, logo, icons,
+particles, counters, each entering at a voice-over cue). Vary layouts between scenes; call get_scene_schema("compose") first.
 The user can also open the project in the web studio at ${STUDIO} (run \`pnpm studio\` in the repo).`,
 });
 

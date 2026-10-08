@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { claudeCode, type AgentEvent, type AgentProvider } from "@vs/ai";
 import { REPO } from "@vs/render";
+import { FONT_LIBRARY } from "@vs/brand";
 import { StudioError, cacheDir, pdir, studioHome } from "./errors.ts";
 
 export interface AgentStep { at: number; kind: "info" | "tool" | "say" | "sheet" | "error" | "done"; text: string; detail?: string; tool?: string; ok?: boolean; image?: string }
@@ -48,24 +49,57 @@ Workflow:
 2. Write the storyboard and save it with update_spec (the whole spec). Fix every validation issue it returns and save again.
 3. check_timing. Fix every lint issue (shorten text, split a scene) and any duration far from the target.
 4. render_stills and LOOK at the contact sheet: wrapped or orphaned headline words, empty or lopsided areas, overlaps, text near edges,
-   visuals out of order with the voice-over. Fix and re-check until it looks premium. Two review rounds are usually enough.
+   visuals out of order with the voice-over, anything that looks generic. Fix and re-check until it looks premium. Two or three review rounds.
 5. Your LAST message is shown to the user as-is: only 2–4 plain sentences on what the video says, how long it runs, and anything they
-   could add (e.g. real screenshots). Do your review thinking in earlier messages, not in the last one.
+   could add (e.g. real photos). Do your review thinking in earlier messages, not in the last one.
 
 Writing rules:
 - Scenes have no durations; each lasts as long as its voice-over (~2.3 words per second; aim for ~70% of the runtime as speech).
 - Voice-over must match what is on screen, in the same order. The on-screen text must tell the story with the sound off.
+- Write for the subject's real world and audience: a café promo talks like a café, not like software. No SaaS clichés unless it is software.
 - Headlines 3–8 words, with the payoff in *asterisks* (accent colour): one contiguous phrase, usually at the end. Respect maxChars limits.
 - Never repeat a stat's number in that scene's headline; the headline gives the meaning, the counter gives the number.
-- Tones: dark for the problem/hook, brand moments and the CTA; light for product and benefits; "brand" (primary colour) sparingly for a big moment.
-- Transitions: flash into a logo reveal, iris into the first light scene and into the CTA, crossfade or push between product scenes.
-- Always end on ctaEndCard. Use a logoReveal early unless the video is 15 s or shorter.
-- In featureGrid and screenFlow give voice-over lines "step": n so each item lands as it is spoken.
-- Use the uploaded images (the spec's assets list) where they fit: featureSpotlight (visual.kind "image") or screenFlow for screenshots, mediaBroll for photos.
-  Never invent image paths; without images use icons, stats, typography and featureSpotlight with a non-image visual.
-- Keep scene ids short lowercase-dashed and unique. Keep the spec's brand, voice, music and variants (formats) unless the user asks to change them.
+- Use the uploaded images (the spec's assets list) where they fit. Never invent image paths.
+- Keep scene ids short lowercase-dashed and unique. Keep the spec's voice, music and variants (formats) unless the user asks to change them.
   For several formats, keep one storyboard; drop optional scenes in short vertical cuts with a variant scene list only if needed for length.
-- Say "AI", not "A.I.". Do not render the final video; the user does that.`;
+- Say "AI", not "A.I.". Do not render the final video; the user does that.
+
+The compose scene (your design tool): layers placed on a % grid of the safe frame (x, y = anchor position; w, h = size), drawn back to front.
+- Layer kinds: text (styles display, headline, title, body, label, quote, stat), shape (rect, circle, pill, line, ring, arc, triangle, blob,
+  optional gradient), svg (your own vector illustration), image, logo, icon, particles (steam, bubbles, sparkles, confetti, dust, snow,
+  embers, petals) and counter. Background: tone, solid, linear, radial, spotlight or split, with an optional pattern and vignette. Camera moves.
+- Timing: every layer enters at a cue (at: "start", a voice-over line id like "v2", or "end") plus delay,
+  with an entrance (rise, fade, drop, left, right, scale, pop, zoom, blur, wipe, reveal, iris, draw, words, letters, typewriter).
+  Bring each thing in as the voice-over mentions it; stagger related layers by 0.1–0.3 s. "until" makes a layer leave at a later cue,
+  so one scene can show a sequence. "loop" adds idle motion (float, sway, spin, pulse, drift, breathe); use it on one or two layers, not all.
+- SVG illustrations: simple, confident line art or flat shapes made for this subject (a cup, a leaf, a storefront, a road, a ticket…):
+  a viewBox, 2–12 elements, stroke="currentColor" with fill="none" for line art (animate it with enter "draw"), or fills using currentColor /
+  style="fill:var(--vs-accent)". Allowed elements: svg, g, path, circle, ellipse, rect, line, polyline, polygon, defs, gradients, stop,
+  clipPath, mask, text, tspan, use, symbol. No scripts, styles, images or external links.
+- Default text colours follow your background's lightness (dark background → white text). Still set the scene tone to match it:
+  tone drives the house background, transitions and the music cue.
+- Every layer that should sit differently on a tall screen gets a "portrait" placement (and "square" for 1:1): stack things vertically,
+  text widths 80–92, sizes up. In 9:16 reels the safe frame already excludes the platform UI.
+- Keep text inside the frame (x ± w/2 within 0–100 for centred layers). 3–9 layers per scene is typical.`;
+
+const FONTS = FONT_LIBRARY.map((f) => `${f.id} (${f.family}, ${f.style}; ${f.roles.join("/")})`).join(", ");
+
+const ORIGINAL = `This is an ORIGINAL video: no template. The current storyboard is only a rough rule-based draft; replace it completely.
+Before writing anything, decide a creative direction for THIS idea and say it in a short message:
+- the concept in one line, and the feeling (cosy, bold, playful, premium, urgent…);
+- the visual world: motifs, illustrations, textures and shapes that belong to this subject (not generic tech grids);
+- the story arc and pacing that fit (a mood piece, a countdown, a step-by-step, a before/after, a list of reasons, a manifesto…);
+- how the opening hooks and how it closes (logo, offer, address, call to action — whatever the idea needs).
+Then build it mostly from compose scenes so every layout is designed for this video. Vary composition from scene to scene
+(asymmetric split, centred statement, full-bleed type, big number, illustration-led, image-led); never use the same layout twice in a row.
+Use the fixed scene types only where they are clearly the best fit (screenFlow or featureSpotlight for real product screenshots,
+ctaEndCard when a button is wanted, mediaBroll for a full-bleed photo). Transitions and tones are yours to choose; keep them purposeful.`;
+
+const TEMPLATE = (t: string) => `The project starts from the "${t}" template. Keep its structure and scene types where they fit, and rewrite all words for this idea.
+House pattern for templates: dark tone for the problem/hook, brand moments and the CTA; light for product and benefits; "brand" sparingly.
+Flash into a logo reveal, iris into the first light scene and into the CTA, crossfade or push between product scenes. End on ctaEndCard.
+In featureGrid and screenFlow give voice-over lines "step": n so each item lands as it is spoken. You may swap a scene for a compose scene
+when the template's layout does not suit the idea.`;
 
 function createPrompt(project: string) {
   const d = pdir(project);
@@ -73,8 +107,7 @@ function createPrompt(project: string) {
   const kit = JSON.parse(fs.readFileSync(path.join(d, "brand", "brand.json"), "utf8"));
   const lines = [
     `Project id: "${project}". Brand: ${kit.name}${kit.cta?.url ? ` (${kit.cta.url})` : ""}.`,
-    req.template ? `The project starts from the "${req.template}" template. Keep its structure where it fits, and rewrite all words for this idea.`
-      : `The current storyboard is a rough rule-based draft: rewrite it freely (scene choice, order and every word).`,
+    req.template ? TEMPLATE(req.template) : ORIGINAL,
     "", "The user's idea:", `"""${(req.idea ?? "").trim() || "(none given: adapt the template to the brand)"}"""`,
   ];
   if (req.audience) lines.push(`Audience: ${req.audience}`);
@@ -83,6 +116,10 @@ function createPrompt(project: string) {
   if (req.tone) lines.push(`Tone: ${req.tone}`);
   lines.push(`Target length: about ${req.length ?? 30} seconds.`, `Formats: ${(req.formats ?? ["16:9"]).join(", ")}.`);
   if (req.screenshots?.length) lines.push(`Uploaded images to use: ${req.screenshots.join(", ")}.`);
+  if (req.brand?.theme === "auto") lines.push("", `The user left the look to you. First call set_brand with five colours (primary, accent, dark, light, ink) and fonts
+(display, body, mono) that suit the concept; keep the brand name and website. Fonts: ${FONTS}. Choose a music preset that fits too
+(set_brand music: ${fs.readdirSync(path.join(REPO, "python/vsaudio/score/presets")).filter((f) => f.endsWith(".yaml")).map((f) => f.slice(0, -5)).join(", ")}). Make sure primary reads on both light and dark backgrounds.`);
+  else if (!req.template) lines.push("", "The brand colours and fonts are set by the user; design within them (you may use any shade of them).");
   lines.push("", "Make the best possible video for this idea, then give me your short summary.");
   return lines.join("\n");
 }
@@ -90,7 +127,7 @@ const revisePrompt = (project: string, instruction: string) =>
   `Project id: "${project}". The user reviewed the video and asks:\n"""${instruction.trim()}"""\n\nRead the current storyboard, make the change (and only what it needs), check timing and look at the stills, then summarise what you changed in 1–3 sentences.`;
 
 const SCENE: Record<string, string> = { kineticTitle: "title", logoReveal: "logo reveal", featureSpotlight: "feature spotlight", featureGrid: "feature grid",
-  screenFlow: "screen flow", statsCounter: "stats", mediaBroll: "photo", ctaEndCard: "call-to-action" };
+  screenFlow: "screen flow", statsCounter: "stats", mediaBroll: "photo", ctaEndCard: "call-to-action", compose: "composed" };
 function describeTool(name: string, input: any): string {
   switch (name) {
     case "get_spec": return "Reading the storyboard";

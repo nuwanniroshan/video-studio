@@ -10,12 +10,13 @@ You have the `video-studio` MCP tools. The user describes an idea; you produce t
 ## Steps
 
 1. **Plan.** `list_templates` (templates, themes, fonts, voices), then `list_scenes`.
+   - Decide whether a template fits. If none clearly does (a café, a shop, an event, anything not software), make an **original**: pick a concept, a visual world (motifs and illustrations that belong to the subject), a story arc and a palette, then design the scenes yourself with the `compose` scene.
    - Draft a storyboard: 5–8 scenes for about 30–45 s.
    - Write the voice-over at about 2.3 words per second; around 70% of the runtime should be speech.
    - Order the voice-over clauses to match what appears on screen.
    - The text must tell the story with the sound off.
 2. **Create.** `create_project` with the `idea`, `brandName`, `website`, `formats`, `voice`, `length`, and either a `theme` or the user's own `colors` (+ `fonts`); add `template` only if one fits. Every project owns its brand: if the user has a logo file, `set_logo`; change looks later with `set_brand`. Then:
-   - Rewrite the spec it returns to match your storyboard, keeping its structure.
+   - Rewrite the spec it returns to match your storyboard (keep a template's structure; replace a rule-based draft completely).
    - Use `get_scene_schema` for fields and length limits.
    - Save with `update_spec` and fix any issues it returns.
 3. **Timing.** `check_timing`. Fix every lint issue: shorten text, or split a scene.
@@ -32,13 +33,18 @@ You have the `video-studio` MCP tools. The user describes an idea; you produce t
    - Then render `standard` (the final) with `deliverables: "all"`.
 6. **Report.** Give the user the video file paths and the web studio link (`studioUrl`), where they can make edits themselves.
 
+## Original designs: the `compose` scene
+
+- Layers on a % grid of the safe frame (`x`, `y` = anchor position, `w`, `h` = size), drawn back to front: `text` (display, headline, title, body, label, quote, stat), `shape`, `svg` (your own line art or flat illustration; `stroke="currentColor"` + `enter: "draw"`), `image`, `logo`, `icon`, `particles` (steam, bubbles, sparkles, confetti, dust, snow, embers, petals) and `counter`.
+- Each layer enters at a cue (`at`: `start`, a VO line id such as `v2`, or `end`, plus `delay`) with an entrance preset; `until` makes it leave at a later cue; `loop` adds idle motion.
+- Give layers a `portrait` placement for 9:16/4:5. Default text colours follow the background's lightness; still set `tone` to match it.
+- Vary layouts from scene to scene. Use the fixed scenes where they are the best fit (screenshots → `featureSpotlight`/`screenFlow`).
+
 ## Writing rules
 
 - **Scene length.** Scenes have no durations; they last as long as their voice-over. Don't add timestamps.
 - **Headlines.** 3–8 words, with the payoff in `*asterisks*` for the accent colour. Respect the `maxChars` limits.
-- **Background tone.** `dark` for the problem, brand moments and the CTA; `light` for the product.
-- **Transitions.** `flash` into the logo reveal, `iris` into the first light scene and into the CTA, and `crossfade` or `push` between product scenes.
-- **Ending.** End on `ctaEndCard` (it holds at least 5 s).
+- **House pattern (templates and software promos).** `dark` for the problem, brand moments and the CTA; `light` for the product. `flash` into the logo reveal, `iris` into the first light scene and into the CTA, `crossfade` or `push` between product scenes. End on `ctaEndCard` (it holds at least 5 s). Original designs may choose their own tones, transitions and close.
 - **Steps.** In `featureGrid` and `screenFlow`, give a voice-over line `"step": n` so the item lands as it is spoken.
 - **Product screenshots.** If the user gives screenshots, `add_asset` them and use `featureSpotlight` (`visual.kind: "image"`) or `screenFlow`. Click points and focus rects are normalized 0–1 on the screenshot.
 - **Formats.** Add a 9:16 `social` variant with `safeArea: "reels"`, `loudness: -14` and a shorter scene list for social cutdowns.

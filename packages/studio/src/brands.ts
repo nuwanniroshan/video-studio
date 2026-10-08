@@ -55,10 +55,10 @@ export interface BrandInput {
   theme?: string;
 }
 
-const esc = (s: string) => s.replace(/[<&>"]/g, "");
+const esc = (s: string) => s.replace(/[<&>"]/g, (c) => ({ "<": "&lt;", "&": "&amp;", ">": "&gt;", '"': "&quot;" })[c]!);
 /** Text logo used until the user uploads one: the name in a heavy system sans, white for dark scenes, ink for light. */
 function wordmark(dir: string, name: string, ink: string) {
-  const w = Math.max(360, Math.round(esc(name).length * 74 + 60));
+  const w = Math.max(360, Math.round(name.length * 74 + 60));
   const svg = (fill: string) => `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="180" viewBox="0 0 ${w} 180"><text x="${w / 2}" y="128" text-anchor="middle" font-family="Helvetica Neue, Arial, sans-serif" font-weight="700" font-size="120" letter-spacing="-3" fill="${fill}">${esc(name)}</text></svg>`;
   fs.mkdirSync(path.join(dir, "assets"), { recursive: true });
   fs.writeFileSync(path.join(dir, "assets", "wordmark-dark.svg"), svg("#FFFFFF"));

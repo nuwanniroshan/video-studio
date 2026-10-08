@@ -92,3 +92,17 @@ describe("projects own their brand", () => {
     expect(st.brandView("legacy").name).toBe("LuraPlus");
   });
 });
+
+describe("original videos", () => {
+  it("guesses a fitting theme from the idea when the look is left to the agent", () => {
+    expect(st.guessTheme("A promo for our barista coffee bar")).toBe("editorial");
+    expect(st.guessTheme("Yoga studio opening")).toBe("care");
+    expect(st.guessTheme("Payroll for small teams")).toBe("trust");
+    expect(st.guessTheme("Something else entirely")).toBe("classic");
+    const { id } = st.createVideoProject({ idea: "A cosy barista coffee bar on Mill Street, single-origin pour-overs.", name: "Ember", brand: { theme: "auto", name: "Ember" } });
+    const kit = JSON.parse(fs.readFileSync(path.join(home, "projects", id, "brand", "brand.json"), "utf8"));
+    expect(kit.theme).toBe("editorial");
+    const req = JSON.parse(fs.readFileSync(path.join(home, "projects", id, "request.json"), "utf8"));
+    expect(req.brand.theme).toBe("auto");
+  });
+});
