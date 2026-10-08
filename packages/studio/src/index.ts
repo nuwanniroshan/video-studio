@@ -22,7 +22,7 @@ export * from "./brands.ts";
 export * from "./brief.ts";
 export * from "./idea.ts";
 import { briefToSpec, type Brief, type Goal } from "./brief.ts";
-import { ideaToBrief, type IdeaInput } from "./idea.ts";
+import { ideaTitle, ideaToBrief, type IdeaInput } from "./idea.ts";
 import { mixAudio } from "@vs/render";
 
 /** Call once at startup (server, MCP): gives projects from older versions their own brand. */
@@ -174,7 +174,7 @@ export function createVideoProject(o: NewVideo): { id: string } {
   if (o.template && !tpl) throw new StudioError(400, `unknown template "${o.template}"`);
   if (!tpl && !o.brief && !o.idea?.trim()) throw new StudioError(400, "describe the video or pick a template");
   const brandName = ("custom" in (o.brand ?? {}) ? (o.brand as { custom: BrandInput }).custom.name : (o.brand as { name?: string } | undefined)?.name) || o.name || o.brief?.product;
-  const title = o.title?.trim() || brandName || tpl?.name || (o.idea ?? "").split(/[.!?\n]/)[0].slice(0, 60) || "New video";
+  const title = o.title?.trim() || brandName || tpl?.name || ideaTitle(o.idea ?? "") || "New video";
   const { id, dir } = newProjectDir(title);
   try {
     fs.mkdirSync(path.join(dir, "assets"), { recursive: true });

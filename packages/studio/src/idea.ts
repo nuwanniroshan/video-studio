@@ -68,3 +68,20 @@ export function ideaToBrief(i: IdeaInput): Brief {
     formats: i.formats as Brief["formats"], screenshots: i.screenshots, voice: i.voice,
   };
 }
+
+/**
+ * A short title for a pasted idea or script: a "Title:" line, else the first heading, else the first line that is not
+ * a "Style: …" style label, else the first sentence. Markdown is stripped.
+ */
+export function ideaTitle(idea: string, max = 60): string {
+  const plainLine = (l: string) => l.replace(/[*_`#>]+/g, "").replace(/\s+/g, " ").trim();
+  const lines = idea.split(/\n+/).map((l) => l.trim()).filter((l) => l && !/^[-*_]{3,}$/.test(l));
+  const titled = lines.map(plainLine).find((l) => /^(title( card)?|headline|working title)\s*:/i.test(l));
+  const heading = lines.find((l) => /^#{1,3}\s/.test(l));
+  const first = lines.map(plainLine).find((l) => l && !/^[A-Z][\w ]{1,20}:\s/.test(l));
+  let t = titled ? titled.replace(/^[^:]+:\s*/, "") : heading ? plainLine(heading) : first ?? plainLine(lines[0] ?? "");
+  if (!titled && !heading) t = t.split(/(?<=[.!?])\s/)[0];
+  t = t.replace(/^["“']|["”']$/g, "").trim();
+  if (t.length > max) t = t.slice(0, max).replace(/\s+\S*$/, "") + "…";
+  return t;
+}

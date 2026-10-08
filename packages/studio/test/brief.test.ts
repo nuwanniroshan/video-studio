@@ -58,3 +58,14 @@ describe("briefToSpec", () => {
     expect(() => briefToSpec({ ...base, cta: "" }, "luraplus")).toThrow(/call to action/);
   });
 });
+
+describe("ideaTitle", async () => {
+  const { ideaTitle } = await import("../src/idea.ts");
+  it("finds a title in a pasted markdown script", () => {
+    expect(ideaTitle("**Style:** Fast-paced, visual  \n**Title card:** *What If the World’s Population Suddenly Doubled?*\n\n***\n\n### Scene 1 — Hook"))
+      .toBe("What If the World’s Population Suddenly Doubled?");
+    expect(ideaTitle("## Launch week\nWe are shipping dark mode.")).toBe("Launch week");
+    expect(ideaTitle("**Style:** calm\nBrewly is a coffee subscription for offices. Fresh beans weekly.")).toBe("Brewly is a coffee subscription for offices.");
+    expect(ideaTitle("A".repeat(80) + " tail").length).toBeLessThanOrEqual(61);
+  });
+});
