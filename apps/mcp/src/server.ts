@@ -15,6 +15,7 @@ import { SCENE_DEFS, catalog as sceneCatalog } from "@vs/spec";
 import {
   VOICES, applyTheme, brandView, catalog, contactSheets, createVideoProject, fontLibrary, getJob, getProject, getTheme, listOutputs, listPresets, listProjects,
   listTemplates, listThemes, preview, publicJob, saveAsset, saveBrandFile, saveProjectBrand, saveSpec, startRender, initStudio,
+  KINDS,
 } from "@vs/studio";
 
 initStudio();
@@ -43,17 +44,20 @@ Every project has its own brand (get_brand / set_brand); there is no shared bran
 Scenes never take durations: they last as long as their voice-over. Use *asterisks* for accent words in headlines.
 Templates are optional. Without one, design an original video for the idea: pick a concept, visual world and story arc that suit the
 subject, and build most scenes with the "compose" scene (free layers: text, shapes, your own SVG illustrations, images, logo, icons,
-particles, counters, each entering at a voice-over cue). Vary layouts between scenes; call get_scene_schema("compose") first.
+particles, counters, arrows, charts, lists, each entering at a voice-over cue; camera focus moves tour a diagram). Follow a video
+type from list_templates (explainer, what's new, what if…) for the story shape. Give every scene its own visual device and vary
+layouts between scenes; call get_scene_schema("compose") first.
 The user can also open the project in the web studio at ${STUDIO} (run \`pnpm studio\` in the repo).`,
 });
 
 const themeSummary = () => listThemes().map((t) => ({ id: t.id, name: t.name, description: t.description, category: t.category, colors: t.base, fonts: t.fontFamilies, music: t.music }));
 server.registerTool("list_templates", {
   title: "List templates, themes, voices",
-  description: "Templates to start a video from (optional: you can also write the storyboard from scratch), brand themes (looks for projects without their own branding), fonts, music presets and voices.",
+  description: "Video types (story shapes and visual devices for original videos: explainer, what's new, what if…), templates to start from (optional), brand themes (looks for projects without their own branding), fonts, music presets and voices.",
   inputSchema: {},
 }, wrap(() => text({ templates: listTemplates().map(({ variants: _v, thumbnail: _t, ...t }) => t), themes: themeSummary(),
-  fonts: fontLibrary().map((f) => ({ id: f.id, family: f.family, style: f.style, roles: f.roles })), musicPresets: listPresets(), voices: VOICES })));
+  fonts: fontLibrary().map((f) => ({ id: f.id, family: f.family, style: f.style, roles: f.roles })), musicPresets: listPresets(), voices: VOICES,
+  videoTypes: KINDS.filter((k) => k.id !== "auto").map(({ id, label, arc, devices }) => ({ id, label, storyShape: arc, visualDevices: devices })) })));
 
 server.registerTool("list_themes", {
   title: "List brand themes",

@@ -25,6 +25,8 @@ export function Create() {
   const [url, setUrl] = useState(""); const [cta, setCta] = useState(""); const [audience, setAudience] = useState("");
   const [shots, setShots] = useState<{ ref: string; url: string; name: string }[]>([]);
   const [template, setTemplate] = useState<string>("");
+  const [kinds, setKinds] = useState<{ id: string; label: string; blurb: string }[]>([]);
+  const [kind, setKind] = useState("auto");
   const [brandMode, setBrandMode] = useState<"auto" | "theme" | "custom">("auto");
   const [theme, setTheme] = useState("midnight");
   const [custom, setCustom] = useState<CustomBrand>({ name: "", base: DEFAULT_BASE, fonts: { display: { library: "onest" }, body: { library: "inter" }, mono: { library: "jetbrains" } } });
@@ -43,7 +45,7 @@ export function Create() {
 
   useEffect(() => {
     api.themes().then(setThemes); api.templates().then(setTemplates); api.fonts().then(setFonts);
-    api.catalog().then((c) => { setVoices(c.voices); setPresets(c.presets); });
+    api.catalog().then((c) => { setVoices(c.voices); setPresets(c.presets); setKinds(c.kinds ?? []); });
     api.agentStatus().then((s) => { setAgent(s); if (!s.available) setUseAgent(false); }).catch(() => setUseAgent(false));
     if (new URLSearchParams(location.hash.split("?")[1] ?? "").get("template")) setBrandMode("theme");
     const t = new URLSearchParams(location.hash.split("?")[1] ?? "").get("template"); if (t) setTemplate(t);
@@ -77,7 +79,7 @@ export function Create() {
       setBusy("Setting up your project…");
       const brand: NewVideo["brand"] = mode === "auto" ? { theme: "auto", name: name.trim() || undefined } : mode === "theme" ? { theme, name: name.trim() || undefined } : { custom: { ...custom, name: custom.name.trim() || name.trim() } };
       const body: NewVideo = { idea: idea.trim(), name: name.trim() || undefined, url: url.trim() || undefined, cta: cta.trim() || undefined, audience: audience.trim() || undefined,
-        length, formats, voice: effVoice, speed, music: effMusic === "auto" ? undefined : effMusic, template: template || undefined, screenshots: shots.map((s) => s.ref), brand };
+        length, formats, voice: effVoice, speed, music: effMusic === "auto" ? undefined : effMusic, template: template || undefined, kind: template ? undefined : kind, screenshots: shots.map((s) => s.ref), brand };
       const { id } = await api.newVideo(body);
       if (mode === "custom") {
         setBusy("Uploading your brand…");
@@ -121,7 +123,13 @@ export function Create() {
           </section>
 
           <section className="card section">
-            <div className="section-title"><span className="n">2</span><h3>Starting point</h3></div>
+            <div className="section-title"><span className="n">2</span><h3>Video type and starting point</h3></div>
+            {kinds.length > 0 && <div className="f"><span className="l">Video type</span>
+              <div className="kinds">{kinds.map((k) => (
+                <button key={k.id} type="button" className={`kind ${kind === k.id && !tpl ? "on" : ""}`} title={k.blurb}
+                  onClick={() => { setKind(k.id); setTemplate(""); }}><b>{k.label}</b><span>{k.blurb}</span></button>))}</div>
+              <span className="help">{tpl ? "A template sets its own structure. Choose Original to use a video type." : "The type sets the story shape (an explainer walks through a diagram, a what-if builds a scenario…). Every scene is still designed for your idea."}</span></div>}
+            <span className="l" style={{ marginTop: 4 }}>Start from</span>
             <div className="starts-row">
               <button type="button" className={`sp ${!template ? "on" : ""}`} onClick={() => setTemplate("")}>
                 <div className="sp-art agentic">{Icon.wand}</div><b>{aiOn ? "Original" : "From my idea"}</b>
@@ -176,7 +184,7 @@ export function Create() {
           <LookPreview colors={look.colors} display={look.display} body={look.body} name={(mode === "custom" ? custom.name : name) || "Your brand"} logoDark={mode === "custom" ? logoUrl : undefined} />}
           <dl>
             <dt>Brand</dt><dd>{mode === "auto" ? "Designed by the agent" : mode === "theme" ? `${th?.name ?? ""} theme` : custom.name || name || "Your brand"}</dd>
-            <dt>Start</dt><dd>{tpl ? `${tpl.name} template` : aiOn ? "Original" : "Draft from idea"}</dd>
+            <dt>Start</dt><dd>{tpl ? `${tpl.name} template` : `${aiOn ? "Original" : "Draft from idea"} · ${kinds.find((k) => k.id === kind)?.label ?? "auto"}`}</dd>
             <dt>Sizes</dt><dd>{formats.join(" · ")}</dd>
             <dt>Length</dt><dd>~{length} s</dd>
             <dt>Voice</dt><dd>{voices.find((v) => v.id === effVoice)?.label.split(" (")[0] ?? effVoice} · {effMusic === "none" ? "no music" : effMusic === "auto" ? "music chosen by the agent" : effMusic.replace(/-/g, " ")}</dd>

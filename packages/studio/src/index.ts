@@ -15,6 +15,7 @@ import {
 import type { LintIssue, RuntimeDoc } from "@vs/runtime";
 
 import { StudioError, cacheDir, pdir, projectsDir, studioHome, validId } from "./errors.ts";
+import { KINDS, kindById } from "./kinds.ts";
 import { migrateProjectBrands, themeInput, writeBrand, type BrandInput } from "./brands.ts";
 export { StudioError, cacheDir, studioHome };
 export * from "./brands.ts";
@@ -83,6 +84,7 @@ export function catalog() {
       schema: z.toJSONSchema(d.schema, { io: "input", unrepresentable: "any" }) })),
     tones: TONES, transitions: TRANSITIONS, musicCues: MUSIC_CUES, aspects: ASPECTS,
     voices: VOICES, presets: listPresets(), qualities: Object.keys(QUALITY),
+    kinds: KINDS.map(({ id, label, blurb }) => ({ id, label, blurb })),
   };
 }
 
@@ -148,6 +150,8 @@ export interface NewVideo extends Partial<IdeaInput> {
   speed?: number;
   /** a guided brief instead of free text */
   brief?: Brief;
+  /** video type (story shape) for original videos: see kinds.ts */
+  kind?: string;
 }
 
 /** Copy an uploaded image (upload:<name>) or keep a project path. */
@@ -195,7 +199,7 @@ export function createVideoProject(o: NewVideo): { id: string } {
       spec.title = title;
       applyFormats(spec, o.formats);
     } else {
-      const brief = o.brief ? { ...o.brief, screenshots: shots } : ideaToBrief({ ...(o as IdeaInput), name: brandName, screenshots: shots });
+      const brief = o.brief ? { ...o.brief, screenshots: shots } : ideaToBrief({ ...(o as IdeaInput), name: brandName, screenshots: shots, goal: kindById(o.kind)?.id !== "auto" ? kindById(o.kind)?.goal : undefined });
       spec = briefToSpec({ ...brief, product: brief.product || kit.name }, id);
       spec.title = title;
     }
@@ -411,3 +415,4 @@ export function listOutputs(id: string) {
   }));
 }
 export * from "./agent.ts";
+export * from "./kinds.ts";

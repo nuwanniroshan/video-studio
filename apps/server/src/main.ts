@@ -31,6 +31,28 @@ app.setErrorHandler((e, _req, reply) => {
 });
 
 type P = { Params: { id: string } };
+
+// The agent prompt, scene catalogue and project logic live in this process: after a code update the server must
+// restart, or new videos keep the old behaviour. The UI polls this and shows a banner.
+const SRC = ["packages", "apps/server/src", "apps/mcp/src"].map((d) => path.join(REPO, d));
+const newestSource = () => {
+  let t = 0;
+  const walk = (d: string) => {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      if (e.name === "node_modules" || e.name === "dist" || e.name === "test") continue;
+      const f = path.join(d, e.name);
+      if (e.isDirectory()) walk(f); else if (/\.(ts|css)$/.test(e.name)) t = Math.max(t, fs.statSync(f).mtimeMs);
+    }
+  };
+  SRC.forEach((d) => fs.existsSync(d) && walk(d));
+  return t;
+};
+const STARTED = Date.now(), BOOT_SRC = newestSource();
+let srcCheck = { at: 0, stale: false };
+app.get("/api/health", async () => {
+  if (Date.now() - srcCheck.at > 10_000) srcCheck = { at: Date.now(), stale: newestSource() > Math.max(BOOT_SRC, STARTED) };
+  return { started: STARTED, stale: srcCheck.stale };
+});
 app.get("/api/catalog", async () => catalog());
 app.get("/api/templates", async () => listTemplates());
 app.get("/api/themes", async () => listThemes());

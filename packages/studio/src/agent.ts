@@ -9,6 +9,7 @@ import path from "node:path";
 import { claudeCode, type AgentEvent, type AgentProvider } from "@vs/ai";
 import { REPO } from "@vs/render";
 import { FONT_LIBRARY } from "@vs/brand";
+import { KINDS, kindById } from "./kinds.ts";
 import { StudioError, cacheDir, pdir, studioHome } from "./errors.ts";
 
 export interface AgentStep { at: number; kind: "info" | "tool" | "say" | "sheet" | "error" | "done"; text: string; detail?: string; tool?: string; ok?: boolean; image?: string }
@@ -67,7 +68,12 @@ Writing rules:
 The compose scene (your design tool): layers placed on a % grid of the safe frame (x, y = anchor position; w, h = size), drawn back to front.
 - Layer kinds: text (styles display, headline, title, body, label, quote, stat), shape (rect, circle, pill, line, ring, arc, triangle, blob,
   optional gradient), svg (your own vector illustration), image, logo, icon, particles (steam, bubbles, sparkles, confetti, dust, snow,
-  embers, petals) and counter. Background: tone, solid, linear, radial, spotlight or split, with an optional pattern and vignette. Camera moves.
+  embers, petals), counter, arrow (x,y → x2,y2, curved, dashed, draws on: connect diagram parts, show cause → effect),
+  chart (columns, bars, line, area, donut, progress; values count up, bars grow, lines draw; highlight one datum) and
+  list (bullet, number, check, cross, arrow markers; items appear one by one or each at its own voice-over cue).
+  Background: tone, solid, linear, radial, spotlight or split, with an optional pattern and vignette.
+- Camera: a slow move (push-in, pan…) or "focus" moves that fly to a point of the frame at a cue (x, y, zoom; zoom 1 returns to the
+  whole frame). Focus turns one big diagram or illustration into a guided tour: lay it out once, then visit each part as it is explained.
 - Timing: every layer enters at a cue (at: "start", a voice-over line id like "v2", or "end") plus delay,
   with an entrance (rise, fade, drop, left, right, scale, pop, zoom, blur, wipe, reveal, iris, draw, words, letters, typewriter).
   Bring each thing in as the voice-over mentions it; stagger related layers by 0.1–0.3 s. "until" makes a layer leave at a later cue,
@@ -80,7 +86,14 @@ The compose scene (your design tool): layers placed on a % grid of the safe fram
   tone drives the house background, transitions and the music cue.
 - Every layer that should sit differently on a tall screen gets a "portrait" placement (and "square" for 1:1): stack things vertically,
   text widths 80–92, sizes up. In 9:16 reels the safe frame already excludes the platform UI.
-- Keep text inside the frame (x ± w/2 within 0–100 for centred layers). 3–9 layers per scene is typical.`;
+- Keep text inside the frame (x ± w/2 within 0–100 for centred layers). 3–9 layers per scene is typical.
+- The catalogue's compose example (a coffee scene) only shows the syntax. Never copy its layout.
+
+Variety (original videos): every scene has a visual idea of its own. Before writing, give each scene a one-line "device" (e.g. "diagram
+with three nodes and arrows, camera visits each", "left/right split today vs what-if", "column chart, last bar highlighted",
+"giant number 3 with an illustration", "check list appearing per line"). No two scenes in a row may share a device, and at most one scene
+in the whole video may be "a centred headline with an icon or illustration above it". Change composition, scale, background and
+colour from scene to scene; reuse one motif (an illustration style, a shape, a colour) so it still feels like one film.`;
 
 const FONTS = FONT_LIBRARY.map((f) => `${f.id} (${f.family}, ${f.style}; ${f.roles.join("/")})`).join(", ");
 
@@ -88,9 +101,10 @@ const ORIGINAL = `This is an ORIGINAL video: no template. The current storyboard
 Before writing anything, decide a creative direction for THIS idea and say it in a short message:
 - the concept in one line, and the feeling (cosy, bold, playful, premium, urgent…);
 - the visual world: motifs, illustrations, textures and shapes that belong to this subject (not generic tech grids);
-- the story arc and pacing that fit (a mood piece, a countdown, a step-by-step, a before/after, a list of reasons, a manifesto…);
+- the story arc and pacing (see the video type below);
+- one visual device per scene (see Variety);
 - how the opening hooks and how it closes (logo, offer, address, call to action — whatever the idea needs).
-Then build it mostly from compose scenes so every layout is designed for this video. Vary composition from scene to scene
+Then build it from compose scenes so every layout is designed for this video. Vary composition from scene to scene
 (asymmetric split, centred statement, full-bleed type, big number, illustration-led, image-led); never use the same layout twice in a row.
 Use the fixed scene types only where they are clearly the best fit (screenFlow or featureSpotlight for real product screenshots,
 ctaEndCard when a button is wanted, mediaBroll for a full-bleed photo). Transitions and tones are yours to choose; keep them purposeful.`;
@@ -101,13 +115,21 @@ Flash into a logo reveal, iris into the first light scene and into the CTA, cros
 In featureGrid and screenFlow give voice-over lines "step": n so each item lands as it is spoken. You may swap a scene for a compose scene
 when the template's layout does not suit the idea.`;
 
+function kindPrompt(id?: string) {
+  const k = kindById(id) ?? kindById("auto")!;
+  if (k.id === "auto") return [`Video type: your choice. Pick the story shape that fits best:`,
+    ...KINDS.filter((x) => x.id !== "auto").map((x) => `- ${x.label}: ${x.arc}`)].join("\n");
+  return [`Video type: ${k.label}. Follow this story shape (adapt the number of beats to the length):`, k.arc,
+    `Visual devices that suit this type: ${k.devices}.`].join("\n");
+}
+
 function createPrompt(project: string) {
   const d = pdir(project);
   const req = fs.existsSync(path.join(d, "request.json")) ? JSON.parse(fs.readFileSync(path.join(d, "request.json"), "utf8")) : {};
   const kit = JSON.parse(fs.readFileSync(path.join(d, "brand", "brand.json"), "utf8"));
   const lines = [
     `Project id: "${project}". Brand: ${kit.name}${kit.cta?.url ? ` (${kit.cta.url})` : ""}.`,
-    req.template ? TEMPLATE(req.template) : ORIGINAL,
+    req.template ? TEMPLATE(req.template) : `${ORIGINAL}\n\n${kindPrompt(req.kind)}`,
     "", "The user's idea:", `"""${(req.idea ?? "").trim() || "(none given: adapt the template to the brand)"}"""`,
   ];
   if (req.audience) lines.push(`Audience: ${req.audience}`);

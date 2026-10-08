@@ -16,6 +16,8 @@ export interface IdeaInput {
   music?: string;
   voice?: string;
   screenshots?: string[];
+  /** story shape chosen by the user (else guessed from the text) */
+  goal?: Goal;
 }
 
 const split = (s: string) => s.replace(/\s+/g, " ").match(/[^.!?]+[.!?]?/g)?.map((x) => x.trim()).filter((x) => x.length > 2) ?? [];
@@ -46,7 +48,7 @@ export function ideaToBrief(i: IdeaInput): Brief {
   const bullets = lines.filter((l) => /^([-*•]|\d+[.)])\s+/.test(l)).map(clean);
   const prose = lines.filter((l) => !/^([-*•]|\d+[.)])\s+/.test(l)).join(" ");
   const sentences = split(prose).map(clean).filter(Boolean);
-  const goal = guessGoal(text, i.length);
+  const goal = i.goal ?? guessGoal(text, i.length);
   const name = i.name?.trim() || guessName(text) || "Your product";
   const problemIdx = sentences.findIndex((s) => /\b(tired|struggl|hard|painful|waste|wasting|still|manual|spreadsheet|chaos|slow|frustrat|problem|without)\b/i.test(s));
   const problem = problemIdx >= 0 && goal !== "explainer" && goal !== "announcement" ? sentences[problemIdx] : undefined;

@@ -2,7 +2,7 @@ export type Json = any;
 export interface Issue { path: string; message: string }
 export interface LintIssue { level: "error" | "warning"; scene: string; code: string; message: string }
 export interface SceneDef { type: string; version: number; meta: { label: string; category: string; description: string; defaultMusicCue: string; defaultTransition: Json }; example: Json; schema: Json }
-export interface Catalog { scenes: SceneDef[]; tones: string[]; transitions: string[]; musicCues: string[]; aspects: string[]; voices: { id: string; label: string }[]; presets: string[]; qualities: string[] }
+export interface Catalog { scenes: SceneDef[]; tones: string[]; transitions: string[]; musicCues: string[]; aspects: string[]; voices: { id: string; label: string }[]; presets: string[]; qualities: string[]; kinds: { id: string; label: string; blurb: string }[] }
 export interface PreviewRes { variants: string[]; variant: string; doc: Json; lint: LintIssue[]; duration: number; scenes: { id: string; start: number; end: number; vo: { id: string; t: number; dur: number }[] }[]; warnings: string[]; dropped: string[] }
 export interface Job { id: string; project: string; status: "queued" | "running" | "done" | "error"; progress: number; message: string; outputs: { variant: string; files: string[] }[]; error?: string; quality: string; variants: string[] }
 
@@ -22,7 +22,7 @@ export interface AgentJob { id: string; project: string; mode: "create" | "revis
   steps: AgentStep[]; summary?: string; revisions: number; started: number; finished?: number; costUsd?: number }
 export interface AgentStatus { provider: string; label: string; available: boolean; detail: string; models: { id: string; label: string }[] }
 export interface NewVideo { title?: string; idea?: string; name?: string; audience?: string; points?: string[]; cta?: string; url?: string; length?: number; formats?: string[];
-  music?: string; voice?: string; speed?: number; tone?: string; template?: string; screenshots?: string[];
+  music?: string; voice?: string; speed?: number; tone?: string; template?: string; kind?: string; screenshots?: string[];
   brand?: { theme: string; name?: string } | { custom: Json }; agent?: boolean; model?: string }
 export interface BrandKit { id: string; name: string; theme?: string; wordmark?: { onDark: boolean; onLight: boolean }; base?: { primary: string; accent: string; dark: string; light: string; ink: string }; colors: Record<string, string>;
   fonts: Record<string, { family: string; file: string }>; logo: Record<string, string>; voice?: { voice: string; speed: number };
@@ -53,6 +53,7 @@ export const api = {
   newVideo: (b: NewVideo) => req<{ id: string; agentJob?: string }>("POST", "/api/projects/new", b),
   request: (id: string) => req<NewVideo>("GET", `/api/projects/${id}/request`),
   agentStatus: () => req<AgentStatus>("GET", "/api/agent/status"),
+  health: () => req<{ started: number; stale: boolean }>("GET", "/api/health"),
   agent: (id: string, b: { instruction?: string; mode?: "create" | "revise"; model?: string }) => req<AgentJob>("POST", `/api/projects/${id}/agent`, b),
   agentJobs: (id: string) => req<AgentJob[]>("GET", `/api/projects/${id}/agent`),
   stopAgent: (job: string) => req<AgentJob>("POST", `/api/agent/${job}/stop`),

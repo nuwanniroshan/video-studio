@@ -345,3 +345,9 @@ textarea.code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; fon
 .look-auto svg { width: 26px; height: 26px; }
 .look-auto b { font-size: 20px; letter-spacing: -.01em; }
 .look-auto span { font-size: 12px; opacity: .8; }
+.banner.warn { background: var(--warn-50); color: #7A4B00; } .banner.stale { margin: 0 0 16px; } .banner code { font-size: 12px; background: rgba(0,0,0,.06); padding: 1px 5px; border-radius: 4px; }
+.kinds { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.kind { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: var(--r-sm); padding: 9px 11px; display: flex; flex-direction: column; gap: 2px; cursor: pointer; transition: border-color .12s, box-shadow .12s; }
+.kind b { font-size: 13px; } .kind span { font-size: 11.5px; color: var(--muted, #6B7280); line-height: 1.35; }
+.kind:hover { border-color: var(--accent, #4F46E5); }
+.kind.on { border-color: var(--accent, #4F46E5); box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #4F46E5) 25%, transparent); }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Icon } from "./components/ui.tsx";
+import { api } from "./api.ts";
 import { Home } from "./pages/Home.tsx";
 import { Templates } from "./pages/Templates.tsx";
 import { Create } from "./pages/Create.tsx";
@@ -31,6 +32,11 @@ export function App() {
 }
 
 function Shell({ h, children }: { h: string; children: React.ReactNode }) {
+  const [stale, setStale] = useState(false);
+  useEffect(() => {
+    const check = () => api.health().then((x) => setStale(x.stale)).catch(() => undefined);
+    check(); const t = setInterval(check, 30_000); return () => clearInterval(t);
+  }, []);
   const nav = (href: string, label: string, icon: React.ReactNode, on: boolean) => <a href={href} className={`nav ${on ? "on" : ""}`}>{icon}{label}</a>;
   return (
     <div className="shell">
@@ -45,7 +51,9 @@ function Shell({ h, children }: { h: string; children: React.ReactNode }) {
           Describe a video to Claude and it builds it here. <a href="#/claude">How to set up</a>
         </div>
       </aside>
-      <main className="main">{children}</main>
+      <main className="main">
+        {stale && <div className="banner warn stale">The studio's code was updated while it was running. Restart it (stop it and run <code>pnpm studio</code> again) so new videos use the latest scenes and agent.</div>}
+        {children}</main>
     </div>
   );
 }
