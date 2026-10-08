@@ -14,15 +14,14 @@ A code-driven motion-graphics video generator. A declarative storyboard spec goe
 pnpm studio      # opens http://127.0.0.1:5190
 ```
 
-- **Start a video:** pick a template (feature launch, product promo, announcement, how-to, social teaser), or **describe your idea** in a guided brief. The brief writes the storyboard, voice-over and music for you, with no AI needed.
-- **Brand kits:**
-  - upload logos;
-  - pick five colours (shades are derived automatically);
-  - choose fonts from the bundled library or upload your own;
-  - choose the narrator voice and speed;
-  - teach the pronunciation of brand names;
-  - set the website and the default music.
-  - A live preview shows the result.
+- **Create with AI** (`New video`): describe the idea in your own words, optionally add screenshots, then choose:
+  - a starting point: the agent designs the scenes from scratch, or one of 12 templates it adapts;
+  - branding: one of 12 themes, or your own logo (colours are picked from it), colours and fonts;
+  - narrator voice and speed, music, video sizes (16:9, 9:16, 1:1, 4:5) and target length.
+
+  The **video agent** then writes the script, picks and fills the scenes, checks timing and layout, renders contact sheets and fixes what it sees, live on screen. In the editor, **Ask AI** makes further changes in plain words ("make it 15 s for Instagram").
+  The agent runs Claude through your local Claude Code login (no API key). Without it, you get an instant rule-based draft instead; everything else works the same.
+- **Brands belong to projects.** Each video has its own brand (logo, colours, fonts, website, pronunciations) on its Brand page; there is no shared brand library. Switch theme any time; your name, logo and pronunciations are kept.
 - **Editor:**
   - scene list and timeline;
   - live preview, with sound on demand;
@@ -36,7 +35,7 @@ pnpm studio      # opens http://127.0.0.1:5190
 
 ## Ask Claude to make it
 
-Describe the video to Claude Code or Claude Desktop, and it uses the `video-studio` tools to plan, check and render it. Setup and options are in [`docs/CLAUDE-INTEGRATION.md`](docs/CLAUDE-INTEGRATION.md).
+Describe the video to Claude Code or Claude Desktop, and it uses the `video-studio` tools (themes, project brand, logo, storyboard, timing, stills, render) to plan, check and render it. The web studio's agent uses the same tools. Setup and options are in [`docs/CLAUDE-INTEGRATION.md`](docs/CLAUDE-INTEGRATION.md).
 
 ## Setup (macOS)
 
@@ -101,6 +100,7 @@ pnpm vs dev my-launch/spec.json           # local player with a scrubber
 | `packages/storage` | local content addressing |
 | `python/vsaudio` | text-to-speech (Kokoro) with a pronunciation dictionary, score presets, automix and loudness, Whisper QA |
 | `apps/cli` | the `vs` CLI |
-| `templates/`, `brands/` | starting points and brand kits |
+| `templates/`, `themes/`, `brands/` | starting storyboards, ready-made looks, and the example brand kit used by the CLI and golden tests |
+| `packages/ai` | optional AI agent providers (`claude-code`: headless Claude Code driving the MCP tools) |
 | `tests/` | golden frames and determinism |
 | `docker/Dockerfile.render` | the render image |

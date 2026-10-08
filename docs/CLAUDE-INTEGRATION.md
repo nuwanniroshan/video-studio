@@ -15,6 +15,17 @@ Projects are shared with the web studio (`pnpm studio`), so you can open anythin
 - `render_stills` (returns the contact sheet image)
 - `render_video`, `render_status`, `list_outputs`
 
+## Inside the web studio (no setup)
+
+`New video → Create with AI` and the editor's **Ask AI** run the same agent without leaving the studio. The server starts
+`claude -p` headlessly with only the `video-studio` MCP server and only its editing tools (no shell, no file access, no rendering),
+streams its steps to the page and saves its run log in `<project>/agent/`. It uses your Claude Code login; set `VS_CLAUDE_BIN` if
+`claude` is not on the PATH and `VS_AGENT_MODEL` (`sonnet` default, `opus`) to change the default model. If Claude Code is missing
+or logged out, the studio says so and creates a rule-based draft instead.
+
+Measured here: a new 30 s video from an idea took 2–4.5 minutes (about $0.20 of usage) and came back with 0 lint issues in both
+formats; a revision ("add a stats scene, punchier hook") took 1.5 minutes.
+
 ## Options compared
 
 | Where you talk to Claude | How | Works now? | Notes |

@@ -11,7 +11,7 @@ The CLI runs from the repo root as `pnpm vs …` (or `node apps/cli/bin/vs.mjs �
 
 ## Workflow (always in this order)
 
-1. **Brief → spec.** Start from a template: `pnpm vs init <dir> --template feature-launch --brand luraplus`. Edit `<dir>/spec.json`. The JSON Schema is `docs/schema.json`, and `pnpm vs scenes --json` lists every scene with its props schema and an example.
+1. **Brief → spec.** Start from a template: `pnpm vs init <dir> --template feature-launch --brand luraplus`. A `brand/` folder next to `spec.json` (brand.json, fonts/, assets/) overrides `brands/<id>`; that is how studio projects own their brand. Edit `<dir>/spec.json`. The JSON Schema is `docs/schema.json`, and `pnpm vs scenes --json` lists every scene with its props schema and an example.
 2. **Validate and resolve timing:** `pnpm vs validate <spec> --resolve`. This synthesizes VO (cached) and prints each scene's start and end plus VO placement for every variant. Fix every issue it reports; issues come with JSON paths.
 3. **Look at the frames before rendering:** `pnpm vs stills <spec>` writes stills at each scene's cues plus a contact sheet per variant (`out/stills/<variant>-sheet.jpg`). **Open the sheet with the Read tool and inspect it.** Look for:
    - wrapped or orphaned headline words;

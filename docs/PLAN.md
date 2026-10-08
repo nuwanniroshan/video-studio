@@ -551,6 +551,12 @@ pg-boss manages its own schema.
 
 Technical users get AI authoring today through Claude Code, with no API key.
 
+**Amended during M2 (user request, Oct 2026):** an agent provider was pulled forward. `packages/ai` has `claude-code`, which runs the
+local Claude Code CLI headlessly against the `video-studio` MCP server (the user's own login; no API key). It writes and revises
+storyboards and checks contact sheets. Without it, new projects get a rule-based draft (`ideaToBrief` → `briefToSpec`). Brand kits
+also changed: every project owns its brand (`<project>/brand/`, preferred by the renderer over `brands/<id>`), started from a
+theme (`themes/*.json`) or the user's own logo, colours and fonts. The `anthropic` and `bedrock` providers below remain M4.
+
 **AI provider (`packages/ai`, M4):**
 ```
 interface LlmProvider { storyboard(brief, catalog, brand): Promise<Spec>; rewriteVo(lines, targetSec): Promise<string[]> }

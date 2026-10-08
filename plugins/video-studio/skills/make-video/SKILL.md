@@ -5,16 +5,16 @@ description: Turn an idea into a finished motion-graphics video (product promo, 
 
 # Make a video from an idea
 
-You have the `video-studio` MCP tools. The user describes an idea; you produce the video. Do the work yourself and only ask questions that change the result: audience, call to action, length, formats, and product screenshots if they have them.
+You have the `video-studio` MCP tools. The user describes an idea; you produce the video. Do the work yourself and only ask questions that change the result: audience, call to action, length, formats, branding (their logo and colours, or a theme), and product screenshots if they have them.
 
 ## Steps
 
-1. **Plan.** `list_templates`, then `list_scenes`.
+1. **Plan.** `list_templates` (templates, themes, fonts, voices), then `list_scenes`.
    - Draft a storyboard: 5–8 scenes for about 30–45 s.
    - Write the voice-over at about 2.3 words per second; around 70% of the runtime should be speech.
    - Order the voice-over clauses to match what appears on screen.
    - The text must tell the story with the sound off.
-2. **Create.** `create_project` (template `feature-launch` unless another fits; the brand defaults to luraplus). Then:
+2. **Create.** `create_project` with the `idea`, `brandName`, `website`, `formats`, `voice`, `length`, and either a `theme` or the user's own `colors` (+ `fonts`); add `template` only if one fits. Every project owns its brand: if the user has a logo file, `set_logo`; change looks later with `set_brand`. Then:
    - Rewrite the spec it returns to match your storyboard, keeping its structure.
    - Use `get_scene_schema` for fields and length limits.
    - Save with `update_spec` and fix any issues it returns.
