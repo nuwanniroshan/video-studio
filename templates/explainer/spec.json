@@ -1,0 +1,29 @@
+{
+  "version": 1, "title": "How-to explainer", "brand": "luraplus", "fps": 60, "quality": "standard",
+  "music": { "mode": "preset", "preset": "calm-explainer" },
+  "voice": { "provider": "kokoro", "voice": "af_heart", "speed": 0.92 },
+  "variants": [{ "id": "main", "aspect": "16:9", "safeArea": "title" }, { "id": "social", "aspect": "9:16", "safeArea": "reels", "scenes": ["intro", "steps", "cta"] }],
+  "scenes": [
+    { "id": "intro", "type": "kineticTitle", "tone": "light", "musicCue": "build",
+      "vo": [{ "text": "Here's how to run your first pay run, in under a minute." }],
+      "props": { "kicker": "How to", "headline": "Run your first *pay run.*", "sub": "Three steps, under a minute.", "style": "rise", "align": "left" } },
+    { "id": "steps", "type": "screenFlow", "tone": "light", "transitionIn": { "type": "crossfade" }, "musicCue": "groove",
+      "vo": [
+        { "text": "First, open Payroll and start a new pay run.", "step": 0 },
+        { "text": "Next, check the totals. Everything comes from approved timesheets.", "step": 1 },
+        { "text": "Finally, approve. Everyone is paid, and payslips go out automatically.", "step": 2 } ],
+      "props": { "kicker": "Step by step", "title": "Three steps to pay day", "steps": [
+        { "screen": "assets/flow-1.png", "click": { "x": 0.935, "y": 0.126 }, "caption": "1 · Start a pay run", "focus": { "x": 0.5, "y": 0, "w": 0.5, "h": 0.42 } },
+        { "screen": "assets/flow-2.png", "click": { "x": 0.934, "y": 0.947 }, "caption": "2 · Check the totals", "focus": { "x": 0.42, "y": 0.55, "w": 0.58, "h": 0.45 } },
+        { "screen": "assets/flow-3.png", "caption": "3 · Paid", "focus": { "x": 0.2, "y": 0.2, "w": 0.6, "h": 0.6 } } ] } },
+    { "id": "tips", "type": "featureGrid", "tone": "light", "transitionIn": { "type": "crossfade" }, "musicCue": "groove", "optional": true,
+      "vo": [{ "text": "A few tips: approve timesheets first, review overtime, and schedule pay runs ahead." }],
+      "props": { "kicker": "Tips", "headline": "Get it right *every time.*", "items": [
+        { "icon": "check", "title": "Approve timesheets first", "text": "Pay runs build from approved hours." },
+        { "icon": "clock", "title": "Review overtime", "text": "Flagged rows need a look." },
+        { "icon": "cal", "title": "Schedule ahead", "text": "Set the next run in advance." } ] } },
+    { "id": "cta", "type": "ctaEndCard", "tone": "dark", "transitionIn": { "type": "iris" }, "musicCue": "resolve",
+      "vo": [{ "text": "Need a hand? Our team is here to help." }],
+      "props": { "headline": "Questions? *We're here to help.*", "button": "Contact support", "click": true } }
+  ]
+}

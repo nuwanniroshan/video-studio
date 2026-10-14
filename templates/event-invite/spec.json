@@ -1,0 +1,158 @@
+{
+ "version": 1,
+ "title": "Event invite",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "uplifting-tech"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "af_bella",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  },
+  {
+   "id": "square",
+   "aspect": "1:1",
+   "safeArea": "title",
+   "loudness": -14
+  }
+ ],
+ "scenes": [
+  {
+   "id": "hook",
+   "type": "kineticTitle",
+   "tone": "brand",
+   "vo": [
+    {
+     "text": "Join Northwind live for a thirty-minute masterclass."
+    }
+   ],
+   "props": {
+    "kicker": "Live webinar",
+    "headline": "Ship faster *without the chaos.*",
+    "style": "scale"
+   },
+   "musicCue": "build"
+  },
+  {
+   "id": "learn",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "You'll learn how top teams plan sprints,",
+     "step": 0
+    },
+    {
+     "text": "cut meetings in half,",
+     "step": 1
+    },
+    {
+     "text": "and ship with confidence.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "kicker": "What you'll learn",
+    "headline": "Thirty minutes, *three big wins.*",
+    "items": [
+     {
+      "icon": "cal",
+      "title": "Plan better sprints",
+      "text": "A simple weekly rhythm that sticks."
+     },
+     {
+      "icon": "clock",
+      "title": "Halve your meetings",
+      "text": "Async updates that people actually read."
+     },
+     {
+      "icon": "check",
+      "title": "Ship with confidence",
+      "text": "Checklists that catch issues early."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "aspectOverrides": {
+    "1:1": {
+     "props": {
+      "items": [
+       {
+        "icon": "cal",
+        "title": "Plan better sprints"
+       },
+       {
+        "icon": "clock",
+        "title": "Halve your meetings"
+       },
+       {
+        "icon": "check",
+        "title": "Ship with confidence"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "facts",
+   "type": "statsCounter",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "It's free, it's live, and there's time for your questions."
+    }
+   ],
+   "props": {
+    "kicker": "The details",
+    "headline": "Free, live and *interactive.*",
+    "stats": [
+     {
+      "value": 30,
+      "suffix": " min",
+      "label": "of practical tips"
+     },
+     {
+      "value": 15,
+      "suffix": " min",
+      "label": "live Q&A"
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   }
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Seats are limited. Save yours today."
+    }
+   ],
+   "props": {
+    "headline": "Save your seat *today.*",
+    "button": "Register free",
+    "note": "Thursday, 10 am PT. Can't make it? Register for the recording."
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

@@ -1,0 +1,24 @@
+{
+  "id": "evergreen",
+  "name": "Evergreen",
+  "description": "Forest green with warm gold. Natural, sustainable, grounded.",
+  "category": "Lifestyle",
+  "order": 3,
+  "base": {
+    "primary": "#16A34A",
+    "accent": "#CA8A04",
+    "dark": "#08140E",
+    "light": "#F5F8F3",
+    "ink": "#0E1A12"
+  },
+  "fonts": {
+    "display": "dmsans",
+    "body": "dmsans",
+    "mono": "jetbrains"
+  },
+  "music": "calm-explainer",
+  "voice": {
+    "voice": "bf_emma",
+    "speed": 0.94
+  }
+}

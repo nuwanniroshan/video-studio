@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Onest;src:url(../../../brands/luraplus/fonts/Onest.ttf)}
+@font-face{font-family:"Open Sans";src:url(../../../brands/luraplus/fonts/OpenSans.ttf)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:1600px;height:1000px;font-family:"Open Sans";color:#0E1116;background:#F7F8FA;display:flex;-webkit-font-smoothing:antialiased}
+.side{width:232px;background:#fff;border-right:1px solid #E2E5EA;padding:22px 14px;display:flex;flex-direction:column;gap:4px}
+.logo{height:24px;margin:0 10px 26px}
+.nav{display:flex;align-items:center;gap:12px;height:40px;padding:0 12px;border-radius:8px;font-size:14px;color:#3A3F49;font-weight:500}
+.nav i{width:18px;height:18px;border-radius:5px;background:#E2E5EA;display:inline-block}
+.nav.on{background:#EAF2FE;color:#1856C4;font-weight:600}.nav.on i{background:#3782F7}
+.main{flex:1;display:flex;flex-direction:column}
+.top{height:64px;background:#fff;border-bottom:1px solid #E2E5EA;display:flex;align-items:center;padding:0 32px;gap:16px}
+.crumb{font-size:14px;color:#79808D}.crumb b{color:#0E1116;font-weight:600}
+.search{margin-left:auto;width:280px;height:36px;border-radius:8px;background:#F7F8FA;border:1px solid #E2E5EA}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#5697F8,#1F6BE8)}
+.content{padding:32px;display:flex;flex-direction:column;gap:22px;flex:1}
+.head{display:flex;align-items:center;justify-content:space-between}
+h1{font-family:Onest;font-weight:600;font-size:28px;letter-spacing:-.02em}
+.sub{font-size:14px;color:#79808D;margin-top:4px}
+.btn{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 20px;border-radius:9px;font-weight:600;font-size:15px}
+.primary{background:#3782F7;color:#fff;box-shadow:0 1px 2px rgba(31,107,232,.4)}
+.ghost{background:#fff;border:1px solid #E2E5EA;color:#23272E}
+.card{background:#fff;border:1px solid #E2E5EA;border-radius:12px;box-shadow:0 6px 16px rgba(14,17,22,.06)}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+.tile{padding:20px}.tile .l{font-size:13px;color:#79808D}.tile .v{font-family:Onest;font-weight:600;font-size:28px;margin-top:8px;letter-spacing:-.02em}
+.tile .d{font-size:12.5px;color:#178551;margin-top:6px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{font-size:12.5px;color:#79808D;font-weight:600;text-align:left;padding:14px 20px;border-bottom:1px solid #E2E5EA;background:#FCFCFD}
+td{padding:15px 20px;border-bottom:1px solid #EFF1F4}
+.chip{display:inline-flex;height:24px;padding:0 10px;border-radius:99px;font-size:12px;font-weight:600;align-items:center}
+.g{background:#E8F6EF;color:#178551}.a{background:#FBF1E1;color:#B9730A}.b{background:#EAF2FE;color:#1856C4}
+.num{font-family:Onest;font-weight:600;font-variant-numeric:tabular-nums}
+.foot{display:flex;justify-content:flex-end;gap:12px;margin-top:auto}
+.done{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center}
+.tick{width:96px;height:96px;border-radius:50%;background:#E8F6EF;display:flex;align-items:center;justify-content:center}
+.tick svg{width:52px;height:52px;stroke:#1FA463;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.row{display:flex;gap:14px}
+[data-screen]{display:none}
+</style></head>
+<body>
+<div class="side"><img class="logo" src="../../../brands/luraplus/assets/lura-logo.png">
+<div class="nav"><i></i>Home</div><div class="nav"><i></i>People</div><div class="nav"><i></i>Time</div><div class="nav"><i></i>Leave</div>
+<div class="nav on"><i></i>Payroll</div><div class="nav"><i></i>Reports</div><div class="nav"><i></i>Settings</div></div>
+<div class="main"><div class="top"><span class="crumb">Payroll / <b id="crumb">Pay runs</b></span><span class="search"></span><span class="av"></span></div>
+
+<div class="content" data-screen="1">
+ <div class="head"><div><h1>Pay runs</h1><div class="sub">Fortnightly · next pay day Fri 24 Oct</div></div><span class="btn primary">+ New pay run</span></div>
+ <div class="tiles">
+  <div class="card tile"><div class="l">Employees</div><div class="v">128</div><div class="d">+4 this month</div></div>
+  <div class="card tile"><div class="l">Timesheets approved</div><div class="v">128 / 128</div><div class="d">All in</div></div>
+  <div class="card tile"><div class="l">Last pay run</div><div class="v">$406,920</div><div class="d">Paid on time</div></div>
+  <div class="card tile"><div class="l">Leave this period</div><div class="v">23 days</div><div class="d">Synced from Leave</div></div>
+ </div>
+ <div class="card"><table><tr><th>Period</th><th>Pay date</th><th>Employees</th><th>Gross</th><th>Status</th></tr>
+  <tr><td>27 Sep – 10 Oct</td><td>Fri 10 Oct</td><td>124</td><td class="num">$406,920</td><td><span class="chip g">Paid</span></td></tr>
+  <tr><td>13 Sep – 26 Sep</td><td>Fri 26 Sep</td><td>124</td><td class="num">$401,115</td><td><span class="chip g">Paid</span></td></tr>
+  <tr><td>30 Aug – 12 Sep</td><td>Fri 12 Sep</td><td>121</td><td class="num">$398,402</td><td><span class="chip g">Paid</span></td></tr>
+  <tr><td>16 Aug – 29 Aug</td><td>Fri 29 Aug</td><td>120</td><td class="num">$395,870</td><td><span class="chip g">Paid</span></td></tr>
+ </table></div>
+</div>
+
+<div class="content" data-screen="2">
+ <div class="head"><div><h1>Review pay run</h1><div class="sub">11 Oct – 24 Oct · 128 employees · built from approved timesheets</div></div><span class="chip b">Draft</span></div>
+ <div class="tiles">
+  <div class="card tile"><div class="l">Total gross</div><div class="v">$412,380</div><div class="d">+1.3% vs last run</div></div>
+  <div class="card tile"><div class="l">Tax withheld</div><div class="v">$98,971</div><div class="d">Tables up to date</div></div>
+  <div class="card tile"><div class="l">Super</div><div class="v">$47,424</div><div class="d">12% guarantee</div></div>
+  <div class="card tile"><div class="l">Net pay</div><div class="v">$265,985</div><div class="d">To 128 accounts</div></div>
+ </div>
+ <div class="card"><table><tr><th>Employee</th><th>Hours</th><th>Leave</th><th>Allowances</th><th>Gross</th><th>Check</th></tr>
+  <tr><td>Amara Okafor</td><td>76.0</td><td>—</td><td class="num">$120</td><td class="num">$3,920</td><td><span class="chip g">OK</span></td></tr>
+  <tr><td>Ben Whitfield</td><td>68.5</td><td>7.5 h annual</td><td class="num">—</td><td class="num">$3,410</td><td><span class="chip g">OK</span></td></tr>
+  <tr><td>Chen Li</td><td>80.0</td><td>—</td><td class="num">$45</td><td class="num">$4,085</td><td><span class="chip a">Overtime</span></td></tr>
+  <tr><td>Diego Santos</td><td>76.0</td><td>—</td><td class="num">—</td><td class="num">$3,650</td><td><span class="chip g">OK</span></td></tr>
+ </table></div>
+ <div class="foot"><span class="btn ghost">Save draft</span><span class="btn primary">Approve &amp; pay</span></div>
+</div>
+
+<div class="content" data-screen="3">
+ <div class="done"><div class="tick"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg></div>
+  <h1>Paid. Payslips sent.</h1><div class="sub">128 employees paid $265,985 · STP lodged with the ATO · payslips emailed</div>
+  <div class="row"><span class="btn ghost">View payslips</span><span class="btn primary">Back to pay runs</span></div></div>
+</div>
+</div>
+</body></html>

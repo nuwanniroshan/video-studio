@@ -1,0 +1,13 @@
+{
+  "name": "@vs/runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/types.ts", "./paths": "./paths.mjs" },
+  "dependencies": { "@vs/engine": "workspace:*", "@vs/scenes": "workspace:*" },
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "tsc -p .",
+    "test": "vitest run --passWithNoTests"
+  }
+}

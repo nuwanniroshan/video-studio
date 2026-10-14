@@ -1,0 +1,9 @@
+/* Stage only; scene and primitive styles live in @vs/scenes (scenes.css). */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: var(--stage-w, 1920px); height: var(--stage-h, 1080px); overflow: hidden; background: #000; }
+body { font-family: var(--vs-font-body); color: var(--vs-ink); -webkit-font-smoothing: antialiased; text-rendering: geometricPrecision; }
+#stage { position: relative; width: var(--stage-w, 1920px); height: var(--stage-h, 1080px); overflow: hidden; background: var(--vs-dark); container-type: size; }
+.scene { position: absolute; inset: 0; overflow: hidden; }
+.w { display: inline-block; overflow: visible; }
+.wi { display: inline-block; }
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 100; pointer-events: none; }

@@ -1,0 +1,24 @@
+{
+  "id": "royal",
+  "name": "Royal",
+  "description": "Violet with amber highlights. Distinctive and premium.",
+  "category": "Premium",
+  "order": 6,
+  "base": {
+    "primary": "#7C3AED",
+    "accent": "#F59E0B",
+    "dark": "#120A24",
+    "light": "#F8F6FE",
+    "ink": "#1A1033"
+  },
+  "fonts": {
+    "display": "sora",
+    "body": "manrope",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "af_bella",
+    "speed": 0.94
+  }
+}

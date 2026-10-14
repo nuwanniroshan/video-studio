@@ -1,0 +1,17 @@
+{
+  "name": "@vs/spec",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run",
+    "schema": "tsx src/export-schema.ts"
+  },
+  "dependencies": {
+    "zod": "^4.6.5"
+  }
+}

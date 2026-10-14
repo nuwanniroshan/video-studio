@@ -1,0 +1,45 @@
+# studio-render: Node 20 + Playwright Chromium + ffmpeg. Slim, for fast Fargate cold starts (ARM64).
+# No Python: audio runs in the vsaudio sidecar. Build from the repo root:
+#   docker build -f docker/Dockerfile.render -t studio-render .
+FROM node:20.17-bookworm-slim
+
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright \
+    NODE_ENV=production
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ffmpeg ca-certificates fonts-dejavu-core \
+ && rm -rf /var/lib/apt/lists/*
+# corepack in node 20.17 ships stale npm signing keys; install pnpm directly
+RUN npm install -g pnpm@10.34.5
+
+WORKDIR /app
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc turbo.json tsconfig.base.json ./
+COPY packages/engine/package.json packages/engine/
+COPY packages/scenes/package.json packages/scenes/
+COPY packages/runtime/package.json packages/runtime/
+COPY packages/brand/package.json packages/brand/
+COPY packages/render/package.json packages/render/
+COPY packages/spec/package.json packages/spec/
+COPY packages/timing/package.json packages/timing/
+COPY packages/storage/package.json packages/storage/
+COPY apps/cli/package.json apps/cli/
+COPY tests/package.json tests/
+RUN pnpm install --frozen-lockfile --prod=false \
+ && pnpm --filter @vs/render exec playwright install --with-deps --only-shell chromium \
+ && rm -rf /var/lib/apt/lists/*
+
+COPY packages packages
+COPY apps/cli apps/cli
+COPY brands brands
+COPY templates templates
+COPY tests tests
+COPY scripts scripts
+COPY docs/schema.json docs/schema.json
+RUN cd packages/runtime && node build.mjs
+
+# Unprivileged user; caches go to /tmp.
+RUN useradd -m -u 10001 render && chown -R render /app
+USER render
+ENV VS_CACHE=/tmp/vs-cache
+ENTRYPOINT ["npx", "tsx"]
+CMD ["packages/render/scripts/spike.ts"]

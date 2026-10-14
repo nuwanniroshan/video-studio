@@ -1,0 +1,15 @@
+attrs==26.1.0
+ctranslate2==4.8.2
+dlinfo==2.0.0
+faster-whisper==1.2.1
+joblib==1.6.0
+kokoro-onnx==0.6.1
+numpy==2.5.3
+onnxruntime==1.30.0
+phonemizer-fork==3.3.2
+pyloudnorm==0.2.0
+pytest==9.1.1
+PyYAML==6.0.3
+scipy==1.18.1
+segments==2.4.0
+soundfile==0.14.0

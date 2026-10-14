@@ -1,0 +1,164 @@
+{
+ "version": 1,
+ "title": "Customer story",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "calm-explainer"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "bf_emma",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  },
+  {
+   "id": "square",
+   "aspect": "1:1",
+   "safeArea": "title",
+   "loudness": -14,
+   "scenes": [
+    "challenge",
+    "solution",
+    "results",
+    "cta"
+   ]
+  }
+ ],
+ "scenes": [
+  {
+   "id": "challenge",
+   "type": "kineticTitle",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Harbor Logistics was drowning in spreadsheets and late invoices."
+    }
+   ],
+   "props": {
+    "kicker": "Customer story",
+    "headline": "Forty spreadsheets. *One tired team.*",
+    "style": "rise"
+   },
+   "musicCue": "tension"
+  },
+  {
+   "id": "customer",
+   "type": "mediaBroll",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Their finance team needed one place to see every shipment and every payment."
+    }
+   ],
+   "props": {
+    "media": "assets/broll.jpg",
+    "headline": "One place for *every shipment.*",
+    "sub": "Harbor Logistics \u00b7 220 people \u00b7 Rotterdam",
+    "position": "bottom-left",
+    "tint": "darken"
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "musicCue": "build"
+  },
+  {
+   "id": "solution",
+   "type": "featureSpotlight",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "With Northwind, invoices build themselves from delivered orders, and approvals take one click."
+    }
+   ],
+   "props": {
+    "kicker": "The switch",
+    "headline": "Invoices that *build themselves.*",
+    "body": "Delivered orders turn into invoices automatically, ready to approve.",
+    "visual": {
+     "kind": "image",
+     "asset": "assets/flow-1.png",
+     "frame": "browser"
+    }
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "results",
+   "type": "statsCounter",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Six months later, they close the month in two days, and get paid nineteen days sooner."
+    }
+   ],
+   "props": {
+    "kicker": "The results",
+    "headline": "Faster close, *faster cash.*",
+    "stats": [
+     {
+      "value": 2,
+      "label": "days to close the month"
+     },
+     {
+      "value": 19,
+      "label": "days sooner to get paid"
+     },
+     {
+      "value": 0,
+      "label": "spreadsheets left"
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "crossfade"
+   },
+   "musicCue": "build",
+   "aspectOverrides": {
+    "1:1": {
+     "props": {
+      "stats": [
+       {
+        "value": 2,
+        "label": "days to close the month"
+       },
+       {
+        "value": 19,
+        "label": "days sooner to get paid"
+       }
+      ]
+     }
+    }
+   }
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "See what Northwind can do for your team."
+    }
+   ],
+   "props": {
+    "headline": "Your story *could be next.*",
+    "button": "Book a demo"
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

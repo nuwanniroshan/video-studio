@@ -1,0 +1,122 @@
+# Music preset schema (read by vsaudio.score.arranger; validated by load_preset)
+# ---------------------------------------------------------------------------
+# name, description        strings
+# key                      informational ("F major")
+# bpm                      number; a job's music.bpm overrides it. beat = 60/bpm, bar = 4 beats.
+# chords                   {symbol: {pad: [notes], arp: [4 notes], bass: note}}
+#                          notes are scientific pitch names: C#4, Bb2 ... (A4 = 440 Hz)
+# progressions             {section kind: [chord symbols]} for tension|build|reveal|groove|breath|resolve.
+#                          The index restarts at each section and advances one chord per bar (cycling).
+# sections                 {section kind: {layer: options}}. A missing / null layer is off. Layers:
+#   pads      gain, cutoff (Hz, or [from, to] interpolated bar by bar across the section),
+#             sweep (bool: sweep each bar's LP towards the next bar's cutoff), attack, release,
+#             first_attack (attack for the section's first bar), add_top (bool: add the arp's top note)
+#   ticks     gain, gain_fast, fast_from (fraction of the section after which ticks go to eighths),
+#             stop_beats (stop this many beats before the section end), pan
+#   sub_pulse gain, stop_beats                       (sine sub on every beat, on the chord's bass note)
+#   arp       gain, rate (notes per bar: 8 or 16), pattern (indices into the chord's arp notes),
+#             damp, bright (Karplus-Strong), dur (s), accent (gain of off-beat notes), from_bar,
+#             stop_beats, pan
+#   shimmer   gain, rate, pattern, octave, ratio, index, decay, dur  (FM-bell arp, ramps 0.6 -> 1)
+#   kick      gain, beats ([0..3] within each bar), from_bar
+#   clap      gain, beats, from_bar
+#   hats      gain, rate (8 or 16), velocities (per step within a beat), open ([beat, step] or null),
+#             from_frac (fraction of the section after which hats start), pan
+#   bass      gain, rate (notes per bar: 2, 4 or 8), octave_every (0 = never), length (fraction of the
+#             note slot), from_bar
+#   melody    gain, min_bars (only when the section is at least this long). Uses the top-level melody.
+# melody                   notes: [names], beats: [beat offsets within a bar], ratio, index, decay, dur, pan
+# hits                     riser_gain, riser_tail_gain, iris_riser_gain, impact_gain, impact_size,
+#                          snare_roll (bool), roll_gain
+# final_chord              pad: [notes] (ring-out pad), bells: [notes] (bell chord on the final hit),
+#                          kick_gain, impact_gain, bell_gain, pad_gain
+# bus_targets              {pads, arps, keys, bass, drums, fx}: RMS dBFS each bus is automixed to
+# ---------------------------------------------------------------------------
+# calm-explainer: gentle, warm bed for explainers and walkthroughs. F major, 84 BPM.
+# Warm maj7/add9 pads with low cutoffs, eighth-note plucks, soft bells, a kick on 1 and 3 only,
+# light closed eighth hats and a round half-note bass. Loops are I-vi-IV-V-ish (F-Dm-Bb-C).
+name: calm-explainer
+description: Warm, unhurried explainer bed. Soft plucks and bells, light pulse, no claps.
+key: F major
+bpm: 84
+
+chords:
+  F:   {pad: [F3, A3, C4, E4],   arp: [F4, A4, C5, E5],   bass: F2}    # Fmaj7
+  Dm:  {pad: [D3, F3, A3, C4],   arp: [D4, F4, A4, C5],   bass: D2}    # Dm7
+  Bb:  {pad: [Bb2, F3, A3, D4],  arp: [Bb3, D4, F4, A4],  bass: Bb1}   # Bbmaj7
+  C:   {pad: [C3, G3, D4, E4],   arp: [C4, E4, G4, D5],   bass: C2}    # Cadd9
+  Gm:  {pad: [G2, D3, F3, Bb3],  arp: [G3, Bb3, D4, F4],  bass: G1}    # Gm7
+  Am:  {pad: [A2, E3, G3, C4],   arp: [A3, C4, E4, G4],   bass: A1}    # Am7
+  Bbs: {pad: [Bb2, F3, C4, D4],  arp: [Bb3, D4, F4, C5],  bass: Bb1}   # Bbadd9 (suspended feel)
+
+progressions:
+  tension: [Dm, Bbs, Dm, C]
+  build:   [Bb, C]
+  reveal:  [F, Bb]
+  groove:  [F, Dm, Bb, C]
+  breath:  [Bb, Am, Gm, C]
+  resolve: [F, Am, Bb, C]
+
+sections:
+  tension:
+    pads: {gain: 0.5, cutoff: [380, 800], attack: 1.6, release: 2.6}
+    sub_pulse: {gain: 0.3, stop_beats: 2.5}
+    arp: {gain: 0.26, rate: 8, pattern: [0, 2, 1, 3, 2, 1, 0, 2], damp: 0.985, bright: 0.25, dur: 0.55,
+          accent: 0.8, from_bar: 1, stop_beats: 3.0, pan: 0.25}
+  build:
+    pads: {gain: 0.55, cutoff: [600, 1800], sweep: true, attack: 0.8}
+    arp: {gain: 0.26, rate: 8, pattern: [0, 1, 2, 3, 2, 1, 2, 3], damp: 0.99, bright: 0.35, dur: 0.6,
+          accent: 0.8, pan: 0.3}
+    hats: {gain: 0.35, rate: 8, velocities: [0.3, 0.15], open: null, from_frac: 0.5, pan: 0.3}
+  reveal:
+    pads: {gain: 0.7, cutoff: 1800, attack: 0.5, first_attack: 0.15, release: 3.2, add_top: true}
+    shimmer: {gain: 0.09, rate: 8, pattern: [0, 2, 1, 3, 2, 3, 1, 2], octave: 1, ratio: 2.0, index: 0.5,
+              decay: 0.5, dur: 1.4}
+  groove:
+    pads: {gain: 0.6, cutoff: 1400, attack: 0.6, release: 2.6}
+    kick: {gain: 0.6, beats: [0, 2]}
+    hats: {gain: 0.32, rate: 8, velocities: [0.3, 0.15], open: null, pan: 0.3}
+    bass: {gain: 0.36, rate: 2, octave_every: 0, length: 0.9, from_bar: 1}
+    arp: {gain: 0.3, rate: 8, pattern: [0, 2, 1, 3, 2, 1, 3, 2], damp: 0.99, bright: 0.35, dur: 0.6,
+          accent: 0.75, pan: 0.3}
+    melody: {gain: 0.06, min_bars: 6}
+  breath:
+    pads: {gain: 0.55, cutoff: 1100, attack: 0.8, release: 2.6}
+    arp: {gain: 0.24, rate: 8, pattern: [0, 2, 1, 3, 2, 1, 3, 2], damp: 0.99, bright: 0.3, dur: 0.6,
+          accent: 0.75, pan: 0.3}
+  resolve:
+    pads: {gain: 0.66, cutoff: 1900, attack: 0.4, release: 2.8}
+    kick: {gain: 0.6, beats: [0, 2]}
+    hats: {gain: 0.32, rate: 8, velocities: [0.3, 0.15], open: null, pan: 0.3}
+    bass: {gain: 0.36, rate: 2, octave_every: 0, length: 0.9}
+    arp: {gain: 0.32, rate: 8, pattern: [0, 2, 1, 3, 2, 1, 3, 2], damp: 0.99, bright: 0.4, dur: 0.6,
+          accent: 0.75, pan: 0.3}
+    melody: {gain: 0.06, min_bars: 6}
+
+melody:
+  notes: [A5, G5, F5, C5, D5, F5, E5, C5, A5, C6, Bb5, G5]
+  beats: [0, 2, 3]
+  ratio: 2.0
+  index: 0.7
+  decay: 0.7
+  dur: 1.8
+  pan: 0.15
+
+hits:
+  riser_gain: 0.3
+  riser_tail_gain: 0.2
+  iris_riser_gain: 0.2
+  impact_gain: 0.55
+  impact_size: 0.8
+  snare_roll: false
+  roll_gain: 0.0
+
+final_chord:
+  pad: [F3, C4, E4, A4, C5, F5]
+  bells: [F5, A5, C6, E6]
+  kick_gain: 0.6
+  impact_gain: 0.3
+  bell_gain: 0.1
+  pad_gain: 0.9
+
+bus_targets: {pads: -20.0, arps: -25.0, keys: -29.0, bass: -24.0, drums: -27.0, fx: -28.0}

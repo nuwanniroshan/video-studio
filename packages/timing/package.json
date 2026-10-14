@@ -1,0 +1,9 @@
+{
+  "name": "@vs/timing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "dependencies": { "@vs/spec": "workspace:*" },
+  "scripts": { "typecheck": "tsc -p .", "test": "vitest run" }
+}

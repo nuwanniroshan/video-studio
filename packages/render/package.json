@@ -1,0 +1,21 @@
+{
+  "name": "@vs/render",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@vs/brand": "workspace:*",
+    "@vs/runtime": "workspace:*",
+    "playwright": "^1.63.0",
+    "@vs/spec": "workspace:*",
+    "@vs/timing": "workspace:*",
+    "@vs/storage": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run"
+  }
+}

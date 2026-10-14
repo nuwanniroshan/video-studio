@@ -304,7 +304,7 @@ The script totalled 67.4 s of speech in a 92.5 s film, about 73% density, which 
 | Instrument | Recipe |
 |---|---|
 | `pad(notes)` | 3 detuned saws per note (−9, 0, +9 cents, panned −.8 / 0 / .8) plus a sub-octave sine at .12; low-pass at the cutoff (or swept); ADSR with a 0.9 s attack and 2.2 s release |
-| `ks(f)` | Karplus-Strong. Integer period `P = round(SR/f)`, so the actual pitch is `SR/P`. The block-vectorized loop runs one period per numpy op. **Pitch-correct** by resampling with `np.interp` by the ratio `f/(SR/P)`; without this, upper notes were up to 16 cents sharp against the pads. |
+| `ks(f)` | Karplus-Strong. Integer period `P = round(SR/f)`. The block-vectorized loop runs one period per numpy op. **Pitch-correct** by resampling with `np.interp`. *Correction found in M1:* the two-point averaging filter adds half a sample of delay, so the string sounds at `SR/(P+0.5)`, not `SR/P`; the prototype's ratio `f/(SR/P)` left notes flat (E6 −23.8 cents). `vsaudio` resamples by `f/(SR/(P+0.5))`, which measures within 0.05 cents from B3 to A6. |
 | `bell(f)` | 2-op FM, ratio 2–3.5, index decaying with τ = 0.35·decay |
 | `kick()` | Sine with a pitch envelope `46 + 110·e^(−t/.035)` Hz, amplitude τ 0.22 s, a 3 kHz noise click, `tanh(1.6x)` |
 | `clap()` | Noise band-passed 0.9–3.2 kHz, three bursts at 0, 11 and 22 ms with a 0.12 s tail |

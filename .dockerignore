@@ -1,0 +1,10 @@
+**/node_modules
+.venv
+models
+out
+build
+.turbo
+**/dist
+.git
+.vs-cache
+studio-data

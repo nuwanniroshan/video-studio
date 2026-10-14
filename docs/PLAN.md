@@ -362,6 +362,22 @@ Data-driven components that use brand tokens; each mirrors a prototype component
 - It compiles to engine `tw` calls and contains **no code**.
 - **Code-scene plugins** (raw JS) can be added only through the repo with PR review. They are never accepted from the web UI in v1.
 
+**Amended (user request, Oct 2026): `compose` implements freeform.** Agent videos all looked like the templates because every
+scene came from the fixed library and the agent prompt hard-coded one structure. `compose` (`packages/spec/src/scenes/compose.ts`,
+`packages/scenes/src/compose.ts`) is the freeform scene with motion *presets* instead of raw keyframes, which keeps it easy for
+an LLM to write and for the editor to show:
+
+- Layers: `text` (7 styles), `shape`, `svg` (agent-drawn vector art; allowlisted elements, no scripts/styles/images/external refs,
+  checked in the schema and stripped again in the runtime), `image`, `logo`, `icon`, `particles` (8 deterministic closed-form
+  styles) and `counter`. Positions are % of the variant's safe frame, with `portrait`/`square` placement overrides.
+- Each layer enters at a cue (`start`, `end` or a VO line id, plus `delay`) with one of 17 entrances, can leave at an `until`
+  cue and can have one idle loop. Unknown cues fall back to the scene start and raise an `unknown-cue` lint warning.
+- Default text colours follow the measured background luminance, not just `tone`, so custom backgrounds stay readable.
+- The agent has two modes: **original** (no template; it writes a creative direction first and builds mostly from `compose`,
+  free to choose tones, transitions and the close) and **template** (keeps the template's structure and the house pattern).
+  With "Designed for my idea" branding the agent also sets the palette, fonts and music (`set_brand`); without an agent a theme
+  is guessed from the idea's keywords (`guessTheme`).
+
 ---
 
 ## 9. Audio (`python/vsaudio`, JSON in, files out)
@@ -551,6 +567,12 @@ pg-boss manages its own schema.
 
 Technical users get AI authoring today through Claude Code, with no API key.
 
+**Amended during M2 (user request, Oct 2026):** an agent provider was pulled forward. `packages/ai` has `claude-code`, which runs the
+local Claude Code CLI headlessly against the `video-studio` MCP server (the user's own login; no API key). It writes and revises
+storyboards and checks contact sheets. Without it, new projects get a rule-based draft (`ideaToBrief` → `briefToSpec`). Brand kits
+also changed: every project owns its brand (`<project>/brand/`, preferred by the renderer over `brands/<id>`), started from a
+theme (`themes/*.json`) or the user's own logo, colours and fonts. The `anthropic` and `bedrock` providers below remain M4.
+
 **AI provider (`packages/ai`, M4):**
 ```
 interface LlmProvider { storyboard(brief, catalog, brand): Promise<Spec>; rewriteVo(lines, targetSec): Promise<string[]> }
@@ -650,7 +672,10 @@ Mirror Acentra's `infrastructure/lib/constructs/ecs-construct.ts` style: ECR, cl
   - Rendered inside the pinned render image for each scene × aspect × fixture at cue times.
   - Compared by SSIM ≥ 0.985; `--update` refreshes the baselines.
   - Each scene has a long-text stress fixture that must give zero lint errors.
-- **Determinism:** the same frames rendered in shuffled order across two workers must produce byte-identical PNG hashes.
+- **Determinism** (amended after M0, see `SPIKE.md`):
+  - the renderer reloads the page at the start of every segment;
+  - the same **segment** rendered by two workers with different prior history must produce byte-identical frame hashes;
+  - frames rendered in shuffled order across scenes may differ by at most 1/255 per pixel.
 - **Audio:**
   - a stable hash for a short render per preset;
   - LUFS within ±1 LU of target;

@@ -1,0 +1,24 @@
+{
+  "id": "sunset",
+  "name": "Sunset",
+  "description": "Vivid orange into rose. Energetic and bold.",
+  "category": "Consumer",
+  "order": 4,
+  "base": {
+    "primary": "#F97316",
+    "accent": "#E11D48",
+    "dark": "#1A0B0B",
+    "light": "#FFF7F2",
+    "ink": "#1F1410"
+  },
+  "fonts": {
+    "display": "spacegrotesk",
+    "body": "inter",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "am_fenrir",
+    "speed": 0.94
+  }
+}

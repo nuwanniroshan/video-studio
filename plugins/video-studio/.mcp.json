@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "video-studio": {
+      "command": "node",
+      "args": ["${VIDEO_STUDIO_HOME:-/Users/swiveltech/Disk/Swivel/video-studio}/apps/mcp/bin/server.mjs"]
+    }
+  }
+}

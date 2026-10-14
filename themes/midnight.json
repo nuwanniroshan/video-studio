@@ -1,0 +1,24 @@
+{
+  "id": "midnight",
+  "name": "Midnight",
+  "description": "Deep indigo with electric cyan. Confident and techy.",
+  "category": "Tech",
+  "order": 0,
+  "base": {
+    "primary": "#6366F1",
+    "accent": "#22D3EE",
+    "dark": "#0B1020",
+    "light": "#F5F6FB",
+    "ink": "#0F1222"
+  },
+  "fonts": {
+    "display": "sora",
+    "body": "inter",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "am_michael",
+    "speed": 0.94
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "id": "trust",
+  "name": "Trust",
+  "description": "Navy and emerald. Steady and serious for finance and B2B.",
+  "category": "Business",
+  "order": 8,
+  "base": {
+    "primary": "#1D4ED8",
+    "accent": "#10B981",
+    "dark": "#071226",
+    "light": "#F4F7FC",
+    "ink": "#0B1A33"
+  },
+  "fonts": {
+    "display": "inter",
+    "body": "inter",
+    "mono": "plexmono"
+  },
+  "music": "calm-explainer",
+  "voice": {
+    "voice": "am_adam",
+    "speed": 0.94
+  }
+}

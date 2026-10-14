@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "video-studio": {
+      "command": "node",
+      "args": ["apps/mcp/bin/server.mjs"]
+    }
+  }
+}

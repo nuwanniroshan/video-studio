@@ -1,0 +1,139 @@
+{
+ "version": 1,
+ "title": "Sale or offer",
+ "brand": "luraplus",
+ "fps": 60,
+ "quality": "standard",
+ "music": {
+  "mode": "preset",
+  "preset": "uplifting-tech"
+ },
+ "voice": {
+  "provider": "kokoro",
+  "voice": "am_fenrir",
+  "speed": 0.94
+ },
+ "variants": [
+  {
+   "id": "vertical",
+   "aspect": "9:16",
+   "safeArea": "reels",
+   "loudness": -14
+  },
+  {
+   "id": "square",
+   "aspect": "1:1",
+   "safeArea": "title",
+   "loudness": -14
+  },
+  {
+   "id": "main",
+   "aspect": "16:9",
+   "safeArea": "title"
+  }
+ ],
+ "scenes": [
+  {
+   "id": "hook",
+   "type": "kineticTitle",
+   "tone": "brand",
+   "vo": [
+    {
+     "text": "The summer sale is on."
+    }
+   ],
+   "props": {
+    "kicker": "This week only",
+    "headline": "The summer sale *is on.*",
+    "style": "scale"
+   },
+   "musicCue": "build"
+  },
+  {
+   "id": "deal",
+   "type": "statsCounter",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "Get forty percent off every annual plan."
+    }
+   ],
+   "props": {
+    "stats": [
+     {
+      "value": 40,
+      "suffix": "%",
+      "label": "off every annual plan"
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "flash"
+   },
+   "musicCue": "reveal"
+  },
+  {
+   "id": "included",
+   "type": "featureGrid",
+   "tone": "light",
+   "vo": [
+    {
+     "text": "Every feature,",
+     "step": 0
+    },
+    {
+     "text": "unlimited projects,",
+     "step": 1
+    },
+    {
+     "text": "and priority support.",
+     "step": 2
+    }
+   ],
+   "props": {
+    "headline": "Everything, *included.*",
+    "items": [
+     {
+      "icon": "box",
+      "title": "Every feature",
+      "text": "Nothing held back."
+     },
+     {
+      "icon": "list",
+      "title": "Unlimited projects",
+      "text": "Grow without limits."
+     },
+     {
+      "icon": "msg",
+      "title": "Priority support",
+      "text": "Real people, fast."
+     }
+    ]
+   },
+   "transitionIn": {
+    "type": "push",
+    "direction": "left"
+   },
+   "musicCue": "groove"
+  },
+  {
+   "id": "cta",
+   "type": "ctaEndCard",
+   "tone": "dark",
+   "vo": [
+    {
+     "text": "The offer ends Sunday. Grab it now."
+    }
+   ],
+   "props": {
+    "headline": "Ends Sunday. *Don't miss it.*",
+    "button": "Claim 40% off",
+    "click": true
+   },
+   "transitionIn": {
+    "type": "iris"
+   },
+   "musicCue": "resolve"
+  }
+ ]
+}

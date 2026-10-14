@@ -1,0 +1,23 @@
+{
+  "version": 1, "title": "Announcement", "brand": "luraplus", "fps": 60, "quality": "standard",
+  "music": { "mode": "preset", "preset": "uplifting-tech", "bpm": 96 },
+  "voice": { "provider": "kokoro", "voice": "af_heart", "speed": 0.94 },
+  "variants": [{ "id": "main", "aspect": "16:9", "safeArea": "title" }, { "id": "social", "aspect": "9:16", "safeArea": "reels", "loudness": -14 }],
+  "scenes": [
+    { "id": "headline", "type": "kineticTitle", "tone": "brand", "musicCue": "build",
+      "vo": [{ "text": "Big news: we're opening our new Sydney office." }],
+      "props": { "kicker": "Announcing", "headline": "We're opening *in Sydney.*", "style": "scale" } },
+    { "id": "visual", "type": "mediaBroll", "transitionIn": { "type": "crossfade" }, "musicCue": "groove",
+      "vo": [{ "text": "A new home for our growing Asia-Pacific team." }],
+      "props": { "media": "assets/broll.jpg", "headline": "A new home for *our APAC team.*", "position": "bottom-left" } },
+    { "id": "whats-new", "type": "featureGrid", "tone": "light", "transitionIn": { "type": "push", "direction": "up" }, "musicCue": "groove",
+      "vo": [{ "text": "Local support, faster onboarding, and events near you." }],
+      "props": { "headline": "What it means *for you.*", "items": [
+        { "icon": "msg", "title": "Local support", "text": "Help in your time zone." },
+        { "icon": "flag", "title": "Faster onboarding", "text": "A team on the ground." },
+        { "icon": "cal", "title": "Events", "text": "Meet us in person." } ] } },
+    { "id": "cta", "type": "ctaEndCard", "tone": "dark", "transitionIn": { "type": "iris" }, "musicCue": "resolve",
+      "vo": [{ "text": "Find out more on our website." }],
+      "props": { "headline": "Say hello *in Sydney.*", "button": "Learn more" } }
+  ]
+}

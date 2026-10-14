@@ -1,0 +1,22 @@
+{
+  "name": "@vs/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "vs": "./bin/vs.mjs"
+  },
+  "dependencies": {
+    "@vs/render": "workspace:*",
+    "@vs/spec": "workspace:*",
+    "@vs/storage": "workspace:*",
+    "@vs/timing": "workspace:*",
+    "commander": "^14.0.0",
+    "tsx": "^4.19.0",
+    "zod": "^4.6.5"
+  },
+  "scripts": {
+    "typecheck": "tsc -p .",
+    "test": "vitest run --passWithNoTests"
+  }
+}

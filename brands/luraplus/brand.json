@@ -1,0 +1,51 @@
+{
+  "id": "luraplus",
+  "name": "LuraPlus",
+  "colors": {
+    "primary": "#3782F7",
+    "primary400": "#5697F8",
+    "primary600": "#1F6BE8",
+    "primary700": "#1856C4",
+    "primary50": "#EAF2FE",
+    "primary100": "#D3E4FD",
+    "primary200": "#A9C9FB",
+    "accent": "#7C5CFC",
+    "accent50": "#F0ECFF",
+    "success": "#1FA463",
+    "success600": "#178551",
+    "success50": "#E8F6EF",
+    "warning": "#E0900F",
+    "warning600": "#B9730A",
+    "warning50": "#FBF1E1",
+    "danger": "#E5484D",
+    "danger50": "#FCECEC",
+    "ink": "#0E1116",
+    "grey900": "#14171C",
+    "grey800": "#23272E",
+    "grey700": "#3A3F49",
+    "grey600": "#565C68",
+    "grey500": "#79808D",
+    "grey400": "#A6ADB8",
+    "grey300": "#CDD2DA",
+    "grey200": "#E2E5EA",
+    "grey100": "#EFF1F4",
+    "grey50": "#F7F8FA",
+    "grey25": "#FCFCFD",
+    "dark": "#070B14",
+    "light": "#F7F8FA"
+  },
+  "fonts": {
+    "display": { "family": "Onest", "file": "fonts/Onest.ttf", "weight": "100 900" },
+    "body": { "family": "Open Sans", "file": "fonts/OpenSans.ttf", "weight": "300 800" },
+    "mono": { "family": "JetBrains Mono", "file": "fonts/JetBrainsMono.ttf", "weight": "100 800" }
+  },
+  "logo": { "onDark": "assets/lura-logo.png", "onLight": "assets/lura-logo.png", "mark": "assets/lura-favicon.png" },
+  "voice": { "provider": "kokoro", "voice": "af_heart", "speed": 0.94 },
+  "pronunciations": {
+    "Lura": { "ipa": "lˈuːɹə" },
+    "LuraPlus": { "ipa": "lˈuːɹə plˈʌs" },
+    "AI": { "respell": "AI" }
+  },
+  "music": { "preset": "uplifting-tech" },
+  "cta": { "url": "luraplus.io" }
+}

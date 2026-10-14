@@ -1,0 +1,24 @@
+{
+  "id": "pop",
+  "name": "Pop",
+  "description": "Hot pink and violet. Playful and loud for social.",
+  "category": "Consumer",
+  "order": 9,
+  "base": {
+    "primary": "#EC4899",
+    "accent": "#8B5CF6",
+    "dark": "#1B0B1F",
+    "light": "#FFF5FA",
+    "ink": "#24101F"
+  },
+  "fonts": {
+    "display": "dmsans",
+    "body": "dmsans",
+    "mono": "jetbrains"
+  },
+  "music": "uplifting-tech",
+  "voice": {
+    "voice": "af_bella",
+    "speed": 0.94
+  }
+}
